@@ -21,11 +21,11 @@ In a few more: *Mint processes words so you don't have to.*
 Table of contents
 -----------------
 
-I. Use cases
-II. The Mint library
-III. Designing a template
-IV. The Mint path
-V. The `mint` command
+I. Use cases  
+II. The Mint library  
+III. Designing a template  
+IV. The Mint path  
+V. The `mint` command  
 VI. Future directions and tools
 
 I. Use cases
