@@ -27,12 +27,12 @@ module Mint
   def self.directories
     directories = { :templates => 'templates' }
   end
-  
+
   # Returns a hash with key Mint files
   def self.files
     files = { :config => 'config.yaml' }
   end
-  
+
   def self.default_options
     default_options = {
       :template => 'default',   # default layout and style
@@ -59,21 +59,17 @@ module Mint
 
   # Decides whether the template specified by `name_or_file` is a real
   # file or the name of a template. If it is a real file, Mint will
-  # return a template using that file. Otherwise, Mint will look for a
-  # template with that name in the Mint path. The `type`
-  # argument indicates whether the template we are looking for is
-  # a layout or a style and will affect which type of template is returned
-  # for a given template name. For example, `lookup_template :normal`
-  # might return a layout template referring to the file
-  # ~/.mint/templates/normal/layout.erb. Changing the second argument
-  # to :style would return a style template whose source file is
+  # return a that file. Otherwise, Mint will look for a file with that
+  # name in the Mint path. The `type` argument indicates whether the
+  # template we are looking for is a layout or a style and will affect
+  # which type of template is returned for a given template name. For
+  # example, `lookup_template :normal` might return a layout template
+  # referring to the file ~/.mint/templates/normal/layout.erb.
+  # Adding :style as a second argument returns
   # ~/.mint/templates/normal/style.css.
   def self.lookup_template(name_or_file, type=:layout)
-    name_or_file = name_or_file.to_s
-    res = File.file?(name_or_file) ? Pathname.new(name_or_file) :
-  find_template(name_or_file, type)
-
-    Mint.const_get(type.to_s.capitalize).new(res, opts)
+    name = name_or_file.to_s
+    File.file?(name) ? Pathname.new(name) : find_template(name, type)
   end
 
   # Finds a template named `name` in the Mint path. If `type` # is :layout,
@@ -105,7 +101,7 @@ module Mint
 
     file
   end
-  
+
   # Guesses an appropriate name for the resource output file based on
   # its source file's base name
   def self.guess_name_from(name)
@@ -153,7 +149,7 @@ module Mint
       @type = :layout
       super
 
-      @source = lookup_template(@source, @type)
+      @source = Mint.lookup_template(@source, @type)
     end
   end
 
@@ -164,8 +160,8 @@ module Mint
     def initialize(source, opts={})
       @type = :style
       super
-      
-      @source = lookup_template(@source, @type)
+
+      @source = Mint.lookup_template(@source, @type)
     end
   end
 
@@ -175,14 +171,24 @@ module Mint
     attr_reader :content
 
     def initialize(source, opts={})
+      @opts = Mint.default_opts.merge(opts)
+
       @type = :document
       super(source, opts) # do not pass block, which would interfere with call
 
       @content = @renderer.render
-      
-      template = Mint.default_options[:template]
-      @layout = opts[:layout] || Layout.new(template)
-      @style = opts[:style] || Style.new(template)
+
+      style_opts = {
+        :destination => @opts[:style_destination],
+        :name => @opts[:style_name]
+      }
+
+      # If a template is passed as an option, use that for the style
+      # and layout. Otherwise, use the default-merged options and
+      # instantiate a layout and style from there.
+      @opts[:layout], @opts[:style] = templ, templ if (templ = @opts[:template])
+      @layout = Layout.new @opts[:layout]
+      @style = Style.new @opts[:style], style_opts
 
       yield self if block_given?
     end
@@ -207,14 +213,17 @@ module Mint
     attr_accessor :root, :documents, :layout, :style
 
     def initialize(root, opts={})
+      return nil unless root
+      
       @opts = Mint.default_opts.merge opts
       (@opts[:layout], @opts[:style] = t, t) if (t = @opts[:template])
 
       @root = Pathname.new root
+      @destination = @opts[:destination]
+      
       @documents = []
       @layout = @opts[:layout]
       @style = @opts[:style]
-      @destination = @opts[:destination]
 
       yield self if block_given?
     end
@@ -226,19 +235,16 @@ module Mint
     # provides an easy way to stop Mint from rendering a style, even
     # if the document's style is not nil.
     def mint
-      style_dest = @root.expand_path + @style.destination + @style.name
+      style_dest = root.expand_path + style.destination + style.name
+      
       FileUtils.mkdir_p style_dest.dirname
       style_dest.open 'w+' do |f|
         f << @style.render
       end
 
       @documents.each do |doc|
-        # Kernel.puts <<-HERE
-        #   Source: #{doc.source.expand_path}
-        #   Destination: #{@root.expand_path + doc.destination + doc.name}
-        # HERE
-
         dest = @root.expand_path + doc.destination + doc.name
+        
         FileUtils.mkdir_p dest.dirname
         dest.open 'w+' do |f|
           f << doc.render
@@ -248,7 +254,7 @@ module Mint
 
     def add(document)
       document.layout = @layout
-      document.style = @style
+      document.style = nil
 
       @documents << doc
     end
