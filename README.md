@@ -35,9 +35,7 @@ I. Use cases
 
 2. Donna has traditionally used a WYSIWYG word processor to create, edit, version, and present ideas in her personal and school life (not work). She wants her documents to exist forever without breaking standards: she wants them to be completely future-compatible. Therefore, she wants to migrate away from her proprietary word processor. She wants a migration tool to make the initial conversion. Interoperability with other people is not required. As long as she can view and print formatted documents, keeping source files as plaintext, she is happy.
 
-3. Bertrande wants to build a styles gallery that previews certain styles on Textile-formatted documents using a web application... (finish later)
-
-4. Marina wants to convert all her proprietary processed documents to Markdown for future compatibility, but wants to share these documents with friends at work. Interoperability is important here. The friends should be able to easily view *and* edit *and* annotate all documents.
+3. Marina wants to convert all her proprietary processed documents to Markdown for future compatibility, but wants to share these documents with friends at work. Interoperability is important here. The friends should be able to easily view *and* edit *and* annotate all documents.
 
 II. The Mint library
 --------------------
