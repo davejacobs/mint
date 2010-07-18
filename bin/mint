@@ -1,0 +1,107 @@
+#!/usr/bin/env ruby
+# A script for harnessing Mint at the commandline
+
+$:.unshift File.join(File.dirname(__FILE__), '..', 'lib')
+
+require 'optparse'
+require 'yaml'
+
+require 'rubygems'
+require 'mint'
+
+module Mint
+  # Renders and writes to file all resources described by a document.
+  # Specifically: it renders itself (inside of its own layout) and then
+  # renders its style. This method will overwrite any existing content
+  # in a document's destination files. The `render_style` option
+  # provides an easy way to stop Mint from rendering a style, even
+  # if the document's style is not nil.
+  def mint
+    style_dest = root.expand_path + style.destination + style.name
+  
+    FileUtils.mkdir_p style_dest.dirname
+    style_dest.open 'w+' do |f|
+      f << @style.render
+    end
+
+    @documents.each do |doc|
+      dest = @root.expand_path + doc.destination + doc.name
+    
+      FileUtils.mkdir_p dest.dirname
+      dest.open 'w+' do |f|
+        f << doc.render
+      end
+    end
+  end
+end
+
+module Mint  
+  module CommandLine  
+    def self.options
+      options = {
+        :template => ['T', 'template', true],
+        :layout => ['L', 'layout', true],
+        :style => ['S', 'style', true],
+        :root => ['R', 'root', true],
+        :destination => ['D', 'destination', true],
+        :name => ['N', 'name', true],
+        :style_destination => ['E', 'style-destination', true],
+        :style_name => ['A', 'style-name', true],
+        :verbose => ['v', 'verbose', false],
+        :simulation => ['s', 'simulation', false]
+      }
+    end
+
+    def self.config_options
+      config_filename = Pathname.new(MintCommand.files[:config])      
+      
+      ordered_options = []
+      
+      path = Mint.path
+      path.each_index do |i|
+        if (config_file = path[i] + config_filename).exist?
+          ordered_options << YAML.parse_file(config_file)
+        end
+      end
+      
+      ordered_options.reverse.inject(Hash.new) { |mem, o| mem.merge(o) }
+    end
+  
+    def self.command_line_options
+      command_line_options = {}
+      optparse = OptionParser.new do |opts|
+        opts.banner = 'Usage: mint source [destination] [options]'
+
+        options.each do |k,v|
+          has_param = v[2]
+
+          v[0] = "-#{v[0]}"
+          v[1] = "--#{v[1]}"
+
+          if has_param
+            v[1] << " PARAM"
+            opts.on v[0], v[1], 'Description goes here' do |p|
+              command_line_options[k] = p
+            end
+          else
+            opts.on v[0], v[1], 'Description goes here' do
+              command_line_options[k] = true
+            end
+          end
+        end
+      end
+
+      optparse.parse!
+      command_line_options
+    end
+  
+    def self.full_options
+      config_options.merge(command_line_options)
+    end
+  end
+end
+
+puts "Your options are:"
+MintCommand.full_options.each do |k,v|
+  puts "#{k}: #{v}"
+end
