@@ -11,6 +11,7 @@ module Mint
 
   # Return the an array with the Mint template path. Will first look
   # for MINT_PATH environment variable. Otherwise will use smart defaults.
+  # Either way, earlier/higher paths take precedence.
   def self.path
     if e = ENV['MINT_PATH']
       e.split(':').collect { |p| Pathname.new(p).expand_path }
@@ -206,62 +207,6 @@ module Mint
     # be called directly from inside a layout template.
     def stylesheet
       normalize_path(style.destination, destination) + style.name.to_s
-    end
-  end
-
-  class Project
-    attr_accessor :root, :documents, :layout, :style
-
-    def initialize(root, opts={})
-      return nil unless root
-      
-      @opts = Mint.default_opts.merge opts
-      (@opts[:layout], @opts[:style] = t, t) if (t = @opts[:template])
-
-      @root = Pathname.new root
-      @destination = @opts[:destination]
-      
-      @documents = []
-      @layout = @opts[:layout]
-      @style = @opts[:style]
-
-      yield self if block_given?
-    end
-
-    # Renders and writes to file all resources described by a document.
-    # Specifically: it renders itself (inside of its own layout) and then
-    # renders its style. This method will overwrite any existing content
-    # in a document's destination files. The `render_style` option
-    # provides an easy way to stop Mint from rendering a style, even
-    # if the document's style is not nil.
-    def mint
-      style_dest = root.expand_path + style.destination + style.name
-      
-      FileUtils.mkdir_p style_dest.dirname
-      style_dest.open 'w+' do |f|
-        f << @style.render
-      end
-
-      @documents.each do |doc|
-        dest = @root.expand_path + doc.destination + doc.name
-        
-        FileUtils.mkdir_p dest.dirname
-        dest.open 'w+' do |f|
-          f << doc.render
-        end
-      end
-    end
-
-    def add(document)
-      document.layout = @layout
-      document.style = nil
-
-      @documents << doc
-    end
-    alias_method :<<, :add
-
-    def delete(document)
-      @documents.delete document
     end
   end
 end
