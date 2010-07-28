@@ -47,7 +47,7 @@ module Mint
       file = Mint.lookup_template(name, layout_or_style)
       
       if editor = ENV['EDITOR']
-        `#{editor} #{file}`
+        system "#{editor} #{file}"
       end
     end
     
@@ -61,6 +61,17 @@ module Mint
       documents = []
       options = Mint.full_options_with(commandline_options)
       
+      style = options[:style_name]
+      style_dest = options[:style_destination]
+      
+      Style.new(style, :destination => style_dest).mint(Dir.getwd, true)
+      
+      # This is slightly inefficient, because styles are looked up
+      # for each document instance created here, but are not rendered.
+      # However, I want the document to have a reference to its
+      # stylesheet, and performance is not critical for this tool.
+      # I will change this implementation if a better (but clear)
+      # solution presents itself.
       files.each do |file|
         Document.new(file, options).mint(Dir.getwd, false)
       end
@@ -97,7 +108,8 @@ if ARGV[0] == 'edit'
   # (probably a Mint template) and shell out that file to
   # the user's favorite editor. Otherwise ...
   
-  if commandline_options.include? :layout and commandline_options.include? :style
+  if commandline_options.include? :layout and
+      commandline_options.include? :style
     puts optparse.help
   
   elsif layout = commandline_options[:layout]
