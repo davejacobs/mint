@@ -31,28 +31,28 @@ VI. Future directions and tools
 I. Use cases
 ------------
 
-1. Jake has text files formatted as Markdown-style text. He has traditionally published these as blog entries, which works well because his webserver takes care of processing the Markdown, generating HTML, and styling it with his static CSS. Jake has no way of visualizing his documents without a webserver running. He likes the convenience of centralized CSS styles that he can update once and cascade everywhere. He does not like depending on a webserver for static pages. Jake wants a document management system where source files are written in Markdown but are "printed" into HTML and styled with centralized sheets he creates himself.
+1. Jake has text files formatted as Markdown-style text. He has traditionally published these as blog entries, which works well because his webserver takes care of processing the Markdown, generating HTML, and styling it with his static CSS. Jake has no way of visualizing his documents without a webserver running. He likes the convenience of centralized CSS styles that he can update once and cascade everywhere. He does not like depending on a webserver for static pages, i.e., his local documents. Jake wants a document management system where source files are written in Markdown but are "printed" into HTML and styled with centralized sheets he creates himself. In some cases, he merely wants to tweak the typography settings of a solid existing style.
 
-2. Donna has traditionally used a WYSIWYG word processor to create, edit, version, and present ideas in her personal and school life (not work). She wants her documents to exist forever without breaking standards: she wants them to be completely future-compatible. Therefore, she wants to migrate away from her proprietary word processor. She wants a migration tool to make the initial conversion. Interoperability with other people is not required. As long as she can view and print formatted documents, keeping source files as plaintext, she is happy.
+2. Donna has traditionally used a WYSIWYG word processor to create, edit, version, and present ideas in her personal and school life (not work). She wants her documents to exist forever without breaking standards: she wants them to be completely future-proof. Therefore, she wants to migrate away from her proprietary word processor. (Even non-proprietary word processors are really too heavyweight for her text-centered documents.) She wants a migration tool to make the initial conversion. Interoperability with other people is not required. As long as she can view and print formatted documents, keeping source files as plaintext, she is happy.
 
-3. Marina wants to convert all her proprietary processed documents to Markdown for future compatibility, but wants to share these documents with friends at work. Interoperability is important here. The friends should be able to easily view *and* edit *and* annotate all documents.
+3. Marina wants to convert all her proprietary processed documents to Markdown for future compatibility, but wants to share these documents with friends at work. Interoperability is important here. The friends should be able to easily view *and* edit *and* annotate all documents. Marina will be happiest if she has a simple GUI that can export documents to an open-source document format that's interoperable with word processors.
 
 II. The Mint library
 --------------------
 
-This section discusses the Mint library API. Read on for the mint binary.
+This section discusses the Mint library API. Read on for the `mint` binary.
 
 ### A basic Mint document ###
 
-Mint is loaded with smart defaults, so if you don't want to configure something--say, the basic HTML skeleton of your document or the output name or director--you don't have to. You'll probably be surprised at how easy it is to use out of the box, and how configurable it is.
+Mint is loaded with smart defaults, so if you don't want to configure something--say, the basic HTML skeleton of your document or the output directory--you don't have to. You'll probably be surprised at how easy it is to use out of the box, and how configurable it is.
 
     document = Document.new '~/Documents/Minimalism.md'
-    document.press
+    document.mint
 
 And voilà, you will find the following next to Minimalism.md in the same directory:
 
 - Minimalism.html
-- styles/default.css
+- default.css
 
 Opening Minimalism.html with your favorite web browser--[Firefox is best for typography][Firefox typography]--will show what looks like a word processed document, complete with big bolded headers, italic emphasis, automatically numbered lists, and bullets. The page will be on a white canvas that looks like a page, even though you are in a browser.
 
@@ -83,9 +83,7 @@ You can pass any of the following to a new document:
 
   2. If you specify a template name that is also the name of an existing file in your working directory, Mint will use the file and not look for a template. (It is unlikely you'll have an extension-less file named 'normal' or 'default' in your working directory.) If you do specify an existing file, the path/file will be resolved from the directory where you're calling Mint (the 'working directory'). To use Mint this way (and I don't see this as more than a temporary solution) you'll probably want to call Mint from within your source's directory. Alternatively, you can use [`Dir.chdir`][Dir::chdir method] for the same effect.
 
-  3. You can specify nil if you don't want a style to be rendered. This is useful if you're pointing a lot of documents to one stylesheet and only want to Mint the stylesheet one time. `Mint::Project` uses this technique to render a style once, independently of its documents.
-
-- `:destination` lets you organize your output. It directs Mint to output the template or document into one of root's subdirectories. There is an option to specify a separate `:style_destination`, which is resolved relative to `:destination`.
+- `:destination` lets you organize your output. It directs Mint to write the template or document to one of root's subdirectories. There is an option to specify a separate `:style_destination`, which is resolved relative to `:destination`.
 
   Defaults:
 
@@ -94,24 +92,9 @@ You can pass any of the following to a new document:
 
   Notes:
 
-  1. `:destination` *must* refer to a directory (existing or not) and not a file. If you want to specify the output file name, use the `:name` parameter.
+  1. `:destination` *must* refer to a directory (existing or not) and not a file.
 
   2. `:style_destination` is resolved relative to `:destination` so that packaging styles inside document directories is easy. (This supports the common case where you will want a subdirectory called 'styles' to hold your style files.)
-
-  3. If either value is nil, it is simply ignored.
-
-- `:name` is the name of the output file, which will end up in `:destination/`. `:style_name` is the name of the stylesheet output file and will show up in `:destination/:style_destination/`.
-
-  Defaults:
-
-        :name => ''         # guess from source file name
-        :style_name => ''   # same as above
-
-  Notes:
-
-  1. If empty, the name of a document or template comes from it's source file. (Minimalism.md will turn into Minimalism.html without configuration.)
-
-In summary: if `:directory` is unspecified, it will be the directory where your content file ends up. The rendered style files will be placed directly into this directory unless given a specific destination. The output names will come from their source files unless you specify a name.
 
 ### Examples ###
 
@@ -119,31 +102,25 @@ At this point, a couple of example may be useful.
 
 The following are possible:
 
+    include Mint
     content = '~/Documents/Minimalism.md'
-
+    
     Document.new content
-
-    Document.new content, :destination => 'directory', :name => 'final.html'
-    Document.new content, :destination => 'directory'
-
+    Document.new content, :destination => 'directory', :style => 'serif-pro'
+    
     Style.new 'normal'
-    Style.new '~/Sites/Commons/Styles/normal.css', :destination => 'styles', :name => 'style.css'
-
-  > Note: A style's destination is specified as :destination when passed directly to the file or as :style_destination when passed to a document or project
-
-    Style.new '~/Sites/Commons/style/normal.css'
-    Style.new 'Commons/style/normal.css'
+    Style.new :normal
+    Style.new '~/Sites/Common Styles/normal.css', :destination => 'styles'
+    Style.new '~/Sites/Commons Styles/normal.css'
+    Style.new 'Common Styles/normal.css'
+    
+> Note: A style's destination is specified as :destination when passed directly to the file or as :style_destination when passed to a document or project
 
 If block-style initiation is your thing:
 
     Document.new content do |d|
-      d.root = 'my-book'
-      d.name = 'my-book-final-draft.html'
-
-      d.style 'normal' do |s|
-        s.destination = 'styles'
-        s.name = 'stylesheet.css'
-      end
+      d.destination = 'final'
+      d.template = 'resume'
     end
 
 > Note: Block-style indentation passes the block to you after initializing
@@ -155,7 +132,6 @@ One warning: when you initialize a document via a block, do not try
 the following:
 
     # The wrong way to block-initialize a document:
-
     Document.new content do |d|
       d.style_destination = 'styles'
     end
@@ -175,11 +151,13 @@ Templates are rendered in the context of the document they are "about", so Mint 
 
 ### Place your content, point to your styles ###
 
-If you're designing a layout, you need to indicate where Mint should place your content. Therefore, raw HTML files cannot be layouts. Instead, if you want to use HTML templates, you should change the extension to .erb. These files are essentially HTML with the possibility for Ruby calls.
+In Mint layouts, Ruby calls are sparse but necessary.
 
-Inside your template, use the keyword (well, actually the method) `content` to place your source's content.
+If you're designing a layout, you need to indicate where Mint should place your content. For that simple reason, raw HTML files cannot be layouts. Instead, if you want to use Html templates, you should use the Erb format. These files are essentially Html with the possibility for Ruby calls. You can even use the .html extension for your files. Just code the dynamic portion using Erb syntax.
 
-You will want to point to your document's stylesheet (via a relative URL) from within your layout, usually in the `<head/>` element. Use the keyword `stylesheet`.
+Inside your template, use the `content` method to place your source's content.
+
+You will want to point to your document's stylesheet (via a relative URL) from within your layout, usually in the `<head/>` element. Use the `stylesheet` method.
 
 So if you're writing your layout using Erb, the template might look like this:
 
@@ -208,35 +186,37 @@ The same layout in Haml would be:
 
 ### Style your content ###
 
-You can build stylesheets using [CSS][], [Sass/Scss][] or [Less][].
+You can build stylesheets using [Css][], [Sass/Scss][] or [Less][].
 
 [Tilt templates]: http://github.com/rtomayko/tilt/blob/master/TEMPLATES.md "A listing of all templates supported by Tilt."
-[CSS]: http://en.wikipedia.org/wiki/Cascading_Style_Sheets
+[Css]: http://en.wikipedia.org/wiki/Cascading_Style_Sheets
 [Sass/Scss]: http://sass-lang.com/
 [Less]: http://lesscss.org/
 
-Mint comes preloaded with several styles and layouts:
-
-  > Note: These aren't all designed yet. Also, if you have a killer
-  > template you think should be included, send it my way. I'll check
-  > it out and see if it should be part of the standard template library.
-  > (Of course, you'll get all the credit.)
+Mint comes preloaded with several styles and layouts.
 
 1. Default
 2. Serif Pro
 3. Sans Pro
 4. Protocol
-5. Protocol Flow - requires Javascript
+5. Protocol Flow - requires Javascript and jQuery
 6. Resume
+
+> Note: These aren't all designed yet. Also, if you have a killer
+> template you think should be included, send it my way. I'll check
+> it out and see if it should be part of the standard template library.
+> (Of course, you'll get all the credit.)
+
+I'm going to build a template extension system soon so that you can easily base your template off of another one using its template name, and without knowing its location on disk.
 
 IV. The Mint path
 -----------------
 
-Mint's path tells the library where to search for named templates. It can be useful for other things, too, especially for extensions and tools that use the library. The Mint path is flexible and something that you can modify, even from the command line. (Just export `MINT\_PATH`!)
+Mint's path tells the library where to search for named templates. It can be useful for other things, too, especially for extensions and tools that use the library (for example, for storing config files for the `mint` command). The Mint path is flexible and something that you can modify, even from the command line. (Just export `MINT\_PATH`=`your:colon-separated-paths:here`!)
 
 So here's the rundown.
 
-When you instantiate a layout or style with a string or symbol, Mint will first search the current directory for that file (or, if the file includes path information, Mint will follow that path in search of the file). If that file does not exist, Mint will search its path in order until it finds the appropriate template. If no template is found, it will fall back to the default template.
+When you instantiate a layout or style with a string or symbol, Mint will first search the current directory for that file or file path. If that file does not exist, Mint will search its path in order until it finds the appropriate template. If no template is found, it will fall back to the default template.
 
 The default Mint path (in order) is:
 
@@ -250,30 +230,24 @@ Templates should be in a directory named templates. Inside this directory, there
 - ${MINT_PATH}/templates/normal/style.css
 - ${MINT_PATH}/templates/normal/layout.haml
 
-Normally a style will go best with its complement layout. However, layouts and styles can be mixed and matched at your discretion. This is especially true where you are not using stylesheets to format specific DOM IDs or classes you're expecting to find in your layout. (In other words, this works best when your stylesheet focuses on modifying typography and not page layout.)
+Normally a style will go best with its layout complement. However, layouts and styles can be mixed and matched at your discretion. This is especially true where you are not using stylesheets to format specific DOM IDs or classes you're expecting to find in your layout. (In other words, this works best when your stylesheet focuses on modifying typography and not page layout.)
 
 V. The `mint` command
 ---------------------
 
-*The `mint` command is not yet functional.*
+*The `mint` command is almost functional. Testing is coming soon.*
 
 ### The basic `mint` command ###
 
-The easiest Mint command doesn't require configuration. It will transform all of your documents into HTML and link all of them to the default stylesheet, which will be output in the same directory as the source documents.
+The easiest Mint command doesn't require configuration. It will transform the specified document into HTML and link it to the default stylesheet, which will be output in the same directory as the source documents. (If you have a ./templates/default/ subdirectory, the templates found in that directory will be used.)
 
-    mint
-
-If you have a ./templates/default/ subdirectory, the templates found in that directory will be used.
-
-Don't want all of your documents minted just yet? Specify a file:
-
-    mint Minimalism.md
+    mint Minimalism.md                    # creates Minimalism.html
 
 This command can be tweaked with options and arguments to be more flexible:
 
     mint Minimalism.md Final.html         # specifies an output file
     mint Minimalism.md --template=resume  # specifies a style template
-    mint Minimalism.md --destination=output --style-destination=styles
+    mint Minimalism.md --destination=final --style-destination=styles
 
 ### Mint options &amp; shortcuts ###
 
@@ -298,7 +272,7 @@ Other options have nothing to do with document configuration but are there for c
 
 ### Mint configuration ###
 
-A more powerful and reconfigurable version of Mint uses config files so that you can get the power of convention with the flexibility of configuration. You can configure Mint on a global, user-wide, or directory-specific scale to avoid specifying configuration information every time you call the command.
+A more powerful and reconfigurable version of Mint uses config files so that you can get the power of convention with the flexibility of configuration. You can configure Mint on a global, user-wide, or local (directory-specific) scale to avoid passing commandline options every time you call `mint`.
 
 To set a local (directory-specific) configuration option, call `mint set`:
 
@@ -311,7 +285,7 @@ It will contain:
     template: serif-professional
     destination: final
 
-From now on, calling mint in this directory will automatically draw on these two options.
+From now on, calling `mint` in this directory will automatically draw on these two options. (Commandline options will override these file options.)
 
 You can also set user-wide options:
 
@@ -329,7 +303,7 @@ Finally, you can set global options for all users:
 This configuration affects all users and will be put somewhere appropriate:
 
 - In Linux and on other FHS-compliant systems, this will be in /usr/share/mint
-- On Mac OS X, this is going to land somewhere unknown, possibly inside of  /Library/Application Support/Mint or /usr/share/mint
+- On Mac OS X, this is going to land somewhere unknown, possibly inside of  /Library/Application Support/Mint or /usr/share/mint -- I haven't decided
 - On Windows, this will end up *(somewhere dumber than before)*
 
 These options give you the power to unify a directory or user or all users under a certain default layout and style. These options are all overridden via commandline options and only provide defaults so that you can save typing common commands. Mint selects the most specific option possible, starting with the commandline, then checking local the config file, and finally moving to the user-wide and global config files.
@@ -371,7 +345,7 @@ To package a document with its stylesheet, as a sort of a printing:
 
     mint package document.md --name Document
 
-Eventually, this could include multiple output formats, like HTML4, HTML5, PDF and ePub. The format opened by the `mint open` command could be determined by the application you choose to open it with. (This would take some serious OS hacking, I think.)
+Eventually, this could include multiple output formats, like Html4, Html5, Pdf and ePub. The format opened by the `mint open` command could be determined by the application you choose to open it with. (This would take some serious OS hacking, I think.)
 
 When that does happen, you'll also be able to set the default version of the document that will open using:
 
