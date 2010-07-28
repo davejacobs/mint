@@ -10,50 +10,22 @@ require 'rubygems'
 require 'mint'
 
 module Mint
-  # Renders and writes to file all resources described by a document.
-  # Specifically: it renders itself (inside of its own layout) and then
-  # renders its style. This method will overwrite any existing content
-  # in a document's destination files. The `render_style` option
-  # provides an easy way to stop Mint from rendering a style, even
-  # if the document's style is not nil.
-  def mint
-    style_dest = root.expand_path + style.destination + style.name
-  
-    FileUtils.mkdir_p style_dest.dirname
-    style_dest.open 'w+' do |f|
-      f << @style.render
-    end
-
-    @documents.each do |doc|
-      dest = @root.expand_path + doc.destination + doc.name
-    
-      FileUtils.mkdir_p dest.dirname
-      dest.open 'w+' do |f|
-        f << doc.render
-      end
-    end
+  def self.options
+    options = {
+      :template => ['T', 'template', true, 'Description'],
+      :layout => ['L', 'layout', true, 'Description'],
+      :style => ['S', 'style', true, 'Description', 'Description'],
+      :destination => ['D', 'destination', true, 'Description'],
+      :style_destination => ['E', 'style-destination', true, 'Description'],
+      :style_name => ['A', 'style-name', true, 'Description'],
+      :verbose => ['v', 'verbose', false, 'Description'],
+      :simulation => ['s', 'simulation', false, 'Description']
+    }
   end
-end
 
-module Mint  
-  module CommandLine  
-    def self.options
-      options = {
-        :template => ['T', 'template', true],
-        :layout => ['L', 'layout', true],
-        :style => ['S', 'style', true],
-        :root => ['R', 'root', true],
-        :destination => ['D', 'destination', true],
-        :name => ['N', 'name', true],
-        :style_destination => ['E', 'style-destination', true],
-        :style_name => ['A', 'style-name', true],
-        :verbose => ['v', 'verbose', false],
-        :simulation => ['s', 'simulation', false]
-      }
-    end
-
+  module CommandLine
     def self.config_options
-      config_filename = Pathname.new(MintCommand.files[:config])      
+      config_filename = Pathname.new(Mint.files[:config])      
       
       ordered_options = []
       
@@ -66,42 +38,94 @@ module Mint
       
       ordered_options.reverse.inject(Hash.new) { |mem, o| mem.merge(o) }
     end
-  
-    def self.command_line_options
-      command_line_options = {}
-      optparse = OptionParser.new do |opts|
-        opts.banner = 'Usage: mint source [destination] [options]'
 
-        options.each do |k,v|
-          has_param = v[2]
-
-          v[0] = "-#{v[0]}"
-          v[1] = "--#{v[1]}"
-
-          if has_param
-            v[1] << " PARAM"
-            opts.on v[0], v[1], 'Description goes here' do |p|
-              command_line_options[k] = p
-            end
-          else
-            opts.on v[0], v[1], 'Description goes here' do
-              command_line_options[k] = true
-            end
-          end
-        end
-      end
-
-      optparse.parse!
-      command_line_options
+    def self.full_options_with(commandline_options)
+      config_options.merge commandline_options
     end
-  
-    def self.full_options
-      config_options.merge(command_line_options)
+    
+    def self.edit(name, layout_or_style=:layout)
+      file = Mint.lookup_template(name, layout_or_style)
+      
+      if editor = ENV['EDITOR']
+        `#{editor} #{file}`
+      end
+    end
+    
+    # Renders and writes to file all resources described by a document.
+    # Specifically: it renders itself (inside of its own layout) and then
+    # renders its style. This method will overwrite any existing content
+    # in a document's destination files. The `render_style` option
+    # provides an easy way to stop Mint from rendering a style, even
+    # if the document's style is not nil.
+    def self.mint(files, commandline_options)
+      documents = []
+      options = Mint.full_options_with(commandline_options)
+      
+      files.each do |file|
+        Document.new(file, options).mint(Dir.getwd, false)
+      end
     end
   end
 end
 
-puts "Your options are:"
-MintCommand.full_options.each do |k,v|
-  puts "#{k}: #{v}"
+commandline_options = {}
+optparse = OptionParser.new do |opts|
+  opts.banner = 'Usage: mint source [destination] [options]'
+
+  Mint.options.each do |k,v|
+    has_param = v[2]
+
+    v[0] = "-#{v[0]}"
+    v[1] = "--#{v[1]}"
+
+    if has_param
+      v[1] << " PARAM"
+      opts.on v[0], v[1], v[3] do |p|
+        commandline_options[k] = p
+      end
+    else
+      opts.on v[0], v[1], v[3] do
+        commandline_options[k] = true
+      end
+    end
+  end
+end
+optparse.parse!
+
+if ARGV[0] == 'edit'
+  # If we get the "edit" command, will retrieve appropriate file
+  # (probably a Mint template) and shell out that file to
+  # the user's favorite editor. Otherwise ...
+  
+  if commandline_options.include? :layout and commandline_options.include? :style
+    puts optparse.help
+  
+  elsif layout = commandline_options[:layout]
+    Mint::CommandLine.edit(layout, :layout)
+  
+  elsif style = commandline_options[:style]
+    Mint::CommandLine.edit(style, :style)
+  
+  else
+    puts optparse.help
+  end
+  
+elsif ARGV[0] == 'set'
+  # ... if we get the set command, we will try to set
+  # a config option (at the specified scope) per the user's command. Else ...
+  
+else
+  # ... we know we've been passed a set of documents, so parse the
+  # commandline options, merge them with the config options, and
+  # start minting the document list.
+  
+  files = []
+  opts = Mint.full_options_with commandline_options
+  doc_opts = opts.delete(:verbose).delete(:simulation)
+  
+  ARGV.each do |f|
+    files << Document.new(f, doc_opts)
+  end
+  
+  Mint::CommandLine.mint files, commandline_options
 end
