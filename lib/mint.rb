@@ -9,6 +9,12 @@ require 'helpers'
 module Mint
   VERSION = '0.1.1'
 
+  # Assume that someone using an Html template has formatted it
+  # in Erb and that a Css stylesheet will pass untouched through
+  # a Less parser.
+  Tilt.register 'html', Tilt::ERBTemplate
+  Tilt.register 'css', Tilt::LessTemplate
+
   # Return the an array with the Mint template path. Will first look
   # for MINT_PATH environment variable. Otherwise will use smart defaults.
   # Either way, earlier/higher paths take precedence.
@@ -40,12 +46,6 @@ module Mint
       :destination => ''        # do not create a subdirectory
     }
   end
-
-  # Assume that someone using an Html template has formatted it
-  # in Erb and that a Css stylesheet will pass untouched through
-  # a Less parser.
-  Tilt.register 'html', Tilt::ERBTemplate
-  Tilt.register 'css', Tilt::LessTemplate
 
   def self.formats
     Tilt.mappings.keys
@@ -84,7 +84,7 @@ module Mint
   def self.find_template(name, type)
     file = nil
 
-    $path.each do |directory|
+    Mint.path.each do |directory|
       templates_dir = directory + Mint.directories[:templates]
       query = templates_dir + name + type.to_s
 
@@ -170,32 +170,60 @@ module Mint
     include Helpers
 
     attr_reader :content
+    def content=(src)
+      @renderer = Mint.renderer(src)
+      @content = @renderer.render
+    end
 
+    attr_reader :layout
+    def layout=(layout)
+      if layout.respond_to? :render
+        @layout = layout
+      else
+        @layout = Mint.lookup_template layout
+      end
+    end
+    
+    attr_reader :style
+    def style=(style)
+      if style.respond_to? :render
+        @style = style
+      else
+        @style = Mint.lookup_template style, :style
+      end
+    end
+    
     def initialize(source, opts={})
       @opts = Mint.default_opts.merge(opts)
 
       @type = :document
       super(source, opts) # do not pass block, which would interfere with call
 
-      @content = @renderer.render
-
-      style_opts = {
-        :destination => @opts[:style_destination],
-        :name => @opts[:style_name]
-      }
-
-      # If a template is passed as an option, use that for the style
-      # and layout. Otherwise, use the default-merged options and
-      # instantiate a layout and style from there.
+      # The template option takes precedence over the other two
       @opts[:layout], @opts[:style] = templ, templ if (templ = @opts[:template])
-      @layout = Layout.new @opts[:layout]
-      @style = Style.new @opts[:style], style_opts
+
+      # Each of these hould invoke explicitly defined method
+      content = source
+      layout = @opts[:layout]
+      style = @opts [:style]
 
       yield self if block_given?
     end
 
     def render(args={})
       layout.render self, args
+    end
+
+    def mint(root_directory=Pathname.new(Dir.getwd), render_style=true)
+      (resources = [self]) << style if render_style
+      resources.each do |res|
+        dest = root_directory + res.destination + res.name
+        FileUtils.mkdir_p dest.dirname
+        
+        dest.open 'w+' do |file|
+          file << res.render
+        end
+      end
     end
 
     # Convenience methods for views
