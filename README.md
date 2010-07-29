@@ -81,7 +81,8 @@ You can pass any of the following to a new document:
         ${MINT_PATH}/templates/template_name/style.css
         ${MINT_PATH}/templates/template_name/layout.haml
 
-  2. If you specify a template name that is also the name of an existing file in your working directory, Mint will use the file and not look for a template. (It is unlikely you'll have an extension-less file named 'normal' or 'default' in your working directory.) If you do specify an existing file, the path/file will be resolved from the directory where you're calling Mint (the 'working directory'). To use Mint this way (and I don't see this as more than a temporary solution) you'll probably want to call Mint from within your source's directory. Alternatively, you can use [`Dir.chdir`][Dir::chdir method] for the same effect.
+  2. If you specify a template name that is also the name of an existing file in your working directory, Mint will use the file and not look for a template. (It is unlikely you'll have an extension-less file named 'normal' or 'default' in your working directory.) If you do specify an existing file, the path/file will be resolved from the directory where you're calling Mint (the 'working directory'). To use Mint this way (and I don't see this as more than a tem
+  3. porary solution) you'll probably want to call Mint from within your source's directory. Alternatively, you can use [`Dir.chdir`][Dir::chdir method] for the same effect.
 
 - `:destination` lets you organize your output. It directs Mint to write the template or document to one of root's subdirectories. There is an option to specify a separate `:style_destination`, which is resolved relative to `:destination`.
 
@@ -131,8 +132,8 @@ If block-style initiation is your thing:
 One warning: when you initialize a document via a block, do not try
 the following:
 
-    # The wrong way to block-initialize a document:
     Document.new content do |d|
+      # The wrong way to block-initialize a style destination:
       d.style_destination = 'styles'
     end
 
@@ -246,8 +247,8 @@ The easiest Mint command doesn't require configuration. It will transform the sp
 This command can be tweaked with options and arguments to be more flexible:
 
     mint Minimalism.md Final.html         # specifies an output file
-    mint Minimalism.md --template=resume  # specifies a style template
-    mint Minimalism.md --destination=final --style-destination=styles
+    mint Minimalism.md --template resume  # specifies a style template
+    mint Minimalism.md --destination final --style-destination=styles
 
 ### Mint options &amp; shortcuts ###
 
@@ -276,7 +277,7 @@ A more powerful and reconfigurable version of Mint uses config files so that you
 
 To set a local (directory-specific) configuration option, call `mint set`:
 
-    mint set [local] --template=serif-professional --destination=final
+    mint set [local] --template serif-professional --destination final
 
 This will create a config file: ./.mint/config.yaml
 
@@ -289,7 +290,7 @@ From now on, calling `mint` in this directory will automatically draw on these t
 
 You can also set user-wide options:
 
-    mint set user --template=professional --destination=html
+    mint set user --template=professional --destination html
 
 Doing so will create the same style config file, but in your system's user-wide configuration location:
 
@@ -298,7 +299,7 @@ Doing so will create the same style config file, but in your system's user-wide 
 
 Finally, you can set global options for all users:
 
-    mint set global --template=normal --destination=mint
+    mint set global --template=normal --destination mint
 
 This configuration affects all users and will be put somewhere appropriate:
 
