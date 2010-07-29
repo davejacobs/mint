@@ -256,13 +256,17 @@ You can pass several options to `mint`. Following the Unix tradition, common opt
 
 The following correspond to the parameters you can pass to `Mint::Document.new`, as described in [The Mint library][]:
 
-- `--template, -T`
-- `--layout, -L`
-- `--style, -S`
-- `--destination, -D`
-- `--name, -N`
-- `--style-destination`
-- `--style-name`
+- `--template, -t`
+- `--layout, -l`
+- `--style, -s`
+- `--destination, -d`
+- `--style-destination, -n`
+
+There are also scoping options, both for the `set` and `edit` commands:
+
+- `--global, -G`
+- `--user, -U`
+- `--local, -L`
 
 Other options have nothing to do with document configuration but are there for convenience:
 
@@ -290,7 +294,7 @@ From now on, calling `mint` in this directory will automatically draw on these t
 
 You can also set user-wide options:
 
-    mint set user --template=professional --destination html
+    mint set user --template professional --destination html
 
 Doing so will create the same style config file, but in your system's user-wide configuration location:
 
