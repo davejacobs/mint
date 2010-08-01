@@ -63,11 +63,6 @@ module Mint
       documents = []
       options = Mint::CommandLine.full_options_with(commandline_options)
      
-      style_template_name = options[:style]
-      style_dest = options[:style_destination]
-
-      options[:style] = Style.new(style_template_name, :destination => style_dest)
-
       render_style = true
       files.each do |file|
         Document.new(file, options).mint(Dir.getwd, render_style)
