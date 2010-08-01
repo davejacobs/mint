@@ -5,21 +5,24 @@ $:.unshift File.join(File.dirname(__FILE__), '..', 'lib')
 
 require 'optparse'
 require 'yaml'
-
 require 'rubygems'
 require 'mint'
 
 module Mint
   def self.options
     options = {
-      :template => ['T', 'template', true, 'Description'],
-      :layout => ['L', 'layout', true, 'Description'],
-      :style => ['S', 'style', true, 'Description', 'Description'],
-      :destination => ['D', 'destination', true, 'Description'],
-      :style_destination => ['E', 'style-destination', true, 'Description'],
-      :style_name => ['A', 'style-name', true, 'Description'],
-      :verbose => ['v', 'verbose', false, 'Description'],
-      :simulation => ['s', 'simulation', false, 'Description']
+      :template          => ['t', 'template', true, 'Description'],
+      :layout            => ['l', 'layout', true, 'Description'],
+      :style             => ['s', 'style', true, 'Description', 
+                              'Description'],
+      :destination       => ['d', 'destination', true, 'Description'],
+      :style_destination => ['n', 'style-destination', true, 
+                              'Description'],
+      :global            => ['G', 'global', false, 'Description'],
+      :user              => ['U', 'user', false, 'Description'],
+      :local             => ['L', 'local', false, 'Description'],
+      :verbose           => ['v', 'verbose', false, 'Description'],
+      :simulation        => ['s', 'simulation', false, 'Description']
     }
   end
 
@@ -46,9 +49,8 @@ module Mint
     def self.edit(name, layout_or_style=:layout)
       file = Mint.lookup_template(name, layout_or_style)
       
-      if editor = ENV['EDITOR']
-        system "#{editor} #{file}"
-      end
+      editor = ENV['EDITOR'] || 'vim'
+      system "#{editor} #{file}"
     end
     
     # Renders and writes to file all resources described by a document.
@@ -59,21 +61,17 @@ module Mint
     # if the document's style is not nil.
     def self.mint(files, commandline_options)
       documents = []
-      options = Mint.full_options_with(commandline_options)
+      options = Mint::CommandLine.full_options_with(commandline_options)
       
-      style = options[:style_name]
+      style_name = options[:style_name]
       style_dest = options[:style_destination]
       
-      Style.new(style, :destination => style_dest).mint(Dir.getwd, true)
-      
-      # This is slightly inefficient, because styles are looked up
-      # for each document instance created here, but are not rendered.
-      # However, I want the document to have a reference to its
-      # stylesheet, and performance is not critical for this tool.
-      # I will change this implementation if a better (but clear)
-      # solution presents itself.
+      options[:style] = Style.new(style_name, :destination => style_dest)
+
+      render_style = true
       files.each do |file|
-        Document.new(file, options).mint(Dir.getwd, false)
+        Document.new(file, options).mint(Dir.getwd, render_style)
+        style_rendered = false
       end
     end
   end
@@ -131,13 +129,10 @@ else
   # commandline options, merge them with the config options, and
   # start minting the document list.
   
-  files = []
-  opts = Mint.full_options_with commandline_options
-  doc_opts = opts.delete(:verbose).delete(:simulation)
+  puts "commandline options = #{commandline_options.inspect}"
   
-  ARGV.each do |f|
-    files << Document.new(f, doc_opts)
-  end
+  commandline_options.delete(:verbose)
+  commandline_options.delete(:simulation)
   
-  Mint::CommandLine.mint files, commandline_options
+  Mint::CommandLine.mint ARGV, commandline_options
 end
