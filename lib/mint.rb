@@ -19,7 +19,7 @@ module Mint
   # for MINT_PATH environment variable. Otherwise will use smart defaults.
   # Either way, earlier/higher paths take precedence.
   def self.path
-    if e = ENV['MINT_PATH']
+    path = if e = ENV['MINT_PATH']
       e.split(':').collect { |p| Pathname.new(p).expand_path }
     else
       [
@@ -70,7 +70,7 @@ module Mint
   # ~/.mint/templates/normal/style.css.
   def self.lookup_template(name_or_file, type=:layout)
     name = name_or_file.to_s
-    File.file?(name) ? Pathname.new(name) : find_template(name, type)
+    File.exist?(name) ? Pathname.new(name) : find_template(name, type)
   end
 
   # Finds a template named `name` in the Mint path. If `type` # is :layout,
@@ -107,29 +107,44 @@ module Mint
   # its source file's base name
   def self.guess_name_from(name)
     css = Mint.css_formats.join '|'
-    name.gsub(/#{css}/, '.css').gsub(/\.[^css]+/, '.html')
+    name.basename.to_s.gsub(/#{css}/, '.css').gsub(/\.[^css]+/, '.html')
   end
 
   # Transforms a path into a template that will render the file specified
   # at that path
   def self.renderer(path)
-    Tilt.new path
+    Tilt.new path.to_s
   end
 
   class Resource
-    attr_accessor :type, :source, :destination, :name
+    attr_accessor :type
 
-    def initialize(source, opts={}, &block)
+    attr_reader :source
+    def source=(source)
+      @source = Pathname.new(source)
+    end
+    
+    attr_reader :destination
+    def destination=(destination)
+      @destination = Pathname.new(destination)
+    end
+    
+    attr_reader :name
+    def name=(name)
+      @name = name
+    end
+
+    def renderer=(renderer)
+      @renderer = renderer
+    end
+
+    def initialize(src, opts={})
       return nil unless source
 
-      @source = Pathname.new source
-      @destination = Pathname.new @opts[:destination] ||
-        Mint.default_options[:destination]
-      @name = @opts[:name]
-      @name ||= Mint.guess_name_from(@source.basename) if @source.exist?
-      @renderer = Mint.renderer @source
-
-      yield self if block_given?
+      self.source = src
+      self.destination = opts[:destination] || Mint.default_options[:destination]
+      self.name = Mint.guess_name_from source
+      self.renderer = Mint.renderer source
     end
 
     def equals?(other)
@@ -149,8 +164,6 @@ module Mint
     def initialize(source, opts={})
       @type = :layout
       super
-
-      @source = Mint.lookup_template(@source, @type)
     end
   end
 
@@ -161,62 +174,79 @@ module Mint
     def initialize(source, opts={})
       @type = :style
       super
-
-      @source = Mint.lookup_template(@source, @type)
     end
   end
 
   class Document < Resource
     include Helpers
 
+    # The following provide reader/accessor methods for the objects's
+    # important attributes. Each implicit reader is paired with an
+    # explicit reader that processes a variety of input to a standardized
+    # state.
+    
+    # When you set content, you are giving the document a renderer based
+    # on the content file and are processing the templated content into
+    # Html, which you can then access using via the content reader.
     attr_reader :content
     def content=(src)
       @renderer = Mint.renderer(src)
       @content = @renderer.render
     end
 
+    # The explicit accessor allows you to pass the document an existing
+    # layout or the name of a layout template in the Mint path or an
+    # existing layout file.
     attr_reader :layout
-    def layout=(layout)
+    def layout=(layout)      
       if layout.respond_to? :render
         @layout = layout
       else
-        @layout = Mint.lookup_template layout
+        layout_file = Mint.lookup_template layout
+        @layout = Layout.new(layout_file)
       end
     end
     
+    # The explicit accessor allows you to pass the document an existing
+    # style or the name of a style template in the Mint path or an
+    # existing style file.
     attr_reader :style
     def style=(style)
       if style.respond_to? :render
         @style = style
       else
-        @style = Mint.lookup_template style, :style
+        style_file = Mint.lookup_template(style, :style)
+        @style = Style.new(style_file, :destination => destination)
       end
     end
     
     def initialize(source, opts={})
-      @opts = Mint.default_opts.merge(opts)
+      options = Mint.default_options.merge(opts)
 
-      @type = :document
-      super(source, opts) # do not pass block, which would interfere with call
+      self.type = :document
+      super(source, options) # do not pass block, which would interfere with call
 
       # The template option takes precedence over the other two
-      @opts[:layout], @opts[:style] = templ, templ if (templ = @opts[:template])
-
+      if templ = options[:template]
+        (options[:layout], options[:style] = templ, templ) 
+      end
+      
       # Each of these hould invoke explicitly defined method
-      content = source
-      layout = @opts[:layout]
-      style = @opts [:style]
-
-      yield self if block_given?
+      self.content = @source
+      self.layout = options[:layout]
+      self.style = options[:style]
+      self.style.destination = options[:style_destination]
     end
 
     def render(args={})
       layout.render self, args
     end
 
-    def mint(root_directory=Pathname.new(Dir.getwd), render_style=true)
+    def mint(root_directory=Dir.getwd, render_style=true)      
+      root_directory = Pathname.new(root_directory)
+      
       (resources = [self]) << style if render_style
-      resources.each do |res|
+      resources.compact.each do |res|
         dest = root_directory + res.destination + res.name
         FileUtils.mkdir_p dest.dirname
         
@@ -227,9 +257,6 @@ module Mint
     end
 
     # Convenience methods for views
-
-    # Returns the document's text as HTML
-    def content; @content; end
 
     # Returns a relative path from the document to its stylesheet. Can
     # be called directly from inside a layout template.
