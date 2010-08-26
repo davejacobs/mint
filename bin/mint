@@ -1,7 +1,9 @@
 #!/usr/bin/env ruby
 # A script for harnessing Mint at the commandline
 
-$:.unshift File.join(File.dirname(__FILE__), '..', 'lib')
+require 'pathname'
+
+$:.unshift Pathname.new(__FILE__).realpath.dirname + '..' + 'lib'
 
 require 'optparse'
 require 'yaml'
@@ -11,18 +13,29 @@ require 'mint'
 module Mint
   def self.options
     options = {
-      :template          => ['t', 'template', true, 'Description'],
-      :layout            => ['l', 'layout', true, 'Description'],
-      :style             => ['s', 'style', true, 'Description', 
-                              'Description'],
-      :destination       => ['d', 'destination', true, 'Description'],
-      :style_destination => ['n', 'style-destination', true, 
-                              'Description'],
-      :global            => ['G', 'global', false, 'Description'],
-      :user              => ['U', 'user', false, 'Description'],
-      :local             => ['L', 'local', false, 'Description'],
-      :verbose           => ['v', 'verbose', false, 'Description'],
-      :simulation        => ['s', 'simulation', false, 'Description']
+      :template          => [ 't', 'template', true, 
+        'Specify the template (layout + style).' ],
+      :layout            => [ 'l', 'layout', true, 
+        'Specify only the layout.' ],
+      :style             => [ 's', 'style', true, 
+        'Specify only the style.' ],
+      :root              => [ 'w', 'root', true, 
+        'Specify a root context other than the current directory.' ],
+      :destination       => [ 'd', 'destination', true, 
+        'Specify a destination directory, relative to the root.' ],
+      :style_destination => [ 'n', 'style-destination', true, 
+        'Specify a destination subdirectory for stylesheets, relative to
+          the document destination directory.' ],
+      :global            => [ 'G', 'global', false, 
+        'Specify config changes on a global level.' ],
+      :user              => [ 'U', 'user', false, 
+        'Specify config changes on a user-wide level.' ],
+      :local             => [ 'L', 'local', false, 
+        'Specify config changes on a project-specific level.' ],
+      :verbose           => [ 'v', 'verbose', false, 
+        'Verbose output.' ],
+      :simulation        => [ 's', 'simulation', false, 
+        'Simulate transformation without actually creating files.' ]
     }
   end
 
@@ -62,16 +75,19 @@ module Mint
     def self.mint(files, commandline_options)
       documents = []
       options = Mint::CommandLine.full_options_with(commandline_options)
-     
+      
+      root = options[:root] || Dir.getwd
+      
       render_style = true
       files.each do |file|
-        Document.new(file, options).mint(Dir.getwd, render_style)
+        Document.new(file, options).mint(root, render_style)
         style_rendered = false
       end
     end
   end
 end
 
+# Parse options from the commandline
 commandline_options = {}
 optparse = OptionParser.new do |opts|
   opts.banner = 'Usage: mint source [destination] [options]'
@@ -123,8 +139,6 @@ else
   # ... we know we've been passed a set of documents, so parse the
   # commandline options, merge them with the config options, and
   # start minting the document list.
-  
-  puts "commandline options = #{commandline_options.inspect}"
   
   commandline_options.delete(:verbose)
   commandline_options.delete(:simulation)
