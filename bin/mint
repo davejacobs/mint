@@ -19,7 +19,9 @@ module Mint
         'Specify only the layout.' ],
       :style             => [ 's', 'style', true, 
         'Specify only the style.' ],
-      :root              => [ 'w', 'root', true, 
+      :copy_style        => [ 'c', 'copy-style', false,
+        'Copy the style to your current directory.' ],
+      :root              => [ 'w', 'root', true,
         'Specify a root context other than the current directory.' ],
       :destination       => [ 'd', 'destination', true, 
         'Specify a destination directory, relative to the root.' ],
@@ -32,6 +34,8 @@ module Mint
         'Specify config changes on a user-wide level.' ],
       :local             => [ 'L', 'local', false, 
         'Specify config changes on a project-specific level.' ],
+      :force             => [ 'f', 'force', false,
+        'Force file overwrite without prompt.' ],
       :verbose           => [ 'v', 'verbose', false, 
         'Verbose output.' ],
       :simulation        => [ 's', 'simulation', false, 
@@ -77,11 +81,16 @@ module Mint
       options = Mint::CommandLine.full_options_with(commandline_options)
       
       root = options[:root] || Dir.getwd
-      
+
+      # Nullify the style destination (meaning the style will render
+      # to the style's own centralized directory) unless the user
+      # has specified that we're copying the style to his directory.
+      (options[:style_destination] = nil) unless options[:copy_style]
+
       render_style = true
       files.each do |file|
         Document.new(file, options).mint(root, render_style)
-        style_rendered = false
+        render_style = false
       end
     end
   end
