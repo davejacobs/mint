@@ -11,7 +11,7 @@ module Mint
           dir1
         end
 
-      path.expand_path.relative_path_from(dir2)
+      path.expand_path.relative_path_from(dir2.expand_path)
     end
   end
 end
