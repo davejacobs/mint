@@ -7,7 +7,7 @@ require 'rdiscount'
 require 'helpers'
 
 module Mint
-  VERSION = '0.1.1'
+  VERSION = '0.1.2'
 
   # Assume that someone using an Html template has formatted it
   # in Erb and that a Css stylesheet will pass untouched through
@@ -19,15 +19,15 @@ module Mint
   # for MINT_PATH environment variable. Otherwise will use smart defaults.
   # Either way, earlier/higher paths take precedence.
   def self.path
-    path = if e = ENV['MINT_PATH']
-      e.split(':').collect { |p| Pathname.new(p).expand_path }
-    else
-      [
-        Pathname.new('.mint'),                    # 1. Project-defined
-        Pathname.new(ENV['HOME']) + '.mint',      # 2. User-defined
-        Pathname.new(__FILE__).dirname + '..'     # 3. Gemfile-defined
-      ].collect! { |p| p.expand_path }
-    end
+    path = if(e = ENV['MINT_PATH'])
+        e.split(':').collect { |p| Pathname.new(p).expand_path }
+      else
+        [
+          Pathname.new('.mint'),                    # 1. Project-defined
+          Pathname.new(ENV['HOME']) + '.mint',      # 2. User-defined
+          Pathname.new(__FILE__).dirname + '..'     # 3. Gemfile-defined
+        ].collect! { |p| p.expand_path }
+      end
   end
 
   # Returns a hash with key Mint directories
@@ -42,8 +42,12 @@ module Mint
 
   def self.default_options
     default_options = {
-      :template => 'default',   # default layout and style
-      :destination => ''        # do not create a subdirectory
+      # Do not set default template or will override style and
+      # layout when not desired -- causes tricky bugs
+      :layout => 'default', # default layout
+      :style => 'default',   # default style
+      :destination => '',       # do not create a subdirectory
+      :style_destination => nil  # do not create a subdirectory
     }
   end
 
@@ -51,7 +55,7 @@ module Mint
     Tilt.mappings.keys
   end
 
-  # Registered CSS formats, for source -> destination
+  # Registered Css formats, for source -> destination
   # name guessing/conversion only. Source files with one of these
   # extensions will be converted to '.css' destination files.
   def self.css_formats
@@ -91,7 +95,7 @@ module Mint
       if templates_dir.exist?
         # Mint looks for any file with the appropriate basename
         results = Pathname.glob "#{query}.*"
-        results.reject! {|r| r.to_s !~ /#{Mint.formats.join('|')}/}
+        results.reject! { |r| r.to_s !~ /#{Mint.formats.join('|')}/ }
 
         if results.length > 0
           file = results[0]
@@ -121,12 +125,12 @@ module Mint
 
     attr_reader :source
     def source=(source)
-      @source = Pathname.new(source)
+      @source = Pathname.new(source) if source
     end
     
     attr_reader :destination
     def destination=(destination)
-      @destination = Pathname.new(destination)
+      @destination = Pathname.new(destination) if destination
     end
     
     attr_reader :name
@@ -138,11 +142,11 @@ module Mint
       @renderer = renderer
     end
 
-    def initialize(src, opts={})
-      return nil unless source
+    def initialize(src, options={})
+      return nil unless src
 
       self.source = src
-      self.destination = opts[:destination] || Mint.default_options[:destination]
+      self.destination = options[:destination]
       self.name = Mint.guess_name_from source
       self.renderer = Mint.renderer source
     end
@@ -161,7 +165,7 @@ module Mint
   # it is a simple resource. However, its type helps decide which template
   # file to use when a template name is specified.
   class Layout < Resource
-    def initialize(source, opts={})
+    def initialize(source, opts=Mint.default_options)
       @type = :layout
       super
     end
@@ -171,9 +175,13 @@ module Mint
   # it is a simple resource. However, its type helps decide which template
   # file to use when a template name is specified.
   class Style < Resource
-    def initialize(source, opts={})
+    def initialize(source, opts=Mint.default_options)
       @type = :style
       super
+    end
+
+    def needs_rendering?
+      source.extname != '.css'
     end
   end
 
@@ -221,7 +229,7 @@ module Mint
     end
     
     def initialize(source, opts={})
-      options = Mint.default_options.merge(opts)
+      options = Mint.default_options.merge opts
 
       self.type = :document
       super(source, options) # do not pass block, which would interfere with call
@@ -230,12 +238,12 @@ module Mint
       if templ = options[:template]
         (options[:layout], options[:style] = templ, templ) 
       end
-      
-      # Each of these hould invoke explicitly defined method
-      self.content = @source
+
+      # Each of these should invoke explicitly defined method
+      self.content = source
       self.layout = options[:layout]
       self.style = options[:style]
-      self.style.destination = options[:style_destination]
+      self.style.destination = options[:style_destination] || self.style.source.dirname.expand_path
     end
 
     def render(args={})
@@ -245,7 +253,13 @@ module Mint
     def mint(root_directory=Dir.getwd, render_style=true)      
       root_directory = Pathname.new(root_directory)
       
-      (resources = [self]) << style if render_style
+      # Only render style if a) it's specified by the options path and
+      # b) it actually needs rendering (i.e., it's in template form and
+      # not raw, browser-parseable CSS).
+      render_style &&= style.needs_rendering?
+      resources = [self]
+      resources << style if render_style
+
       resources.compact.each do |res|
         dest = root_directory + res.destination + res.name
         FileUtils.mkdir_p dest.dirname
@@ -261,7 +275,7 @@ module Mint
     # Returns a relative path from the document to its stylesheet. Can
     # be called directly from inside a layout template.
     def stylesheet
-      normalize_path(style.destination, destination) + style.name.to_s
+      Helpers.normalize_path(style.destination.expand_path, destination) + style.name.to_s
     end
   end
 end
