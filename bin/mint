@@ -12,51 +12,38 @@ require 'mint'
 
 module Mint
   def self.options
-    options = {
-      :template          => [ 't', 'template', true, 
-        'Specify the template (layout + style).' ],
-      :layout            => [ 'l', 'layout', true, 
-        'Specify only the layout.' ],
-      :style             => [ 's', 'style', true, 
-        'Specify only the style.' ],
-      :copy_style        => [ 'c', 'copy-style', false,
-        'Copy the style to your current directory.' ],
-      :root              => [ 'w', 'root', true,
-        'Specify a root context other than the current directory.' ],
-      :destination       => [ 'd', 'destination', true, 
-        'Specify a destination directory, relative to the root.' ],
-      :style_destination => [ 'n', 'style-destination', true, 
-        'Specify a destination subdirectory for stylesheets, relative to
-          the document destination directory.' ],
-      :global            => [ 'G', 'global', false, 
-        'Specify config changes on a global level.' ],
-      :user              => [ 'U', 'user', false, 
-        'Specify config changes on a user-wide level.' ],
-      :local             => [ 'L', 'local', false, 
-        'Specify config changes on a project-specific level.' ],
-      :force             => [ 'f', 'force', false,
-        'Force file overwrite without prompt.' ],
-      :verbose           => [ 'v', 'verbose', false, 
-        'Verbose output.' ],
-      :simulation        => [ 's', 'simulation', false, 
-        'Simulate transformation without actually creating files.' ]
+    {
+      :template     
+                  => [ 't', 'template', true, 'Specify the template (layout + style).' ],
+      :layout     => [ 'l', 'layout', true, 'Specify only the layout.' ],
+      :style      => [ 's', 'style', true, 'Specify only the style.' ],
+      :copy_style => [ 'c', 'copy-style', false, 'Copy the style to your current directory.' ],
+      :root       => [ 'w', 'root', true, 'Specify a root outside the current directory.' ],
+      :destination
+                  => [ 'd', 'destination', true, 'Specify a destination directory, 
+                       relative to the root.' ],
+      :style_destination 
+                  => [ 'n', 'style-destination', true, 'Specify a destination 
+                       subdirectory for stylesheets, relative to the document 
+                       destination directory.' ],
+      :global     => [ 'G', 'global', false, 'Specify config changes on a global level.' ],
+      :user       => [ 'U', 'user', false, 'Specify config changes on a user-wide level.' ],
+      :local      => [ 'L', 'local', false, 'Specify config changes on a project-specific level.' ],
+      :force      => [ 'f', 'force', false, 'Force file overwrite without prompt.' ],
+      :verbose    => [ 'v', 'verbose', false, 'Verbose output.' ],
+      :simulation => [ 's', 'simulation', false, 'Simulate transformation without 
+                       actually creating files.' ]
     }
   end
 
   module CommandLine
     def self.config_options
       config_filename = Pathname.new(Mint.files[:config])      
-      
-      ordered_options = []
-      
-      path = Mint.path
-      path.each_index do |i|
-        if (config_file = path[i] + config_filename).exist?
-          ordered_options << YAML.parse_file(config_file)
-        end
-      end
-      
-      ordered_options.reverse.inject(Hash.new) { |mem, o| mem.merge(o) }
+      Mint.path.map {|p| p + config_filename }.
+        select(&:exist?).
+        inject(Array.new) {|res, p| res + [YAML.parse_file p] }.
+        reverse.
+        inject(Hash.new) {|res, p| res.merge p }
     end
 
     def self.full_options_with(commandline_options)
@@ -68,6 +55,14 @@ module Mint
       
       editor = ENV['EDITOR'] || 'vim'
       system "#{editor} #{file}"
+    end
+
+    def self.set(name, property, scope=:local)
+      puts "I haven't yet implemented the mint set function"
+    end
+
+    def self.config
+      puts "I haven't yet implemented the mint config function"
     end
     
     # Renders and writes to file all resources described by a document.
@@ -99,7 +94,7 @@ end
 # Parse options from the commandline
 commandline_options = {}
 optparse = OptionParser.new do |opts|
-  opts.banner = 'Usage: mint source [destination] [options]'
+  opts.banner = 'Usage: mint [command] files [options]'
 
   Mint.options.each do |k,v|
     has_param = v[2]
@@ -121,7 +116,8 @@ optparse = OptionParser.new do |opts|
 end
 optparse.parse!
 
-if ARGV[0] == 'edit'
+case ARGV.shift.downcase.to_sym
+when :edit
   # If we get the "edit" command, will retrieve appropriate file
   # (probably a Mint template) and shell out that file to
   # the user's favorite editor. Otherwise ...
@@ -139,11 +135,31 @@ if ARGV[0] == 'edit'
   else
     puts optparse.help
   end
-  
-elsif ARGV[0] == 'set'
+ 
+when :set
   # ... if we get the set command, we will try to set
   # a config option (at the specified scope) per the user's command. Else ...
+
+  # This command isn't working yet. I need to fix this and then the
+  # README. I'm trying to decide between two different syntaxes:
+  #
+  # This only allows for one key/value to be set at a time, like in git
+  #
+  #     mint set --global key value
+  #
+  # This is more confusing, because `global` looks like a command:
+  #
+  #     mint set global --key=value --second-key=second-value
+
+  scope = ARGV.shift
+  key = ARGV.shift
+  value = ARGV.shift
+
+  Mint::CommandLine.set key, value, scope.to_sym
   
+when :config
+  Mint::CommandLine.config
+
 else
   # ... we know we've been passed a set of documents, so parse the
   # commandline options, merge them with the config options, and
