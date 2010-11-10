@@ -8,6 +8,7 @@ require 'helpers'
 
 module Mint
   VERSION = '0.1.2'
+  MINT_DIR = Pathname.new(__FILE__).dirname + '..'
 
   # Assume that someone using an Html template has formatted it
   # in Erb and that a Css stylesheet will pass untouched through
@@ -19,29 +20,22 @@ module Mint
   # for MINT_PATH environment variable. Otherwise will use smart defaults.
   # Either way, earlier/higher paths take precedence.
   def self.path
-    path = if(e = ENV['MINT_PATH'])
-        e.split(':').collect { |p| Pathname.new(p).expand_path }
-      else
-        [
-          Pathname.new('.mint'),                    # 1. Project-defined
-          Pathname.new(ENV['HOME']) + '.mint',      # 2. User-defined
-          Pathname.new(__FILE__).dirname + '..'     # 3. Gemfile-defined
-        ].collect! { |p| p.expand_path }
-      end
+    mint_path = ENV['MINT_PATH'] || "#{Dir.getwd}/.mint:~/.mint:#{MINT_DIR}"
+    path = mint_path.split(':').map {|p| Pathname.new(p).expand_path }
   end
 
   # Returns a hash with key Mint directories
   def self.directories
-    directories = { :templates => 'templates' }
+    { :templates => 'templates' }
   end
 
   # Returns a hash with key Mint files
   def self.files
-    files = { :config => 'config.yaml' }
+    { :config => 'config.yaml' }
   end
 
   def self.default_options
-    default_options = {
+    {
       # Do not set default template or will override style and
       # layout when not desired -- causes tricky bugs
       :layout => 'default', # default layout
@@ -51,13 +45,13 @@ module Mint
     }
   end
 
+  # Returns a list of all file extensions that Tilt will render
   def self.formats
     Tilt.mappings.keys
   end
 
   # Registered Css formats, for source -> destination
-  # name guessing/conversion only. Source files with one of these
-  # extensions will be converted to '.css' destination files.
+  # name guessing/conversion only.
   def self.css_formats
     css_formats = [ '.css', '.sass', '.scss', '.less' ]
   end
@@ -86,25 +80,16 @@ module Mint
   # called `layout.*` in the `template_name` directory. Returns nil if
   # it cannot find a template.
   def self.find_template(name, type)
-    file = nil
+    templates_dir = Mint.directories[:templates]
+    acceptable_formats = /#{Mint.formats.join('|')}/
 
-    Mint.path.each do |directory|
-      templates_dir = directory + Mint.directories[:templates]
-      query = templates_dir + name + type.to_s
-
-      if templates_dir.exist?
-        # Mint looks for any file with the appropriate basename
-        results = Pathname.glob "#{query}.*"
-        results.reject! { |r| r.to_s !~ /#{Mint.formats.join('|')}/ }
-
-        if results.length > 0
-          file = results[0]
-          break
-        end
-      end
-    end
-
-    file
+    Mint.path.
+      map {|p| p + templates_dir + name + type.to_s }.
+      map {|p| Pathname.glob("#{p.to_s}.*") }.
+      flatten.
+      select {|p| p.to_s =~ acceptable_formats }.
+      select(&:exist?).
+      first
   end
 
   # Guesses an appropriate name for the resource output file based on
@@ -117,7 +102,7 @@ module Mint
   # Transforms a path into a template that will render the file specified
   # at that path
   def self.renderer(path)
-    Tilt.new path.to_s
+    Tilt.new path.to_s, :smart => true
   end
 
   class Resource
