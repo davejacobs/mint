@@ -239,7 +239,7 @@ module Mint
 
       # The template option takes precedence over the other two
       if templ = options[:template]
-        (options[:layout], options[:style] = templ, templ) 
+        options[:layout], options[:style] = templ, templ 
       end
 
       # Each of these should invoke explicitly defined method
