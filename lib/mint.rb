@@ -7,8 +7,8 @@ require 'rdiscount'
 require 'helpers'
 
 module Mint
-  VERSION = '0.1.2'
-  MINT_DIR = Pathname.new(__FILE__).dirname + '..'
+  VERSION = '0.1.3'
+  MINT_DIR = Pathname.new(__FILE__).realpath.dirname + '..'
 
   # Assume that someone using an Html template has formatted it
   # in Erb and that a Css stylesheet will pass untouched through
@@ -24,6 +24,24 @@ module Mint
     path = mint_path.split(':').map {|p| Pathname.new(p).expand_path }
   end
 
+  # I want to refactor this so that Mint.path is always a Hash...
+  # should take care of this in the Mint.path=() method.
+  # Right now, this is a hack. It assumes a sane MINT_PATH, where the
+  # first entry is most local and the last entry is most global.
+  def self.path_for_scope(scope=:local)
+    case Mint.path
+    when Array
+      index = { :local => 0, :user => 1, :global => 2 }[scope]
+      Mint.path[index]
+      
+    when Hash
+      Mint.path[scope]
+
+    else
+      nil
+    end
+  end
+
   # Returns a hash with key Mint directories
   def self.directories
     { :templates => 'templates' }
@@ -36,12 +54,12 @@ module Mint
 
   def self.default_options
     {
-      # Do not set default template or will override style and
-      # layout when not desired -- causes tricky bugs
-      :layout => 'default', # default layout
-      :style => 'default',   # default style
+      # Do not set default `:template`--will override style and
+      # layout when already specified -- causes tricky bugs
+      :layout => 'default',     # default layout
+      :style => 'default',      # default style
       :destination => '',       # do not create a subdirectory
-      :style_destination => nil  # do not create a subdirectory
+      :style_destination => nil # do not copy style to root
     }
   end
 
@@ -81,7 +99,7 @@ module Mint
   # it cannot find a template.
   def self.find_template(name, type)
     templates_dir = Mint.directories[:templates]
-    acceptable_formats = /#{Mint.formats.join('|')}/
+    acceptable_formats = /#{Mint.formats.join '|'}/
 
     Mint.path.
       map {|p| p + templates_dir + name + type.to_s }.
@@ -136,10 +154,10 @@ module Mint
       self.renderer = Mint.renderer source
     end
 
-    def equals?(other)
+    def equal?(other)
       destination + name == other.destination + other.name
     end
-    alias_method :==, :equals?
+    alias_method :==, :equal?
 
     def render(context=Object.new, args={})
       @renderer.render context, args # see Tilt TEMPLATES.md for more info
@@ -175,19 +193,19 @@ module Mint
 
     # The following provide reader/accessor methods for the objects's
     # important attributes. Each implicit reader is paired with an
-    # explicit reader that processes a variety of input to a standardized
-    # state.
+    # explicit assignment method that processes a variety of input to a 
+    # standardized state.
     
     # When you set content, you are giving the document a renderer based
     # on the content file and are processing the templated content into
     # Html, which you can then access using via the content reader.
     attr_reader :content
     def content=(src)
-      @renderer = Mint.renderer(src)
+      @renderer = Mint.renderer src
       @content = @renderer.render
     end
 
-    # The explicit accessor allows you to pass the document an existing
+    # The explicit assignment method allows you to pass the document an existing
     # layout or the name of a layout template in the Mint path or an
     # existing layout file.
     attr_reader :layout
@@ -195,12 +213,12 @@ module Mint
       if layout.respond_to? :render
         @layout = layout
       else
-        layout_file = Mint.lookup_template layout
-        @layout = Layout.new(layout_file)
+        layout_file = Mint.lookup_template layout, :layout
+        @layout = Layout.new layout_file
       end
     end
     
-    # The explicit accessor allows you to pass the document an existing
+    # The explicit assignment method allows you to pass the document an existing
     # style or the name of a style template in the Mint path or an
     # existing style file.
     attr_reader :style
@@ -208,8 +226,8 @@ module Mint
       if style.respond_to? :render
         @style = style
       else
-        style_file = Mint.lookup_template(style, :style)
-        @style = Style.new(style_file, :destination => destination)
+        style_file = Mint.lookup_template style, :style
+        @style = Style.new style_file, :destination => destination
       end
     end
     
@@ -228,7 +246,8 @@ module Mint
       self.content = source
       self.layout = options[:layout]
       self.style = options[:style]
-      self.style.destination = options[:style_destination] || self.style.source.dirname.expand_path
+      self.style.destination = options[:style_destination] || 
+        self.style.source.dirname.expand_path
     end
 
     def render(args={})
@@ -236,15 +255,21 @@ module Mint
     end
 
     def mint(root_directory=Dir.getwd, render_style=true)      
-      root_directory = Pathname.new(root_directory)
+      root_directory = Pathname.new root_directory
       
       # Only render style if a) it's specified by the options path and
       # b) it actually needs rendering (i.e., it's in template form and
       # not raw, browser-parseable CSS).
       render_style &&= style.needs_rendering?
-      resources = [self]
+      resources = [ self ]
+
       resources << style if render_style
 
+      # Need to reimplement this so that all edge cases are satsified:
+      # - Sass file -> rendered, copied
+      # - Sass file -> rendered, not copied
+      # - Css file -> copied
+      # - Css file -> not copied
       resources.compact.each do |res|
         dest = root_directory + res.destination + res.name
         FileUtils.mkdir_p dest.dirname
