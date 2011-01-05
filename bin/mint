@@ -16,22 +16,20 @@ module Mint
   def self.options
     {
       # These options take parameters
-      :template   => ['t', 'template', true, 'Specify the template (layout + style).'],
-      :layout     => ['l', 'layout', true, 'Specify only the layout.'],
-      :style      => ['s', 'style', true, 'Specify only the style.'],
-      :root       => ['w', 'root', true, 'Specify a root outside the current directory.'],
-      :destination \
-                  => ['d', 'destination', true, 'Specify a destination directory, relative to the root.'],
-      :style_destination \
-                  => ['n', 'style-destination', true, 'Specify a destination directory for stylesheets, relative to the document destination directory. If not explicit, will be linked from original location.'],
+      template: ['t', 'template', true, 'Specify the template (layout + style).'],
+      layout: ['l', 'layout', true, 'Specify only the layout.'],
+      style: ['s', 'style', true, 'Specify only the style.'],
+      root: ['w', 'root', true, 'Specify a root outside the current directory.'],
+      destination: ['d', 'destination', true, 'Specify a destination directory, relative to the root.'],
+      style_destination: ['n', 'style-destination', true, 'Specify a destination directory for stylesheets, relative to the document destination directory. If not explicit, will be linked from original location.'],
 
       # These options do not take parameters
-      :global     => ['G', 'global', false, 'Specify config changes on a global level.'],
-      :user       => ['U', 'user', false, 'Specify config changes on a user-wide level.'],
-      :local      => ['L', 'local', false, 'Specify config changes on a project-specific level.'],
-      :force      => ['f', 'force', false, 'Force file overwrite without prompt.'],
-      :verbose    => ['v', 'verbose', false, 'Verbose output.'],
-      :simulation => ['s', 'simulation', false, 'Simulate transformation without actually creating files.']
+      global: ['G', 'global', false, 'Specify config changes on a global level.'],
+      user: ['U', 'user', false, 'Specify config changes on a user-wide level.'],
+      local: ['L', 'local', false, 'Specify config changes on a project-specific level.'],
+      force: ['f', 'force', false, 'Force file overwrite without prompt.'],
+      verbose: ['v', 'verbose', false, 'Verbose output.'],
+      simulation: ['s', 'simulation', false, 'Simulate transformation without actually creating files.']
     }
   end
 

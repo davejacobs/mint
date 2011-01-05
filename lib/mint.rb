@@ -44,22 +44,22 @@ module Mint
 
   # Returns a hash with key Mint directories
   def self.directories
-    { :templates => 'templates' }
+    { templates: 'templates' }
   end
 
   # Returns a hash with key Mint files
   def self.files
-    { :config => 'config.yaml' }
+    { config: 'config.yaml' }
   end
 
   def self.default_options
     {
       # Do not set default `:template`--will override style and
       # layout when already specified -- causes tricky bugs
-      :layout => 'default',     # default layout
-      :style => 'default',      # default style
-      :destination => '',       # do not create a subdirectory
-      :style_destination => nil # do not copy style to root
+      layout: 'default',     # default layout
+      style: 'default',      # default style
+      destination: '',       # do not create a subdirectory
+      style_destination: nil # do not copy style to root
     }
   end
 
@@ -261,7 +261,7 @@ module Mint
       # b) it actually needs rendering (i.e., it's in template form and
       # not raw, browser-parseable CSS).
       render_style &&= style.needs_rendering?
-      resources = [ self ]
+      resources = [self]
 
       resources << style if render_style
 
@@ -285,7 +285,8 @@ module Mint
     # Returns a relative path from the document to its stylesheet. Can
     # be called directly from inside a layout template.
     def stylesheet
-      Helpers.normalize_path(style.destination.expand_path, destination) + style.name.to_s
+      Helpers.normalize_path(style.destination.expand_path, destination) + 
+        style.name.to_s
     end
   end
 end
