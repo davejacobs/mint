@@ -1,9 +1,6 @@
 require 'pathname'
 require 'fileutils'
 require 'tilt'
-require 'haml'
-require 'rdiscount'
-
 require 'helpers'
 
 module Mint
@@ -31,12 +28,10 @@ module Mint
   def self.path_for_scope(scope=:local)
     case Mint.path
     when Array
-      index = { :local => 0, :user => 1, :global => 2 }[scope]
+      index = { local: 0, user: 1, global: 2 }[scope]
       Mint.path[index]
-      
     when Hash
       Mint.path[scope]
-
     else
       nil
     end
@@ -71,7 +66,7 @@ module Mint
   # Registered Css formats, for source -> destination
   # name guessing/conversion only.
   def self.css_formats
-    css_formats = [ '.css', '.sass', '.scss', '.less' ]
+    css_formats = ['.css', '.sass', '.scss', '.less']
   end
 
   # Decides whether the template specified by `name_or_file` is a real
@@ -114,7 +109,9 @@ module Mint
   # its source file's base name
   def self.guess_name_from(name)
     css = Mint.css_formats.join '|'
-    name.basename.to_s.gsub(/#{css}/, '.css').gsub(/\.[^css]+/, '.html')
+    name.basename.to_s.
+      gsub(/(#{css})$/, '.css').
+      gsub(/(\.[^css]+)$/, '.html')
   end
 
   # Transforms a path into a template that will render the file specified
@@ -191,7 +188,7 @@ module Mint
     end
 
     def needs_rendering?
-      source.extname != '.css'
+      source.extname !~ /\.css$/
     end
   end
 
