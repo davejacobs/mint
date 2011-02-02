@@ -84,7 +84,7 @@ You can pass any of the following to a new document:
 
   Defaults:
 
-        :destination => ''
+        :destination => nil
         :style_destination => nil
 
   Notes:
