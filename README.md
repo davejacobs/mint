@@ -299,16 +299,15 @@ Currently, the `mint` vocabulary consists of `set`, `edit`, and `config`.
 
 To set a local (directory-specific) configuration option, call `mint set`:
 
-    mint set [local] --template serif-professional --destination final
+    mint set [--local] template=serif-professional
 
 This will create (or update) a config file: ./.mint/config.yml
 
 It will contain:
 
     template: serif-professional
-    destination: final
 
-From now on, calling `mint` in this directory will automatically draw on these two options. (Commandline options will override these file options.)
+From now on, calling `mint` in this directory will automatically draw on this option. (Commandline options will override any file-based options.)
 
 You can also set user-wide options:
 
@@ -327,8 +326,7 @@ Finally, you can set global options for all users:
 This configuration affects all users and will be put somewhere appropriate:
 
 - In Linux and on other FHS-compliant systems, this will be in /usr/share/mint
-- On Mac OS X, this is going to land somewhere unknown, possibly inside 
-  of /Library/Application Support/Mint or /usr/share/mint -- I haven't decided
+- On Mac OS X, this is going to land somewhere yet to be determined, possibly inside of /Library/Application Support/Mint or /usr/share/mint -- I haven't decided
 - On Windows, this will end up *(somewhere dumber than before)*
 
 These options give you the power to unify a directory or user or all users under a certain default layout and style. These options are all overridden via commandline options and only provide defaults so that you can save typing common commands. `mint` selects the most specific option possible, starting with the commandline, then checking local the config file, and finally moving to the user-wide and global config files.
@@ -362,24 +360,10 @@ This section documents features that do not yet exist, but that I would like to 
 
 ### Composed styles ###
 
-Not everyone wants to code an entire stylesheet every time he wants a new look. In fact, the most common use case for stylesheets is probably tweaking typography. For this reason (and to make this tool as accessible as possible), I want to implement a feature where you can select one stylesheet as a base and implement tweaks on top of that file. Of course Css makes this easy enough, but I want to implement this feature in such a way that it is easy and intuitive for everyone.
+Not everyone wants to code an entire stylesheet every time he wants a new look. In fact, the most common use case for stylesheets is probably tweaking typography. For this reason (and to make this tool as accessible as possible), I want to implement a feature where you can select one stylesheet as a base and implement tweaks on top of that file, using a Yaml-based DSL. Of course Css makes this easy enough, but I want to implement this feature in such a way that it is easy and intuitive for everyone.
 
 ### Packages ###
 
-Sometimes, it may be useful to "finalize" the design of a document, for example, with publications. The best way I can think of to do this is to package the document's output file along with its style in a zipped package, which can be read by the following:
+Sometimes, it may be useful to "finalize" the design of a document, for example, with publications. The best way I can think of to do this is to package the document's output file with its style inline. To do so, simply add the package option:
 
-    mint open --package Minimalism --in firefox
-
-To package a document with its stylesheet, as a sort of a printing:
-
-    mint package document.md --name Document
-
-Eventually, this could include multiple output formats, like Html4, Html5, Pdf and ePub. The format opened by the `mint open` command could be determined by the application you choose to open it with. (This would take some serious OS hacking, I think.)
-
-When that does happen, you'll also be able to set the default version of the document that will open using:
-
-    mint set [local] --package-default html5
-    
-### More ###
-
-More ideas are coming soon...
+    mint package document.md
