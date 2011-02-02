@@ -4,7 +4,6 @@ require 'tilt'
 require 'helpers'
 
 module Mint
-  VERSION = '0.1.3'
   MINT_DIR = Pathname.new(__FILE__).realpath.dirname + '..'
 
   # Assume that someone using an Html template has formatted it
