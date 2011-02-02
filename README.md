@@ -227,14 +227,14 @@ When you name a layout or style with a string or symbol, Mint will first search 
 The default Mint path (in order) is:
 
 - the current working directory
-- ${HOME}/.mint
-- /usr/share/mint (or whatever your system uses for system-wide configuration - Mint will make a smart guess)
+- `${HOME}/.mint`
+- `/usr/share/mint` (or whatever your system uses for system-wide configuration - Mint will make a smart guess)
 - the Mint gem directory (which holds the Mint-approved templates)
 
 Templates should be in a directory named templates. Inside this directory, there should be a subdirectory for each template:
 
-- ${MINT\_PATH}/templates/normal/style.css
-- ${MINT\_PATH}/templates/normal/layout.haml
+- `${MINT_PATH}/templates/normal/style.sass`
+- `${MINT_PATH}/templates/normal/layout.haml`
 
 Normally a style will go best with its layout complement. However, layouts and styles can be mixed and matched at your discretion. This is especially true where you are primarily customizing DOM elements with your stylesheet instead of targeting specific IDs or classes you're expecting to find. (In other words, this works best when your stylesheet focuses on modifying typography and not page layout.)
 
