@@ -54,11 +54,11 @@ module Mint
 
   def self.default_options
     {
-      # Do not set default `:template`--will override style and
+      # Do not set default `template`--will override style and
       # layout when already specified -- causes tricky bugs
       layout: 'default',     # default layout
       style: 'default',      # default style
-      destination: '',       # do not create a subdirectory
+      destination: nil,      # do not create a subdirectory
       style_destination: nil # do not copy style to root
     }
   end
@@ -99,14 +99,14 @@ module Mint
   # it cannot find a template.
   def self.find_template(name, type)
     templates_dir = Mint.directories[:templates]
-    acceptable_formats = /#{Mint.formats.join '|'}/
+
+    file_name  = lambda {|x| x + templates_dir + name + type.to_s }
+    find_files = lambda {|x| Pathname.glob "#{x.to_s}.*" }
+    acceptable = lambda {|x| x.to_s =~ /#{Mint.formats.join '|'}/ }
 
     Mint.path.
-      map {|p| p + templates_dir + name + type.to_s }.
-      map {|p| Pathname.glob("#{p.to_s}.*") }.
-      flatten.
-      select {|p| p.to_s =~ acceptable_formats }.
-      select(&:exist?).
+      map(&file_name).map(&find_files).flatten.
+      select(&acceptable).select(&:exist?).
       first
   end
 
@@ -131,9 +131,16 @@ module Mint
       @source = Pathname.new(source) if source
     end
     
+    # I haven't tested this - moved empty string from
+    # default options into this method, so that default options
+    # can be uniform - i.e., style_destination and destination
+    # can each be nil to indicate that any rendering will be
+    # done in the same folder the file is already in. I need
+    # to make sure that adding the empty string here actually
+    # keeps us in the current working directory
     attr_reader :destination
     def destination=(destination)
-      @destination = Pathname.new(destination) if destination
+      @destination = Pathname.new(destination || '')
     end
     
     attr_reader :name
@@ -145,10 +152,11 @@ module Mint
       @renderer = renderer
     end
 
-    def initialize(src, options={})
-      return nil unless src
+    def initialize(source, type=:resource, options={})
+      return nil unless source
 
-      self.source = src
+      self.source = source
+      self.type = type
       self.destination = options[:destination]
       self.name = Mint.guess_name_from source
       self.renderer = Mint.renderer source
@@ -160,7 +168,8 @@ module Mint
     alias_method :==, :equal?
 
     def render(context=Object.new, args={})
-      @renderer.render context, args # see Tilt TEMPLATES.md for more info
+      # see Tilt TEMPLATES.md for more info
+      @renderer.render context, args 
     end
   end
 
@@ -169,8 +178,7 @@ module Mint
   # file to use when a template name is specified.
   class Layout < Resource
     def initialize(source, opts=Mint.default_options)
-      @type = :layout
-      super
+      super(source, :layout, opts)
     end
   end
 
@@ -179,8 +187,7 @@ module Mint
   # file to use when a template name is specified.
   class Style < Resource
     def initialize(source, opts=Mint.default_options)
-      @type = :style
-      super
+      super(source, :style, opts)
     end
 
     def needs_rendering?
@@ -200,8 +207,16 @@ module Mint
     # on the content file and are processing the templated content into
     # Html, which you can then access using via the content reader.
     attr_reader :content
-    def content=(src)
-      @renderer = Mint.renderer src
+    def content=(content)
+      meta, body = src.split "\n\n"
+      @inline_style = YAML.load meta
+      @renderer = Mint.renderer body
+      @content = @renderer.render
+    rescue
+      # I want to dry up this part of the code - and maybe look up which
+      # error Yaml will throw if it can't parse the first paragraph
+      # in the content
+      @renderer = Mint.renderer content
       @content = @renderer.render
     end
 
@@ -210,12 +225,13 @@ module Mint
     # existing layout file.
     attr_reader :layout
     def layout=(layout)      
-      if layout.respond_to? :render
-        @layout = layout
-      else
-        layout_file = Mint.lookup_template layout, :layout
-        @layout = Layout.new layout_file
-      end
+      @layout = 
+        if layout.respond_to? :render
+          layout
+        else
+          layout_file = Mint.lookup_template layout, :layout
+          Layout.new layout_file
+        end
     end
     
     # The explicit assignment method allows you to pass the document an existing
@@ -223,64 +239,68 @@ module Mint
     # existing style file.
     attr_reader :style
     def style=(style)
-      if style.respond_to? :render
-        @style = style
-      else
-        style_file = Mint.lookup_template style, :style
-        @style = Style.new style_file, :destination => destination
-      end
+      @style = 
+        if style.respond_to? :render
+          style
+        else
+          style_file = Mint.lookup_template style, :style
+          Style.new style_file, :destination => destination
+        end
+    end
+
+    def template=(template)
+      layout, style = template, template if template
     end
     
     def initialize(source, opts={})
       options = Mint.default_options.merge opts
-
-      self.type = :document
-      super(source, options) # do not pass block, which would interfere with call
-
-      # The template option takes precedence over the other two
-      if templ = options[:template]
-        options[:layout], options[:style] = templ, templ 
-      end
+      super(source, :document, options)
 
       # Each of these should invoke explicitly defined method
-      self.content = source
-      self.layout = options[:layout]
-      self.style = options[:style]
-      self.style.destination = options[:style_destination] || 
-        self.style.source.dirname.expand_path
+      self.content  = source
+      self.layout   = options[:layout]
+      self.style    = options[:style]
+
+      # The template option takes precedence over the other two
+      self.template = options[:template]
+
+      self.style.destination = 
+        options[:style_destination] || self.style.source.dirname.expand_path
     end
 
     def render(args={})
       layout.render self, args
     end
 
-    def mint(root_directory=Dir.getwd, render_style=true)      
-      root_directory = Pathname.new root_directory
+    def mint(root=Dir.getwd, render_style=true)      
+      root = Pathname.new root
       
       # Only render style if a) it's specified by the options path and
       # b) it actually needs rendering (i.e., it's in template form and
       # not raw, browser-parseable CSS).
       render_style &&= style.needs_rendering?
-      resources = [self]
 
+      resources = [self]
       resources << style if render_style
 
-      # Need to reimplement this so that all edge cases are satsified:
-      # - Sass file -> rendered, copied
-      # - Sass file -> rendered, not copied
-      # - Css file -> copied
-      # - Css file -> not copied
-      resources.compact.each do |res|
-        dest = root_directory + res.destination + res.name
+      resources.compact.each do |r|
+        dest = root + r.destination + r.name
         FileUtils.mkdir_p dest.dirname
         
-        dest.open 'w+' do |file|
-          file << res.render
+        dest.open 'w+' do |f|
+          f << r.render
         end
       end
     end
 
     # Convenience methods for views
+
+    # Returns any inline document style that was parsed from the
+    # content file, in the header. For use in view where we want
+    # document-specific Css modifications.
+    def inline_style
+      @inline_style
+    end
 
     # Returns a relative path from the document to its stylesheet. Can
     # be called directly from inside a layout template.
