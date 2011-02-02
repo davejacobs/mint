@@ -7,7 +7,6 @@ $:.unshift Pathname.new(__FILE__).realpath.dirname + '..' + 'lib'
 
 require 'optparse'
 require 'yaml'
-require 'rubygems'
 require 'mint'
 
 module Mint
