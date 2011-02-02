@@ -269,7 +269,6 @@ The following correspond to the parameters you can pass to `Mint::Document.new`,
 - `--style, -s`
 - `--destination, -d`
 - `--style-destination, -n`
-- `--copy-style`
 
 There are also scoping options, both for the `set` and `edit` commands:
 
