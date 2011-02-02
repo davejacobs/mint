@@ -2,9 +2,6 @@
 # A script for harnessing Mint at the commandline
 
 require 'pathname'
-
-$:.unshift Pathname.new(__FILE__).realpath.dirname + '..' + 'lib'
-
 require 'optparse'
 require 'yaml'
 require 'mint'
@@ -19,8 +16,10 @@ module Mint
       layout: ['l', 'layout', true, 'Specify only the layout.'],
       style: ['s', 'style', true, 'Specify only the style.'],
       root: ['w', 'root', true, 'Specify a root outside the current directory.'],
-      destination: ['d', 'destination', true, 'Specify a destination directory, relative to the root.'],
-      style_destination: ['n', 'style-destination', true, 'Specify a destination directory for stylesheets, relative to the document destination directory. If not explicit, will be linked from original location.'],
+      destination: ['d', 'destination', true, 
+        'Specify a destination directory, relative to the root.'],
+      style_destination: ['n', 'style-destination', true, 
+        'Specify a destination directory for stylesheets, or nil to link in place'],
 
       # These options do not take parameters
       global: ['G', 'global', false, 'Specify config changes on a global level.'],
@@ -43,7 +42,7 @@ module Mint
         select(&:exist?).
         map {|p| YAML.load_file p }.
         reverse.
-        reduce({}) {|r,p| r.merge p }
+        reduce(Hash.new) {|r,p| r.merge p }
     end
 
     def self.full_options_with(commandline_options)
@@ -51,8 +50,9 @@ module Mint
     end
 
     def self.write_config(opts, scope=:local)
-      Helpers.ensure_directory Mint.path_for_scope(scope)
-      Helpers.update_yaml(opts, Mint.path_for_scope(scope) + Mint.files[:config])
+      config_directory = Mint.path_for_scope scope
+      Helpers.ensure_directory config_directory
+      Helpers.update_yaml(opts, config_directory + Mint.files[:config])
     end
     
     def self.edit(name, layout_or_style=:layout)
@@ -77,7 +77,6 @@ module Mint
     # provides an easy way to stop Mint from rendering a style, even
     # if the document's style is not nil.
     def self.mint(files, commandline_options)
-      puts "minting #{files}"
       documents = []
       options = Mint::CommandLine.full_options_with commandline_options
       
@@ -159,6 +158,5 @@ else
   commandline_options.delete :verbose
   commandline_options.delete :simulation
 
-  puts "ARGV = #{ARGV}"
   Mint::CommandLine.mint ARGV, commandline_options
 end
