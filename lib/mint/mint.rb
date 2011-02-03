@@ -4,7 +4,6 @@ require 'tilt'
 require 'helpers'
 
 module Mint
-  MINT_DIR = Pathname.new(__FILE__).realpath.dirname + '..'
 
   # Assume that someone using an Html template has formatted it
   # in Erb and that a Css stylesheet will pass untouched through
@@ -12,18 +11,24 @@ module Mint
   Tilt.register 'html', Tilt::ERBTemplate
   Tilt.register 'css', Tilt::LessTemplate
 
+  def root
+    Pathname.new(__FILE__).realpath.dirname + '../..'
+  end
+
   # Return the an array with the Mint template path. Will first look
   # for MINT_PATH environment variable. Otherwise will use smart defaults.
-  # Either way, earlier/higher paths take precedence.
+  # Either way, earlier/higher paths take precedence. And is considered to
+  # be the directory for "local" config options, templates, etc.
   def self.path
     mint_path = ENV['MINT_PATH'] || "#{Dir.getwd}/.mint:~/.mint:#{MINT_DIR}"
-    path = mint_path.split(':').map {|p| Pathname.new(p).expand_path }
+    mint_path.split(':').map {|p| Pathname.new(p).expand_path }
   end
 
   # I want to refactor this so that Mint.path is always a Hash...
   # should take care of this in the Mint.path=() method.
   # Right now, this is a hack. It assumes a sane MINT_PATH, where the
-  # first entry is most local and the last entry is most global.
+  # first entry is most local, the second is user-level,
+  # and the last entry is most global.
   def self.path_for_scope(scope=:local)
     case Mint.path
     when Array
