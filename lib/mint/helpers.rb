@@ -36,12 +36,11 @@ module Mint
         gsub(/&/, 'and').
         gsub(/\s+/, '-').
         gsub(/-+/, '-').
-        gsub(/[^a-z0-9-]/, '').
-        to_sym
+        gsub(/[^a-z0-9-]/, '')
     end
 
     def self.symbolize(obj)
-      obj.slugize.gsub(/-/, '_')
+      slugize(obj).gsub(/-/, '_').to_sym
     end
   end
 end
