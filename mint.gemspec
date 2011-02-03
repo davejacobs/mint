@@ -19,9 +19,12 @@ Gem::Specification.new do |s|
     bin/mint
     lib/mint.rb
     lib/mint/mint.rb
-    lib/mint/helpers.rb
     lib/mint/version.rb
+    lib/mint/helpers.rb
+    lib/mint/css.rb
     config/options.yaml
+    templates/default/layout.haml
+    templates/default/style.css
   ]
 
   s.require_path = 'lib'
