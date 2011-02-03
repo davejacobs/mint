@@ -7,31 +7,31 @@ require 'yaml'
 require 'mint'
 
 module Mint
-  # A map of all options that OptParse will accept from the commandline.
-  # All other arguments are taken to be filenames.
-  def self.options
-    {
-      # These options take parameters
-      template: ['t', 'template', true, 'Specify the template (layout + style).'],
-      layout: ['l', 'layout', true, 'Specify only the layout.'],
-      style: ['s', 'style', true, 'Specify only the style.'],
-      root: ['w', 'root', true, 'Specify a root outside the current directory.'],
-      destination: ['d', 'destination', true, 
-        'Specify a destination directory, relative to the root.'],
-      style_destination: ['n', 'style-destination', true, 
-        'Specify a destination directory for stylesheets, or nil to link in place'],
-
-      # These options do not take parameters
-      global: ['G', 'global', false, 'Specify config changes on a global level.'],
-      user: ['U', 'user', false, 'Specify config changes on a user-wide level.'],
-      local: ['L', 'local', false, 'Specify config changes on a project-specific level.'],
-      force: ['f', 'force', false, 'Force file overwrite without prompt.'],
-      verbose: ['v', 'verbose', false, 'Verbose output.'],
-      simulation: ['s', 'simulation', false, 'Simulate transformation without actually creating files.']
-    }
-  end
-
   module CommandLine
+    # A map of all options that OptParse will accept from the commandline.
+    # All other arguments are taken to be filenames.
+    def self.options
+      {
+        # These options take parameters
+        template: ['t', 'template', true, 'Specify the template (layout + style).'],
+        layout: ['l', 'layout', true, 'Specify only the layout.'],
+        style: ['s', 'style', true, 'Specify only the style.'],
+        root: ['w', 'root', true, 'Specify a root outside the current directory.'],
+        destination: ['d', 'destination', true, 
+          'Specify a destination directory, relative to the root.'],
+        style_destination: ['n', 'style-destination', true, 
+          'Specify a destination directory for stylesheets, or nil to link in place'],
+
+        # These options do not take parameters
+        global: ['G', 'global', false, 'Specify config changes on a global level.'],
+        user: ['U', 'user', false, 'Specify config changes on a user-wide level.'],
+        local: ['L', 'local', false, 'Specify config changes on a project-specific level.'],
+        force: ['f', 'force', false, 'Force file overwrite without prompt.'],
+        verbose: ['v', 'verbose', false, 'Verbose output.'],
+        simulation: ['s', 'simulation', false, 'Simulate transformation without actually creating files.']
+      }
+    end
+
     def self.config_options
       config_filename = Pathname.new(Mint.files[:config])      
 
@@ -49,12 +49,11 @@ module Mint
       config_options.merge commandline_options
     end
 
-    def self.write_config(opts, scope=:local)
-      config_directory = Mint.path_for_scope scope
-      Helpers.ensure_directory config_directory
-      Helpers.update_yaml(opts, config_directory + Mint.files[:config])
-    end
-    
+    # def self.install(file, scope=:local)
+    #   directory = path_for_scope(scope)
+    #   FileUtils.copy file, directory
+    # end
+
     def self.edit(name, layout_or_style=:layout)
       file = Mint.lookup_template name, layout_or_style
       
@@ -62,6 +61,12 @@ module Mint
       system "#{editor} #{file}"
     end
 
+    def self.write_config(opts, scope=:local)
+      config_directory = Mint.path_for_scope scope
+      Helpers.ensure_directory config_directory
+      Helpers.update_yaml(opts, config_directory + Mint.files[:config])
+    end
+ 
     def self.set(key, value, scope=:local)
       write_config({ key => value }, scope)
     end
@@ -97,7 +102,7 @@ commandline_options = {}
 optparse = OptionParser.new do |opts|
   opts.banner = 'Usage: mint [command] files [options]'
 
-  Mint.options.each do |k,v|
+  Mint::Commandline.options.each do |k,v|
     has_param = v[2]
 
     v[0] = "-#{v[0]}"
@@ -118,6 +123,19 @@ end
 optparse.parse!
 
 case ARGV.first.downcase.to_sym
+
+when :help
+  puts optparse.help
+
+# ... if we get the install command, install the listed file to the
+# scope listed, using local as the default scope
+when :install
+  commandline_options[:local] = true
+  scope = [:global, :user, :local].
+    select {|e| commandline_options[e] }.
+    first
+
+  Mint::CommandLine.install ARGV.shift, scope
 
 # If we get the edit command, will retrieve appropriate file
 # (probably a Mint template) and shell out that file to
