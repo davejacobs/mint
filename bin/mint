@@ -11,25 +11,9 @@ module Mint
     # A map of all options that OptParse will accept from the commandline.
     # All other arguments are taken to be filenames.
     def self.options
-      {
-        # These options take parameters
-        template: ['t', 'template', true, 'Specify the template (layout + style).'],
-        layout: ['l', 'layout', true, 'Specify only the layout.'],
-        style: ['s', 'style', true, 'Specify only the style.'],
-        root: ['w', 'root', true, 'Specify a root outside the current directory.'],
-        destination: ['d', 'destination', true, 
-          'Specify a destination directory, relative to the root.'],
-        style_destination: ['n', 'style-destination', true, 
-          'Specify a destination directory for stylesheets, or nil to link in place'],
-
-        # These options do not take parameters
-        global: ['G', 'global', false, 'Specify config changes on a global level.'],
-        user: ['U', 'user', false, 'Specify config changes on a user-wide level.'],
-        local: ['L', 'local', false, 'Specify config changes on a project-specific level.'],
-        force: ['f', 'force', false, 'Force file overwrite without prompt.'],
-        verbose: ['v', 'verbose', false, 'Verbose output.'],
-        simulation: ['s', 'simulation', false, 'Simulate transformation without actually creating files.']
-      }
+      # Options file, relative to this one
+      options_file = '../../config/options.yaml'
+      YAML.load_file File.expand_path(options_file, __FILE__)
     end
 
     def self.config_options
@@ -42,7 +26,7 @@ module Mint
         select(&:exist?).
         map {|p| YAML.load_file p }.
         reverse.
-        reduce(Hash.new) {|r,p| r.merge p }
+        reduce(Mint.default_options) {|r,p| r.merge p }
     end
 
     def self.full_options_with(commandline_options)
@@ -102,19 +86,19 @@ commandline_options = {}
 optparse = OptionParser.new do |opts|
   opts.banner = 'Usage: mint [command] files [options]'
 
-  Mint::Commandline.options.each do |k,v|
-    has_param = v[2]
+  Mint::CommandLine.options.each do |k,v|
+    has_param = v['parameter']
 
-    v[0] = "-#{v[0]}"
-    v[1] = "--#{v[1]}"
+    v['short'] = "-#{v['short']}"
+    v['long'] = "--#{v['long']}"
 
     if has_param
-      v[1] << " PARAM"
-      opts.on v[0], v[1], v[3] do |p|
-        commandline_options[k] = p
+      v['long'] << " PARAM"
+      opts.on v['short'], v['long'], v['description'] do |p|
+        commandline_options[k.to_sym] = p
       end
     else
-      opts.on v[0], v[1], v[3] do
+      opts.on v['short'], v['long'], v['description'] do
         commandline_options[k] = true
       end
     end

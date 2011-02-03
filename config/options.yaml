@@ -1,0 +1,72 @@
+template:
+  short: t
+  long: template
+  parameter: true
+  description: 'Specify the template (layout + style).'
+
+layout:
+  short: l
+  long: layout
+  parameter: true
+  description: 'Specify only the style'
+
+style:
+  short: s
+  long: style
+  parameter: true
+  description: 'Specify only the style.'
+
+root:
+  short: w
+  long: r
+  parameter: true
+  description: 'Specify a root outside the current directory.'
+
+destination:
+  short: d
+  long: destination
+  parameter: true 
+  description: 'Specify a destination directory, relative to the root.'
+
+style_destination:
+  short: n
+  long: style-destination
+  parameter: true
+  description: 'Specify a destination directory for stylesheets, or nil to link in place'
+
+global:
+  short: G
+  long: global
+  parameter: false
+  description: 'Specify config changes on a global level.'
+
+user:
+  short: U
+  long: user
+  parameter: false
+  description: 'Specify config changes on a user-wide level.'
+
+
+local:
+  short: L
+  long: local
+  parameter: false
+  description: 'Specify config changes on a project-specific level.'
+
+force:
+  short: f
+  long: force
+  parameter: false
+  description: 'Force file overwrite without prompt.'
+
+verbose:
+  short: v
+  long: verbose
+  parameter: false
+  description: 'Verbose output.'
+
+simulation:
+  short: s
+  long: simulation
+  parameter: false
+  description: 'Simulate transformation without actually creating files.'
