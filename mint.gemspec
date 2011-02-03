@@ -6,7 +6,6 @@ Gem::Specification.new do |s|
   
   s.name      = 'mint'
   s.version   = Mint::VERSION
-  s.date      = '2011-02-01'
   
   s.platform  = Gem::Platform::RUBY
   s.homepage  = 'http://github.com/davejacobs/mint'
@@ -21,6 +20,8 @@ Gem::Specification.new do |s|
     lib/mint.rb
     lib/mint/mint.rb
     lib/mint/helpers.rb
+    lib/mint/version.rb
+    config/options.yaml
   ]
 
   s.require_path = 'lib'
