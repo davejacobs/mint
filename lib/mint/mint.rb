@@ -70,7 +70,7 @@ module Mint
   # Registered Css formats, for source -> destination
   # name guessing/conversion only.
   def self.css_formats
-    css_formats = ['.css', '.sass', '.scss', '.less']
+    css_formats = ['css', 'sass', 'scss', 'less']
   end
 
   # Decides whether the template specified by `name_or_file` is a real
@@ -112,9 +112,10 @@ module Mint
   # Guesses an appropriate name for the resource output file based on
   # its source file's base name
   def self.guess_name_from(name)
+    name = name.basename if name.respond_to? :basename
     css = Mint.css_formats.join '|'
-    name.basename.to_s.
-      gsub(/(#{css})$/, '.css').
+    name.to_s.
+      gsub(/\.(#{css})$/, '.css').
       gsub(/(\.[^css]+)$/, '.html')
   end
 
@@ -197,8 +198,6 @@ module Mint
   end
 
   class Document < Resource
-    include Helpers
-
     # The following provide reader/accessor methods for the objects's
     # important attributes. Each implicit reader is paired with an
     # explicit assignment method that processes a variety of input to a 
@@ -210,7 +209,7 @@ module Mint
     attr_reader :content
     def content=(content)
       meta, body = src.split "\n\n"
-      @inline_style = YAML.load meta
+      @inline_style = Mint::CSS.parse(YAML.load meta)
       @renderer = Mint.renderer body
       @content = @renderer.render
     rescue
@@ -306,7 +305,7 @@ module Mint
     # Returns a relative path from the document to its stylesheet. Can
     # be called directly from inside a layout template.
     def stylesheet
-      Helpers.normalize_path(style.destination.expand_path, destination) + 
+      Helpers.normalize_path(style.destination, destination) + 
         style.name.to_s
     end
   end
