@@ -1,7 +1,6 @@
 require 'pathname'
 require 'fileutils'
 require 'tilt'
-require 'helpers'
 
 module Mint
 
@@ -11,7 +10,7 @@ module Mint
   Tilt.register 'html', Tilt::ERBTemplate
   Tilt.register 'css', Tilt::LessTemplate
 
-  def root
+  def self.root
     Pathname.new(__FILE__).realpath.dirname + '../..'
   end
 
@@ -20,7 +19,8 @@ module Mint
   # Either way, earlier/higher paths take precedence. And is considered to
   # be the directory for "local" config options, templates, etc.
   def self.path
-    mint_path = ENV['MINT_PATH'] || "#{Dir.getwd}/.mint:~/.mint:#{MINT_DIR}"
+    mint_path = ENV['MINT_PATH'] || 
+      "#{Dir.getwd}/.mint:~/.mint:#{Mint.root}"
     mint_path.split(':').map {|p| Pathname.new(p).expand_path }
   end
 
