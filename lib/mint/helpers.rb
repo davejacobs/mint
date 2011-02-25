@@ -4,6 +4,18 @@ require 'yaml'
 
 module Mint
   module Helpers    
+    def self.slugize(obj)
+      obj.to_s.downcase.
+        gsub(/&/, 'and').
+        gsub(/\s+/, '-').
+        gsub(/-+/, '-').
+        gsub(/[^a-z0-9-]/, '')
+    end
+
+    def self.symbolize(obj)
+      slugize(obj).gsub(/-/, '_').to_sym
+    end
+  
     def self.pathize(str_or_path)
       case str_or_path
       when String
@@ -27,20 +39,8 @@ module Mint
       curr_opts = file.exist? ? YAML.load_file(file) : {}
 
       File.open file, 'w' do |f|
-        YAML.dump curr_opts.merge(new_opts), f
+        YAML.dump(curr_opts.merge(new_opts), f)
       end
-    end
-
-    def self.slugize(obj)
-      obj.to_s.downcase.
-        gsub(/&/, 'and').
-        gsub(/\s+/, '-').
-        gsub(/-+/, '-').
-        gsub(/[^a-z0-9-]/, '')
-    end
-
-    def self.symbolize(obj)
-      slugize(obj).gsub(/-/, '_').to_sym
     end
   end
 end
