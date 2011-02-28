@@ -18,17 +18,22 @@ Gem::Specification.new do |s|
     README.md
     bin/mint
     lib/mint.rb
+    lib/mint/helpers.rb
     lib/mint/mint.rb
     lib/mint/version.rb
-    lib/mint/helpers.rb
     lib/mint/css.rb
+    lib/mint/commandline.rb
     config/options.yaml
     templates/default/layout.haml
     templates/default/style.css
+    templates/pro/layout.haml
+    templates/pro/style.sass
   ]
 
   s.require_path = 'lib'
-  s.executables = ['mint']
+  s.executables  = ['mint']
 
   s.add_dependency 'tilt'
+  s.add_development_dependency 'rspec'
+  s.add_development_dependency 'cucumber'
 end
