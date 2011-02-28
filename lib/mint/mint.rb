@@ -1,5 +1,6 @@
 require 'pathname'
 require 'fileutils'
+require 'yaml'
 require 'tilt'
 
 module Mint
@@ -249,7 +250,10 @@ module Mint
     end
 
     def template=(template)
-      layout, style = template, template if template
+      if template
+        self.layout = template
+        self.style = template
+      end
     end
     
     def initialize(source, opts={})
