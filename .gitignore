@@ -1,4 +1,5 @@
-.DS_Store
-Thumbs.db
 *~
 *.swp
+.DS_Store
+Thumbs.db
+tmp/*
