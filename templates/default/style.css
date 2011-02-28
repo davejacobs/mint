@@ -13,10 +13,10 @@ h1 {
 }
 
 h2 {
-  font-size: 105%;
-  font-weight: bold;
+  font-size: 125%;
+  font-weight: normal;
   margin-top: 10px;
-  margin-bottom: 0
+  margin-bottom: 5px
 }
 
 h3 {
@@ -28,7 +28,15 @@ h3 {
 }
 
 code {
-  font-family: Monaco, 'Lucida Console', Consolas, Monotype, mono; }
+  font-family: Monaco, 'Lucida Console', Consolas, Monotype, mono; 
+  font-size: 12px; 
+}
+
+pre {
+  display: block;
+  background-color: #eee;
+  padding: 5px 10px
+}
 
 ul {
   list-style-type: square;
@@ -46,12 +54,16 @@ ol {
 }
   
 ul li, ol li {
-  margin-left: 25px;
+  margin-left: 5px;
 }
 
 p {
   font-size: 100%;
-  margin: 10px 0;
+  margin: 0 0 10px 0;
+}
+
+p+p, ul+p, ol+p {
+  text-indent: 1em;
 }
 
 blockquote {
@@ -66,7 +78,8 @@ blockquote {
 @media screen {
   body {
     font-size: 16px;
-    background-color: #666; }
+    background-color: #666; 
+  }
 
   #container {
     display: block;
@@ -87,9 +100,9 @@ blockquote {
     font-size: 12pt;
     margin: 1in 1.25in; }
 
-    
   img {
-    display: block; }
+    display: block; 
+  }
     
   blockquote {
     background-color: #ddd;
