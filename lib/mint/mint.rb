@@ -256,6 +256,16 @@ module Mint
       end
     end
     
+    # Convenience methods for reaching into a document's style
+    # via a unified interface
+    def style_destination=(style_destination)
+      self.style.destination = style_destination if self.style
+    end
+
+    def style_destination
+      self.style.destination
+    end
+
     def initialize(source, opts={})
       options = Mint.default_options.merge opts
       super(source, :document, options)
