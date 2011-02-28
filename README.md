@@ -1,4 +1,4 @@
-*The following is a **rough draft** of the current Mint design, along with my future plans for the library and tool. The code is not yet tested, though it will be as soon as I decide on a framework, and the binary does not yet work. This is concept stuff, people.*
+*The following is a **rough draft** of the current Mint design, along with my future plans for the library and tool. The templates are not all there yet (that's the next step) and my first plugins aren't quite there. That said, I'm excited about where this library is going to go.*
 
 If I believed in slogans...
 ---------------------------
