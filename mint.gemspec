@@ -28,6 +28,19 @@ Gem::Specification.new do |s|
     templates/default/style.css
     templates/pro/layout.haml
     templates/pro/style.sass
+    features/mint_document.feature
+    features/step_definitions/mint_steps.rb
+    features/support/env.rb
+    spec/document_spec.rb
+    spec/spec_helper.rb
+  ]
+
+  s.test_files = %w[
+    features/mint_document.feature
+    features/step_definitions/mint_steps.rb
+    features/support/env.rb
+    spec/document_spec.rb
+    spec/spec_helper.rb
   ]
 
   s.require_path = 'lib'
