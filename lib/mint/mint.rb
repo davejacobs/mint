@@ -143,7 +143,7 @@ module Mint
     # keeps us in the current working directory
     attr_reader :destination
     def destination=(destination)
-      @destination = Pathname.new(destination || '')
+      @destination = Pathname.new(destination) if destination 
     end
     
     attr_reader :name
@@ -191,6 +191,7 @@ module Mint
   class Style < Resource
     def initialize(source, opts=Mint.default_options)
       super(source, :style, opts)
+      self.destination ||= source.dirname.expand_path
     end
 
     def needs_rendering?
@@ -232,17 +233,28 @@ module Mint
     # existing style file.
     attr_reader :style
     def style=(style)
-      # Before setting this document's style to a new one, save
-      # the current style destination, if it exists
-      destination = @style ? @style.destination : ''
-
       @style = 
         if style.respond_to? :render
           style
         else
           style_file = Mint.lookup_template style, :style
-          Style.new style_file, :destination => destination
+          Style.new style_file
         end
+    end
+
+    # I'm going to maintain a document's official style_destination
+    # outside of its style object. If a document has no
+    # style_destination defined when it needs one, the document will
+    # use the style's source directory. This eliminates edge cases
+    # nicely and lets us maintain document-specific information
+    # separately. (Without this separation, funky things happen when
+    # you assign a new style template to an existing document -- if
+    # you had specified a custom style_destination before changing
+    # the template, that custom destination would be overridden.
+
+    attr_reader :style_destination
+    def style_destination=(style_destination)
+      @style_destination = style_destination
     end
 
     def template=(template)
@@ -252,16 +264,6 @@ module Mint
       end
     end
     
-    # Convenience methods for reaching into a document's style
-    # via a unified interface
-    def style_destination=(style_destination)
-      self.style.destination = style_destination if self.style
-    end
-
-    def style_destination
-      self.style.destination
-    end
-
     def initialize(source, opts={})
       options = Mint.default_options.merge opts
       super(source, :document, options)
@@ -270,12 +272,10 @@ module Mint
       self.content  = source
       self.layout   = options[:layout]
       self.style    = options[:style]
+      self.style_destination = options[:style_destination]
 
       # The template option will override layout and style choices
       self.template = options[:template]
-
-      self.style_destination = 
-        options[:style_destination] || self.style.source.dirname.expand_path
 
       yield self if block_given?
     end
@@ -292,15 +292,24 @@ module Mint
       # not raw, browser-parseable CSS).
       render_style &&= style.needs_rendering?
 
-      resources = [self]
-      resources << style if render_style
+      document_file = root + (self.destination || '') + self.name
+      FileUtils.mkdir_p document_file.dirname
+      document_file.open 'w+' do |f|
+        f << self.render
+      end
 
-      resources.compact.each do |r|
-        dest = root + r.destination + r.name
-        FileUtils.mkdir_p dest.dirname
+      if render_style
+        style_dest = 
+          if style_destination 
+            root + self.destination + style_destination
+          else
+            self.style.destination
+          end
+        style_file = style_dest + self.style.name
+        FileUtils.mkdir_p style_file.dirname
         
-        dest.open 'w+' do |f|
-          f << r.render
+        style_file.open 'w+' do |f|
+          f << self.style.render
         end
       end
     end
