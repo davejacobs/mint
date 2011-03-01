@@ -275,7 +275,7 @@ module Mint
       self.layout   = options[:layout]
       self.style    = options[:style]
 
-      # The template option takes precedence over the other two
+      # The template option will override layout and style choices
       self.template = options[:template]
 
       self.style.destination = 
