@@ -209,14 +209,6 @@ module Mint
     # Html, which you can then access using via the content reader.
     attr_reader :content
     def content=(content)
-      meta, body = src.split "\n\n"
-      @inline_style = Mint::CSS.parse(YAML.load meta)
-      @renderer = Mint.renderer body
-      @content = @renderer.render
-    rescue
-      # I want to dry up this part of the code - and maybe look up which
-      # error Yaml will throw if it can't parse the first paragraph
-      # in the content
       @renderer = Mint.renderer content
       @content = @renderer.render
     end
@@ -308,13 +300,6 @@ module Mint
     end
 
     # Convenience methods for views
-
-    # Returns any inline document style that was parsed from the
-    # content file, in the header. For use in view where we want
-    # document-specific Css modifications.
-    def inline_style
-      @inline_style
-    end
 
     # Returns a relative path from the document to its stylesheet. Can
     # be called directly from inside a layout template.
