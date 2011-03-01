@@ -232,6 +232,10 @@ module Mint
     # existing style file.
     attr_reader :style
     def style=(style)
+      # Before setting this document's style to a new one, save
+      # the current style destination, if it exists
+      destination = @style ? @style.destination : ''
+
       @style = 
         if style.respond_to? :render
           style
@@ -270,8 +274,10 @@ module Mint
       # The template option will override layout and style choices
       self.template = options[:template]
 
-      self.style.destination = 
+      self.style_destination = 
         options[:style_destination] || self.style.source.dirname.expand_path
+
+      yield self if block_given?
     end
 
     def render(args={})
