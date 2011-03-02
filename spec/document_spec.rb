@@ -94,12 +94,12 @@ module Mint
     end
 
     shared_examples_for "documents with the local template" do
-      it "chooses the 'local' layout" do
+      it "chooses the local layout" do
         @document.layout.name.to_s.should =~ /local/
         @document.layout.source.to_s.should == 'local.haml'
       end
 
-      it "chooses the 'local' style" do
+      it "chooses the local style" do
         @document.style.name.to_s.should =~ /local/
         @document.style.source.to_s.should == 'local.css'
       end
