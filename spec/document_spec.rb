@@ -52,17 +52,23 @@ module Mint
       end
 
       it "renders its layout, injecting content inside"
-      it "writes its rendered layout + content to its destination directory"
+      it "writes its rendered layout + content to its destination directory" do
+        @document.mint
+        file = Pathname.getwd + (@document.destination || '') + @document.name
+        file.exist?.should == true
+      end
     end
 
     shared_examples_for "documents with a static stylesheet" do
       it "does not render its style" do
+        pending "need to figure out how to clean out styles rendered during tests"
         @document.style.needs_rendering?.should == false
       end
     end
 
     shared_examples_for "documents with a dynamic stylesheet" do
       it "renders its style" do
+        pending "need to figure out how to clean out styles rendered during tests"
         @document.style.needs_rendering?.should == true
       end
     end
