@@ -5,8 +5,6 @@ require 'fakefs/safe'
 module Mint
   describe Document do
     before(:each) do 
-      include FakeFS::SpecHelpers
-
       @file = 'content.md'
       @layout_file = 'local.haml'
       @style_file = 'local.css'
