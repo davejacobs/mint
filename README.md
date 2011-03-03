@@ -46,12 +46,12 @@ This section discusses the Mint library API. This library encapsulates the idea 
 
 Mint is loaded with smart defaults, so if you don't want to configure something--say, the basic HTML skeleton of your document or the output directory--you don't have to. You'll probably be surprised at how easy it is to use out of the box, and how configurable it is.
 
-    document = Document.new '~/Documents/Minimalism.md'
+    document = Document.new 'Minimalism.md'
     document.mint
 
 And voilà, Minimalism.html will show up next to Minimalism.md.
 
-Opening Minimalism.html with your favorite web browser--[Firefox is best for typography][Firefox typography], but Webkit-based browsers (Chrome, Safari) work, too--will show what looks like a word processed document, complete with big bolded headers, italic emphasis, automatically indented and numbered lists, and bullets. If you're in a modern browser, you'll even see ligatures and proper kerning. The page will be on a white canvas that looks like a page, even though you are in a browser.
+Opening Minimalism.html with your favorite web browser--[Firefox is best for typography][Firefox typography], but Webkit-based browsers (Chrome, Safari) work, too--will show what looks like a word-processed document, complete with big bold headers, italic emphasis, automatically indented and numbered lists, and bullets. If you're in a modern browser, you'll even see ligatures and proper kerning. The page will be on a white canvas that looks like a page, even though you are in a browser.
 
 Sending that page to a printer is as easy as clicking "Print" from your browser. What comes out of your printer will have a 12 pt base font, normal margins, and a not-too-cramped baseline. (Ah the wonder of print stylesheets.)
 
