@@ -3,6 +3,8 @@ require 'fileutils'
 require 'yaml'
 require 'tilt'
 
+require 'mint/exceptions'
+
 module Mint
   # Assume that someone using an Html template has formatted it
   # in Erb and that a Css stylesheet will pass untouched through
@@ -103,10 +105,11 @@ module Mint
     find_files = lambda {|x| Pathname.glob "#{x.to_s}.*" }
     acceptable = lambda {|x| x.to_s =~ /#{Mint.formats.join '|'}/ }
 
-    Mint.path.
-      map(&file_name).map(&find_files).flatten.
-      select(&acceptable).select(&:exist?).
-      first
+    template = Mint.path.map(&file_name).map(&find_files).flatten.
+      select(&acceptable).select(&:exist?).first
+    raise TemplateNotFoundException unless template
+
+    template
   end
 
   # Guesses an appropriate name for the resource output file based on
@@ -122,6 +125,6 @@ module Mint
   # Transforms a path into a template that will render the file specified
   # at that path
   def self.renderer(path)
-    Tilt.new path.to_s, :smart => true
+    Tilt.new path.to_s, :smart => true, :ugly => true
   end
 end
