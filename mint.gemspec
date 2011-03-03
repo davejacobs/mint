@@ -20,6 +20,10 @@ Gem::Specification.new do |s|
     lib/mint.rb
     lib/mint/helpers.rb
     lib/mint/mint.rb
+    lib/mint/resource.rb
+    lib/mint/layout.rb
+    lib/mint/style.rb
+    lib/mint/document.rb
     lib/mint/version.rb
     lib/mint/css.rb
     lib/mint/commandline.rb

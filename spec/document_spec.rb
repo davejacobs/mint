@@ -4,6 +4,11 @@ require 'fakefs/safe'
 
 module Mint
   describe Document do
+    before(:all) do
+      @old_dir = Dir.getwd
+      Dir.chdir 'tmp'
+    end
+
     before(:each) do 
       @file = 'content.md'
       @layout_file = 'local.haml'
@@ -36,6 +41,10 @@ module Mint
       File.open @style_file, 'w' do |f|
         f << @style
       end
+    end
+
+    after(:all) do
+      Dir.chdir @old_dir
     end
 
     shared_examples_for "all documents" do
