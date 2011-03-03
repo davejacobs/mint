@@ -60,7 +60,11 @@ module Mint
         @document.content.should =~ /<p>This is just a test.<\/p>/
       end
 
-      it "renders its layout, injecting content inside"
+      it "renders its layout, injecting content inside" do
+        @document.render.should =~ /.*<html>.*<\/html>.*/m
+        @document.render.should =~ /<p>This is just a test.<\/p>/
+      end
+
       it "writes its rendered layout + content to its destination directory" do
         @document.mint
         file = Pathname.getwd + (@document.destination || '') + @document.name
@@ -70,14 +74,12 @@ module Mint
 
     shared_examples_for "documents with a static stylesheet" do
       it "does not render its style" do
-        pending "need to figure out how to clean out styles rendered during tests"
         @document.style.needs_rendering?.should == false
       end
     end
 
     shared_examples_for "documents with a dynamic stylesheet" do
       it "renders its style" do
-        pending "need to figure out how to clean out styles rendered during tests"
         @document.style.needs_rendering?.should == true
       end
     end

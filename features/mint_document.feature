@@ -38,10 +38,10 @@ Feature: Mint document with varying options at the command line
     And the file "content.html" should contain "<style file>"
 
     Examples:
-      | template | layout | style  | style file                        |
-      |          |        |        | ../../templates/default/style.css |
-      | -t pro   |        |        | ../../templates/pro/style.css     |
-      |          | -l pro | -s pro | ../../templates/pro/style.css     |
+      | template | layout | style  | style file                            |
+      |          |        |        | ../../templates/default/css/style.css |
+      | -t pro   |        |        | ../../templates/pro/css/style.css     |
+      |          | -l pro | -s pro | ../../templates/pro/css/style.css     |
 
   Scenario: Mint document with non-existent template
     When I run "mint -t nonexistent content.md"

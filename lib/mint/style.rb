@@ -7,7 +7,7 @@ module Mint
   class Style < Resource
     def initialize(source, opts=Mint.default_options)
       super(source, :style, opts)
-      self.destination ||= source.dirname.expand_path
+      self.destination ||= source.dirname.expand_path + 'css'
     end
 
     def needs_rendering?
