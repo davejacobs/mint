@@ -69,14 +69,14 @@ You can pass any of the following to a new document:
 
   Defaults:
 
-        :template => 'default'
+      :template => 'default'
 
   Notes:
 
   1. If you specify a template name here, Mint will search its paths in order (see **The Mint Path** for more details) for a template with that name. A template file looks like the following:
 
-            ${MINT_PATH}/templates/template_name/style.css
-            ${MINT_PATH}/templates/template_name/layout.haml
+          ${MINT_PATH}/templates/template_name/style.css
+          ${MINT_PATH}/templates/template_name/layout.haml
 
   2. If you specify a template name that is also the name of an existing file in your working directory, Mint will use the file and not look for a template. (It is unlikely you'll have an extension-less file named 'normal' or 'default' in your working directory, so don't worry about this edge case.) If you do specify an existing file, the path/file will be resolved from the directory where you're calling Mint (the 'working directory'). To use Mint this way (and I don't see this as more than a temporary solution) you'll probably want to call Mint from within your source's directory. Alternatively, you can use [`Dir.chdir`][Dir::chdir method] for the same effect.
 
@@ -84,8 +84,8 @@ You can pass any of the following to a new document:
 
   Defaults:
 
-        :destination => nil
-        :style_destination => nil
+      :destination => nil
+      :style_destination => nil
 
   Notes:
 
@@ -103,12 +103,14 @@ The following are possible:
     content = '~/Documents/Minimalism.md'
     
     Document.new content
-    Document.new content, :destination => 'directory', :style => 'serif-pro'
+    Document.new content, :destination => 'directory', 
+      :style => 'serif-pro'
     Document.new content, :style => Style.new(:normal)
     
     Style.new 'normal'
     Style.new :normal
-    Style.new '~/Sites/Common Styles/normal.css', :destination => 'styles'
+    Style.new '~/Sites/Common Styles/normal.css', 
+      :destination => 'styles'
     Style.new '~/Sites/Common Styles/normal.css', 
       :style_destination => 'inline'
     Style.new 'Common Styles/normal.css'
@@ -126,23 +128,6 @@ If block-style initiation is your thing:
 > the document with default values. So you do not need to worry about
 > specifying each argument. Anything you specify will override what
 > is already there.
-
-One warning: when you initialize a document via a block, do not try
-the following:
-
-    Document.new content do |d|
-      # The wrong way to block-initialize a style destination:
-      d.style_destination = 'styles'
-    end
-
-Because `:style_destination` translates internally to `:destination` (so that it can be passed to the style initializer), setting `:style_destination` is meaningless in a document block. Instead, you should do the following:
-
-    Document.new content do |d|
-      # The right way to block-initialize a style destination:
-      d.style.destination = 'styles'
-    end
-
-*(Should this change? Maybe I'll fix that.)*
 
 [Dir::chdir method]: http://ruby-doc.org/core/classes/Dir.html#M002314 "You can change the current directory context with Dir::chdir(path)"
 
