@@ -18,16 +18,6 @@ Mint manages your documents in a decentralized but consistent way. It frees you 
 
 In a few more: *Mint processes words so you don't have to.*
 
-Table of contents
------------------
-
-I. Use cases  
-II. The Mint library  
-III. Designing a template  
-IV. The Mint path  
-V. The `mint` command  
-VI. Future directions and tools
-
 I. Use cases
 ------------
 
@@ -91,7 +81,7 @@ You can pass any of the following to a new document:
 
   1. `:destination` *must* refer to a directory (existing or not) and not a file.
 
-  2. `:style_destination` is resolved relative to `:destination` so that packaging styles inside document directories is easy. (This supports the common case where you will want a subdirectory called 'styles' to hold your style files.) When `:style_destination` is nil (default), the stylesheet will not be copied anywhere. Instead, your document will link to the rendered stylesheet in place. If `:style_destination` is 'inline', your style will be included inline with your published document.
+  2. `:style_destination` is resolved relative to `:destination` so that packaging styles inside document directories is easy. (This supports the common case where you will want a subdirectory called 'styles' to hold your style files.) When `:style_destination` is nil (default), the stylesheet will not be copied anywhere. Instead, your document will link to the rendered stylesheet in place. If it needs to be rendered, it will be rendered into a subdirectory called 'css' so that the rendered document isn't picked up the next time you specify the same style.
 
 ### Examples ###
 
@@ -100,10 +90,10 @@ At this point, a couple of examples may be useful.
 The following are possible:
 
     include Mint
-    content = '~/Documents/Minimalism.md'
+    content = 'Minimalism.md'
     
     Document.new content
-    Document.new content, :destination => 'directory', 
+    Document.new content, :destination => 'output', 
       :style => 'serif-pro'
     Document.new content, :style => Style.new(:normal)
     
@@ -115,8 +105,6 @@ The following are possible:
       :style_destination => 'inline'
     Style.new 'Common Styles/normal.css'
 
-> Note: A style's destination is specified as `:destination` when passed directly to the file or as `:style_destination` when passed to a document or project
-
 If block-style initiation is your thing:
 
     Document.new content do |d|
@@ -124,10 +112,7 @@ If block-style initiation is your thing:
       d.template = 'resume'
     end
 
-> Note: Block-style indentation passes the block to you *after* initializing
-> the document with default values. So you do not need to worry about
-> specifying each argument. Anything you specify will override what
-> is already there.
+Block-style indentation passes the block to you *after* initializing the document with default values. So you do not need to worry about specifying each argument. Anything you specify will override what is already there.
 
 [Dir::chdir method]: http://ruby-doc.org/core/classes/Dir.html#M002314 "You can change the current directory context with Dir::chdir(path)"
 
@@ -335,8 +320,8 @@ Inside of a directory, you can edit any stylesheet or document template that wou
 
 Mint will open the appropriate file in the editor specified by EDITOR. The same short forms listed earlier apply here:
 
-    mint edit -L normal
-    mint edit -S normal
+    mint edit -l normal
+    mint edit -s normal
 
 VI. The future of Mint
 ----------------------
@@ -351,4 +336,5 @@ Not everyone wants to code an entire stylesheet every time he wants a new look. 
 
 Sometimes, it may be useful to "finalize" the design of a document, for example, with publications. The best way I can think of to do this is to package the document's output file with its style inline. To do so, simply add the package option:
 
+    # Note: I haven't implemented this yet 
     mint package document.md
