@@ -30,6 +30,8 @@ module Mint
           layout_file = Mint.lookup_template layout, :layout
           Layout.new layout_file
         end
+    rescue TemplateNotFoundException
+      abort "Template '#{layout}' does not exist."
     end
     
     # The explicit assignment method allows you to pass the document an existing
@@ -44,6 +46,8 @@ module Mint
           style_file = Mint.lookup_template style, :style
           Style.new style_file
         end
+    rescue TemplateNotFoundException
+      abort "Template '#{style}' does not exist."
     end
 
     # I'm going to maintain a document's official style_destination
