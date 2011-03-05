@@ -44,6 +44,9 @@ module Mint
     end
 
     after(:all) do
+      File.delete @content
+      File.delete @layout_file
+      File.delete @style_file
       Dir.chdir @old_dir
     end
 
