@@ -261,7 +261,7 @@ Other options have nothing to do with document configuration but are there for c
 
 Not all commandline arguments will be read as files. `mint` has a certain vocabulary that you can use, for example, to manipulate configuration options or edit layout files.
 
-Currently, the `mint` vocabulary consists of `set`, `edit`, and `config`. 
+Currently, the `mint` vocabulary consists of `set`, `edit`, and `config`. (Coming soon: `install` and `package`.)
 
 ### `mint` configuration ###
 
