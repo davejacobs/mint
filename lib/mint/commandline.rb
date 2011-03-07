@@ -41,7 +41,6 @@ module Mint
     #   FileUtils.copy file, directory
     # end
 
-
     # If we get the edit command, will retrieve appropriate file
     # (probably a Mint template) and shell out that file to
     # the user's favorite editor.
@@ -58,7 +57,6 @@ module Mint
       Helpers.ensure_directory config_directory
       Helpers.update_yaml opts, config_file
     end
- 
 
     # Try to set a config option (at the specified scope) per 
     # the user's command.
