@@ -90,7 +90,7 @@ module Mint
     File.exist?(name) ? Pathname.new(name) : find_template(name, type)
   end
 
-  # Finds a template named `name` in the Mint path. If `type` # is :layout,
+  # Finds a template named `name` in the Mint path. If `type` is :layout,
   # will look for `${MINT_PATH}/templates/layout.*`. If it is :style, will
   # look for `${MINT_PATH}/templates/template_name/style.*`. Mint assumes
   # that a named template will hold only one layout and one style template.
