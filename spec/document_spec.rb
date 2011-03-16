@@ -1,6 +1,4 @@
 require 'spec_helper'
-require 'fakefs/spec_helpers'
-require 'fakefs/safe'
 
 module Mint
   describe Document do
