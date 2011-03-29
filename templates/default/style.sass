@@ -24,23 +24,31 @@ h3
 
 ul
   list-style-type: square
+
   ul
     list-style-type: circle
 
-li
-  margin: 6px 0
-
-ol
-  margin: 6px 0
-
-ul li, ol li
-  margin-left: 5px
+ul, ol
+  margin: 6px 0 0 5px
+  padding-left: 25px
 
 p
   margin: 9px 0 9px 0
 
 p+p, ul+p, ol+p
   // text-indent: 1em
+
+$link_color: #cb0018
+a
+  &:link
+    color: $link_color
+  &:visited
+    color: $link_color
+  &:active
+    color: $link_color
+  &:hover
+    color: #fff
+    background-color: $link_color
 
 code
   font-family: Menlo, Mensch, Monaco, Consolas, Monotype, mono
