@@ -4,8 +4,8 @@ module Mint
       'container'
     end
 
-    # Mappings from "DSL" to actual CSS. The plan is to translate
-    # this into something like:
+    # Mappings from "DSL" to actual CSS. This is not yet implemented, but 
+    # the plan is to translate this into something like:
     #
     # #container {
     #   font: (value specified and cleaned up)
