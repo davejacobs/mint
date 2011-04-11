@@ -29,7 +29,7 @@ Gem::Specification.new do |s|
     lib/mint/commandline.rb
     config/options.yaml
     templates/default/layout.haml
-    templates/default/style.css
+    templates/default/style.sass
     templates/pro/layout.haml
     templates/pro/style.sass
     features/mint_document.feature
