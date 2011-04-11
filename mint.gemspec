@@ -51,6 +51,14 @@ Gem::Specification.new do |s|
   s.executables  = ['mint']
 
   s.add_dependency 'tilt'
+  s.add_dependency 'rdiscount'
+  s.add_dependency 'erubis'
+  s.add_dependency 'haml', '>= 2.2.11'
+  s.add_dependency 'rdiscount'
+  s.add_dependency 'liquid'
+  s.add_dependency 'less'
+  s.add_dependency 'radius'
+  s.add_dependency 'markaby'
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'cucumber'
   s.add_development_dependency 'aruba'
