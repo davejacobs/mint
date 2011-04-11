@@ -42,12 +42,14 @@ module Mint
     end
 
     after do
-      File.delete @content
+      File.delete @content_file
       File.delete @layout_file
       File.delete @style_file
     end
 
-    after(:all) { Dir.chdir @old_dir }
+    after(:all) do
+      Dir.chdir @old_dir
+    end
 
     shared_examples_for "all documents" do
       it "loads content as its source" do
@@ -215,5 +217,8 @@ module Mint
       it_behaves_like "documents with explicit directories"
       it_behaves_like "documents with a dynamic stylesheet"
     end
+
+    context "when it's created with an existing layout"
+    context "when it's created with an existnig style"
   end
 end
