@@ -204,7 +204,7 @@ module Mint
 
     context "when it's created with a block" do
       let(:document) do
-        Document.new @file do |document|
+        Document.new @content_file do |document|
           document.destination = 'destination'
           document.style_destination = 'styles'
           document.layout = 'pro'
