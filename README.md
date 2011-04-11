@@ -1,5 +1,7 @@
 *The following is a **rough draft** of the current Mint design, along with my future plans for the library and tool. The templates are not all there yet (that's the next step) and my first plugins aren't quite there. That said, I'm excited about where this library is going to go.*
 
+**Mint requires Ruby 1.9.**
+
 If I believed in slogans...
 ---------------------------
 
@@ -26,6 +28,8 @@ I. Use cases
 2. Donna has traditionally used a WYSIWYG word processor to create, edit, version, and present ideas in her personal and school life (not work). She wants her documents to exist forever without breaking standards: she wants them to be completely future-proof. Therefore, she wants to migrate away from her proprietary word processor. (Even non-proprietary word processors are really too heavyweight for her text-centered documents.) She wants a migration tool to make the initial conversion. Interoperability with other people is not required. As long as she can view and print formatted documents, keeping source files as plain text, she is happy.
 
 3. Marina wants to convert all her proprietary processed documents to Markdown for future compatibility, but wants to share these documents with friends at work. Interoperability is important here. The friends should be able to easily view *and* edit *and* annotate all documents. Marina will be happiest if she has a simple GUI that can export documents to an open-source document format that's interoperable with word processors.
+
+4. Santosh stores his blog entries in Markdown and wants to see how they look using his blog engine's stylesheet. He doesn't want to upload his entry until he's finished with it, but he wants to preview it with that stylesheet along the way.
 
 II. The Mint library
 --------------------
