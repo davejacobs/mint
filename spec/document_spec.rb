@@ -85,7 +85,7 @@ module Mint
 
     shared_examples_for "documents with a static stylesheet" do
       it "knows not to render its style" do
-        document.style.should_not need_rendering
+        document.style.need_rendering.should == false
       end
       
       it "does not render or write its style"
@@ -93,7 +93,7 @@ module Mint
 
     shared_examples_for "documents with a dynamic stylesheet" do
       it "knows to render its style" do
-        document.style.should_not need_rendering
+        document.style.need_rendering.should == true
       end
 
       it "writes its rendered style into its style_destination"
