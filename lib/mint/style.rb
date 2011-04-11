@@ -10,7 +10,7 @@ module Mint
       self.destination ||= source.dirname.expand_path + 'css'
     end
 
-    def needs_rendering?
+    def need_rendering?
       source.extname !~ /\.css$/
     end
   end

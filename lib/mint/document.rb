@@ -98,7 +98,7 @@ module Mint
       # Only render style if a) it's specified by the options path and
       # b) it actually needs rendering (i.e., it's in template form and
       # not raw, browser-parseable CSS).
-      render_style &&= style.needs_rendering?
+      render_style &&= style.need_rendering?
 
       document_file = root + (self.destination || '') + self.name
       FileUtils.mkdir_p document_file.dirname
