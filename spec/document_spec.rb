@@ -69,20 +69,15 @@ This is just a test.
           /.*<html>.*<p>This is just a test.<\/p>.*<\/html>.*/m
       end
 
-      # This test makes me think I want to add document.destination_file and
-      # change document.destination to document.destination_directory.
       it "creates a named output file in its specified destination directory" do
-        pending
-        document.mint
-        document.destination_file.should exist
-        # file = Pathname.getwd + (document.destination || '') + document.name
-        # file.should exist
+        file = Pathname.getwd + (document.destination || '') + document.name
+        file.should exist
       end
 
       it "writes its rendered layout and content to that output file" do
-        pending
         document.mint
-        content = File.read document.destination_file
+        file = Pathname.getwd + (document.destination || '') + document.name
+        content = File.read file
         content.should =~ /.*<html>.*<p>This is just a test.<\/p>.*<\/html>.*/m
       end
     end
