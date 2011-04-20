@@ -1,9 +1,11 @@
-*The following is a **rough draft** of the current Mint design, along with my future plans for the library and tool. The templates are not all there yet (that's the next step) and my first plugins aren't quite there. That said, I'm excited about where this library is going to go.*
+*The following is a **rough description** of the current Mint design, along with my future plans for the library and tool. When I have time, I'll extract the juciest parts into a README and move the rest into official documentation. The templates are not finished, and I haven't completed the plugin system. That said, I'm excited about where this library is going to go.*
 
 > **Mint requires Ruby 1.9.**
 
 If I believed in slogans...
 ---------------------------
+
+Mint is a publishing platform for people who want to store their documents as plain text without giving up proper layout or the ability to share with friends.
 
 I don't actually believe in tag lines, but if Mint were to have one, it might be one of these:
 
@@ -57,35 +59,39 @@ If you want to customize your document, though--and that's why I built this libr
 
 To understand how the library works, with and without configuration, it is helpful to look at the options you can pass to the library and what their defaults are.
 
-You can pass any of the following to a new document:
+You can change a document by passing it one of several options.
 
-- `:layout` and `:style` are names of templates or file names. They can be overridden by `:template`, which sets both to the same name.
+#### Layout and style ####
 
-  Defaults:
+`:layout` and `:style` are names of templates or file names. They can be overridden by `:template`, which sets both to the same name.
 
-      :template => 'default'
+Defaults:
 
-  Notes:
+    :template => 'default'
 
-  1. If you specify a template name here, Mint will search its paths in order (see **The Mint Path** for more details) for a template with that name. A template file looks like the following:
+Notes:
 
-          ${MINT_PATH}/templates/template_name/style.css
-          ${MINT_PATH}/templates/template_name/layout.haml
+1. If you specify a template name here, Mint will search its paths in order (see **The Mint Path** for more details) for a template with that name. A template file looks like the following:
 
-  2. If you specify a template name that is also the name of an existing file in your working directory, Mint will use the file and not look for a template. (It is unlikely you'll have an extension-less file named 'normal' or 'default' in your working directory, so don't worry about this edge case.) If you do specify an existing file, the path/file will be resolved from the directory where you're calling Mint (the 'working directory'). To use Mint this way (and I don't see this as more than a temporary solution) you'll probably want to call Mint from within your source's directory. Alternatively, you can use [`Dir.chdir`][Dir::chdir method] for the same effect.
+      ${MINT_PATH}/templates/template_name/style.css
+      ${MINT_PATH}/templates/template_name/layout.haml
 
-- `:destination` lets you organize your output. It directs Mint to write the template or document to one of root's subdirectories. There is an option to specify a separate `:style_destination`, which is resolved relative to `:destination`.
+2. If you specify a template name that is also the name of an existing file in your working directory, Mint will use the file and not look for a template. (It is unlikely you'll have an extension-less file named 'normal' or 'default' in your working directory, so don't worry about this edge case.) If you do specify an existing file, the path/file will be resolved from the directory where you're calling Mint (the 'working directory'). To use Mint this way (and I don't see this as more than a temporary solution) you'll probably want to call Mint from within your source's directory. Alternatively, you can use [`Dir.chdir`][Dir::chdir method] for the same effect.
 
-  Defaults:
+#### Destination ####
 
-      :destination => nil
-      :style_destination => nil
+`:destination` lets you organize your output. It directs Mint to write the template or document to one of root's subdirectories. There is an option to specify a separate `:style_destination`, which is resolved relative to `:destination`.
 
-  Notes:
+Defaults:
 
-  1. `:destination` *must* refer to a directory (existing or not) and not a file.
+    :destination => nil
+    :style_destination => nil
 
-  2. `:style_destination` is resolved relative to `:destination` so that packaging styles inside document directories is easy. (This supports the common case where you will want a subdirectory called 'styles' to hold your style files.) When `:style_destination` is nil (default), the stylesheet will not be copied anywhere. Instead, your document will link to the rendered stylesheet in place. If it needs to be rendered, it will be rendered into a subdirectory called 'css' so that the rendered document isn't picked up the next time you specify the same style.
+Notes:
+
+1. `:destination` *must* refer to a directory (existing or not) and not a file.
+
+2. `:style_destination` is resolved relative to `:destination` so that packaging styles inside document directories is easy. (This supports the common case where you will want a subdirectory called 'styles' to hold your style files.) When `:style_destination` is nil (default), the stylesheet will not be copied anywhere. Instead, your document will link to the rendered stylesheet in place. If it needs to be rendered, it will be rendered into a subdirectory called 'css' so that the rendered document isn't picked up the next time you specify the same style.
 
 ### Examples ###
 
@@ -176,18 +182,17 @@ destination.
 Mint comes preloaded with several styles and layouts.
 
 1. Default
-2. Serif Pro
-3. Sans Pro
+2. Pro
+3. Resume\*
 4. Protocol
-5. Protocol Flow - requires Javascript and jQuery
-6. Resume
+5. Protocol Flow\* - requires Javascript and jQuery
 
-> Note: These aren't all designed yet. Also, if you have a killer
+> Note: Starred entries are not yet implemente. If you have a killer
 > template you think should be included, send it my way. I'll check
 > it out and see if it should be part of the standard template library.
 > (Of course, you'll get all the credit.)
 
-I'm going to build a template extension system soon so that you can easily base your template off of another one using its template name, and without knowing its location on disk.
+I've included a base stylesheet that is useful for setting sensible typographic defaults.
 
 IV. The Mint path
 -----------------
