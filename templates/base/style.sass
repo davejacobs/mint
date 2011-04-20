@@ -1,0 +1,160 @@
+@import '../reset.css'
+
+$screen_font_size: 18px
+$screen_line_height: $screen_font_size * 1.3
+$screen_unit: $screen_line_height
+
+$print_font_size: 12pt
+$print_line_height: $print_font_size * 1.3
+$print_unit: $print_line_height
+
+$link_color: #cb0018
+
+body
+  font-family: Georgia, 'Hoefler Text', Garamond, FreeSerif, serif
+
+h1, h2
+  line-height: 1.3
+
+h2, h3, h4, h5, h6
+  line-height: $screen_line_height
+
+h1, h2, h3, h4, h6
+  font-weight: normal
+
+h1
+  font-size:      $screen_font_size * 1.5
+  border-bottom:  solid 2px #666
+  margin-top:     $screen_unit
+  margin-bottom:  $screen_unit
+
+h2
+  font-size:      $screen_font_size * 1.2
+  margin-top:     $screen_unit
+  margin-bottom:  $screen_unit
+
+h3
+  font-size:      $screen_font_size * 1.1
+  font-style:     italic
+  margin-top:     $screen_unit * 3/2
+  margin-bottom:  $screen_unit * 1/2
+
+h4
+  font-size:      $screen_font_size * 1.05
+  font-variant:   small-caps
+  margin-top:     $screen_unit * 7/4
+  margin-bottom:  $screen_unit * 1/4
+
+h5, h6
+  font-size:      $screen_font_size * 1
+  font-weight:    bold
+  margin-top:     $screen_unit * 7/8
+  margin-bottom:  $screen_unit * 1/8
+
+ul
+  list-style-type: square
+
+  ul
+    list-style-type: circle
+
+ul, ol
+  margin: ($screen_unit / 4) 0 0 ($screen_unit / 2)
+  padding-left: $screen_unit * 1.2
+
+  li
+    p
+      text-indent: 0 !important
+
+  li+li
+    margin-top: $screen_unit / 4
+
+p
+  margin: ($screen_unit / 2) 0
+
+p+p
+  text-indent: $screen_unit
+
+// For some reason this is necessary ...
+ul+p, ol+p, blockquote+p, pre+p
+  text-indent: 0
+
+a
+  &:link, &:visited, &:active
+    color: $link_color
+    text-decoration: none
+  &:hover
+    text-decoration: underline
+
+code
+  font-family: Menlo, Mensch, Monaco, Consolas, Monotype, mono
+  font-style: normal
+
+pre, blockquote
+  display: block
+  margin-left: $screen_unit
+  margin-right: $screen_unit * 2
+  padding: $screen_unit / 3 $screen_unit
+  padding-left: $screen_unit * 3/4
+
+  font-size: $screen_font_size
+
+  border-left: solid 2px #ddd
+
+  p
+    margin: 0
+    line-height: 1.35
+
+blockquote
+  font-style: italic
+
+img
+  display: block
+
+@media screen
+  body
+    font-size: $screen_font_size
+    line-height: $screen_line_height
+    background-color: #666
+
+  #container
+    display: block
+    border: solid 1px #999
+    width: 620px
+    padding: 60px
+    margin: ($screen_unit / 2) auto
+    background-color: #fff
+    
+  code
+    font-size: $screen_font_size * 7/8
+
+  pre
+    code
+      font-size: $screen_font_size * 3/4
+
+@media print
+  @page
+    margin-left: 1in
+    margin-right: 1in
+    margin-top: 1in
+    margin-bottom: 1in
+
+  body
+    font-size: $print_font_size
+    line-height: $print_line_height
+    width: auto
+    margin: 0
+    padding: 0
+
+  code
+    font-size: $print_font_size * 7/8
+
+  pre
+    code
+      font-size: $print_font_size * 3/4
+
+  h1, h2, h3, h4, h5, h6, li, blockquote 
+    page-break-inside: avoid
+
+  p
+    widows: 3
+    orphans: 3
