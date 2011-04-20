@@ -1,6 +1,6 @@
 *The following is a **rough draft** of the current Mint design, along with my future plans for the library and tool. The templates are not all there yet (that's the next step) and my first plugins aren't quite there. That said, I'm excited about where this library is going to go.*
 
-**Mint requires Ruby 1.9.**
+> **Mint requires Ruby 1.9.**
 
 If I believed in slogans...
 ---------------------------
@@ -43,7 +43,7 @@ Mint is loaded with smart defaults, so if you don't want to configure something-
     document = Document.new 'Minimalism.md'
     document.mint
 
-And voilà, Minimalism.html will show up next to Minimalism.md.
+And voil&agrave;, Minimalism.html will show up next to Minimalism.md.
 
 Opening Minimalism.html with your favorite web browser--[Firefox is best for typography][Firefox typography], but Webkit-based browsers (Chrome, Safari) work, too--will show what looks like a word-processed document, complete with big bold headers, italic emphasis, automatically indented and numbered lists, and bullets. If you're in a modern browser, you'll even see ligatures and proper kerning. The page will be on a white canvas that looks like a page, even though you are in a browser.
 
