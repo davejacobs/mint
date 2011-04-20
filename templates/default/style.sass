@@ -17,7 +17,7 @@ h1, h2
   line-height: 1.3
 
 h2, h3, h4, h5, h6
-  line_height: $screen_line_height
+  line-height: $screen_line_height
 
 h1, h2, h3, h4, h6
   font-weight: normal
@@ -58,14 +58,18 @@ ul
     list-style-type: circle
 
 ul, ol
-  margin: 6px 0 0 10px
-  padding-left: 25px
+  margin: ($screen_unit / 4) 0 0 ($screen_unit / 2)
+  padding-left: $screen_unit * 1.2
+
+  li
+    p
+      text-indent: 0 !important
 
   li+li
-    margin-top: 6px
+    margin-top: $screen_unit / 4
 
 p
-  margin: $screen_unit / 2 0
+  margin: ($screen_unit / 2) 0
 
 p+p
   text-indent: $screen_unit
@@ -75,15 +79,11 @@ ul+p, ol+p, blockquote+p, pre+p
   text-indent: 0
 
 a
-  &:link
+  &:link, &:visited, &:active
     color: $link_color
-  &:visited
-    color: $link_color
-  &:active
-    color: $link_color
+    text-decoration: none
   &:hover
-    color: #fff
-    background-color: $link_color
+    text-decoration: underline
 
 code
   font-family: Menlo, Mensch, Monaco, Consolas, Monotype, mono
@@ -96,16 +96,19 @@ pre, blockquote
   padding: $screen_unit / 3 $screen_unit
   padding-left: $screen_unit * 3/4
 
-  font-size: 90%
+  font-size: $screen_font_size
+
+  border-left: solid 2px #ddd
 
   p
     margin: 0
     line-height: 1.35
 
 blockquote
-  border-left: solid 2px #ddd
-
   font-style: italic
+
+img
+  display: block
 
 @media screen
   body
@@ -118,22 +121,40 @@ blockquote
     border: solid 1px #999
     width: 620px
     padding: 60px
-    margin: 10px auto
+    margin: ($screen_unit / 2) auto
     background-color: #fff
     
   code
-    font-size: 12px
+    font-size: $screen_font_size * 7/8
 
   pre
     code
-      font-size: 11px
+      font-size: $screen_font_size * 3/4
 
 @media print
+  @page
+    margin-left: 1in
+    margin-right: 1in
+    margin-top: 1in
+    margin-bottom: 1in
+
   body
     font-size: $print_font_size
     line-height: $print_line_height
-    margin: 1in 1.25in
-  img
-    display: block
+    width: auto
+    margin: 0
+    padding: 0
+
   code
-    font-size: 12pt
+    font-size: $print_font_size * 7/8
+
+  pre
+    code
+      font-size: $print_font_size * 3/4
+
+  h1, h2, h3, h4, h5, h6, li, blockquote 
+    page-break-inside: avoid
+
+  p
+    widows: 3
+    orphans: 3
