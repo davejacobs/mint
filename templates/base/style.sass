@@ -1,17 +1,7 @@
 @import '../reset.css'
 
-$screen_font_size: 18px
-$screen_line_height: $screen_font_size * 1.3
-$screen_unit: $screen_line_height
-
-$print_font_size: 12pt
-$print_line_height: $print_font_size * 1.3
-$print_unit: $print_line_height
-
-$link_color: #cb0018
-
 body
-  font-family: Georgia, 'Hoefler Text', Garamond, FreeSerif, serif
+  font-family: Georgia, serif
 
 h1, h2
   line-height: 1.3
@@ -19,12 +9,11 @@ h1, h2
 h2, h3, h4, h5, h6
   line-height: $screen_line_height
 
-h1, h2, h3, h4, h6
+h1, h2, h3, h4, h5, h6
   font-weight: normal
 
 h1
   font-size:      $screen_font_size * 1.5
-  border-bottom:  solid 2px #666
   margin-top:     $screen_unit
   margin-bottom:  $screen_unit
 
@@ -35,19 +24,16 @@ h2
 
 h3
   font-size:      $screen_font_size * 1.1
-  font-style:     italic
   margin-top:     $screen_unit * 3/2
   margin-bottom:  $screen_unit * 1/2
 
 h4
   font-size:      $screen_font_size * 1.05
-  font-variant:   small-caps
   margin-top:     $screen_unit * 7/4
   margin-bottom:  $screen_unit * 1/4
 
 h5, h6
   font-size:      $screen_font_size * 1
-  font-weight:    bold
   margin-top:     $screen_unit * 7/8
   margin-bottom:  $screen_unit * 1/8
 
@@ -71,9 +57,6 @@ ul, ol
 p
   margin: ($screen_unit / 2) 0
 
-p+p
-  text-indent: $screen_unit
-
 // For some reason this is necessary ...
 ul+p, ol+p, blockquote+p, pre+p
   text-indent: 0
@@ -91,21 +74,10 @@ code
 
 pre, blockquote
   display: block
-  margin-left: $screen_unit
-  margin-right: $screen_unit * 2
-  padding: $screen_unit / 3 $screen_unit
-  padding-left: $screen_unit * 3/4
-
-  font-size: $screen_font_size
-
-  border-left: solid 2px #ddd
 
   p
     margin: 0
     line-height: 1.35
-
-blockquote
-  font-style: italic
 
 img
   display: block
