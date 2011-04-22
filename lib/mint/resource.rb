@@ -4,28 +4,72 @@ module Mint
   class Resource
     attr_accessor :type
 
-    attr_reader :source
-    def source=(source)
-      @source = Pathname.new(source) if source
-    end
-    
-    # I haven't tested this - moved empty string from
-    # default options into this method, so that default options
-    # can be uniform - i.e., style_destination and destination
-    # can each be nil to indicate that any rendering will be
-    # done in the same folder the file is already in. I need
-    # to make sure that adding the empty string here actually
-    # keeps us in the current working directory
-    attr_reader :destination
-    def destination=(destination)
-      @destination = Pathname.new(destination) if destination 
-    end
-    
     attr_reader :name
     def name=(name)
       @name = name
     end
 
+    attr_reader :root
+    def root=(root)
+      @root = root || Dir.getwd
+    end
+
+    def root_directory_path
+      root ? Pathname.new(root) : ''
+    end
+
+    def root_directory
+      root_directory_path.to_s
+    end
+
+    attr_reader :source
+    def source=(source)
+      @source = source || ''
+      @name = Mint.guess_name_from(source)
+    end
+
+    def source_file_path
+      path = Pathname.new(source)
+      if path.absolute?
+        path.expand_path
+      else
+        root_directory_path + path
+      end
+    end
+
+    def source_file
+      source_file_path.to_s
+    end
+
+    def source_directory_path
+      source_file_path.dirname
+    end
+
+    def source_directory
+      source_directory_path.to_s
+    end
+
+    attr_reader :destination
+    def destination=(destination)
+      @destination = destination || ''
+    end
+
+    def destination_file_path
+      Pathname.new(destination).expand_path + name
+    end
+
+    def destination_file
+      destination_file_path.to_s
+    end
+
+    def destination_directory_path
+      destination_file_path.dirname
+    end
+
+    def destination_directory
+      destination_directory_path.to_s
+    end
+    
     def renderer=(renderer)
       @renderer = renderer
     end
@@ -35,13 +79,14 @@ module Mint
 
       self.source = source
       self.type = type
-      self.destination = options[:destination]
       self.name = Mint.guess_name_from source
+      self.root = options[:root]
+      self.destination = options[:destination]
       self.renderer = Mint.renderer source
     end
 
     def equal?(other)
-      self.destination + self.name == other.destination + other.name
+      self.destination_file_path == other.destination_file_path
     end
     alias_method :==, :equal?
 
