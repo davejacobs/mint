@@ -24,12 +24,12 @@ module Mint
 
     attr_reader :source
     def source=(source)
-      @source = source || ''
+      @source = source
       @name = Mint.guess_name_from(source)
     end
 
     def source_file_path
-      path = Pathname.new(source)
+      path = Pathname.new(source || '')
       if path.absolute?
         path.expand_path
       else
@@ -51,11 +51,11 @@ module Mint
 
     attr_reader :destination
     def destination=(destination)
-      @destination = destination || ''
+      @destination = destination
     end
 
     def destination_file_path
-      Pathname.new(destination).expand_path + name
+      Pathname.new(destination || '').expand_path + name
     end
 
     def destination_file
