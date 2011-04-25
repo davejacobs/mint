@@ -15,26 +15,19 @@ module Mint
     end
 
     def root_directory_path
-      root ? Pathname.new(root) : ''
+      root ? Pathname.new(root).expand_path : ''
     end
 
     def root_directory
       root_directory_path.to_s
     end
 
-    attr_reader :source
-    def source=(source)
-      @source = source
-      @name = Mint.guess_name_from(source)
-    end
+    attr_accessor :source
 
     def source_file_path
       path = Pathname.new(source || '')
-      if path.absolute?
-        path.expand_path
-      else
-        root_directory_path + path
-      end
+      path.absolute? ? 
+        path.expand_path : root_directory_path + path
     end
 
     def source_file
@@ -49,13 +42,10 @@ module Mint
       source_directory_path.to_s
     end
 
-    attr_reader :destination
-    def destination=(destination)
-      @destination = destination
-    end
+    attr_accessor :destination
 
     def destination_file_path
-      Pathname.new(destination || '').expand_path + name
+      root_directory_path + (destination || '') + name
     end
 
     def destination_file

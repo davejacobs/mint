@@ -13,7 +13,7 @@ module Mint
   Tilt.register 'css', Tilt::LessTemplate
 
   def self.root
-    Pathname.new(__FILE__).realpath.dirname + '../..'
+    (Pathname.new(__FILE__).realpath.dirname + '../..').to_s
   end
 
   # Return the an array with the Mint template path. Will first look

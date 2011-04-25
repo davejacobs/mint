@@ -19,7 +19,7 @@ RSpec.configure do |config|
 
   config.after(:suite) do
     Dir.chdir @old_dir
-    Dir.rmdir @tmp_dir
+    FileUtils.rm_r @tmp_dir
   end
 
   config.before(:each) do

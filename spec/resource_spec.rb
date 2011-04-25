@@ -65,7 +65,7 @@ module Mint
       end
 
       it "#destination" do
-        resource.destination.should == ''
+        resource.destination.should be_nil
       end
 
       it "#destination_file_path" do

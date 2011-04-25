@@ -2,206 +2,195 @@ require 'spec_helper'
 
 module Mint
   describe Document do
-    before(:all) do
-      @old_dir = Dir.getwd
-      Dir.chdir 'tmp'
-    end
-
-    before do 
-      @content_file = 'content.md'
-      @layout_file = 'local.haml'
-      @style_file = 'local.css'
-
-      @content = <<-HERE
-Header
-------
-
-This is just a test.
-      HERE
-
-      @layout = <<-HERE
-!!!
-%html
-  %head
-  %body= content
-      HERE
-
-      @style = 'body { font-size: 16px }'
-
-      File.open @content_file, 'w' do |f|
-        f << @content
-      end
-
-      File.open @layout_file, 'w' do |f|
-        f << @layout
-      end
-
-      File.open @style_file, 'w' do |f|
-        f << @style
-      end
-    end
-
-    after do
-      File.delete @content_file
-      File.delete @layout_file
-      File.delete @style_file
-    end
-
-    after(:all) do
-      Dir.chdir @old_dir
-    end
-
     shared_examples_for "all documents" do
-      it "loads content as its source" do
-        document.source.to_s.should == 'content.md'
+      # Re-test key methods defined in resource to make sure
+      # they haven't changed. (We are not testing any logical derivatives
+      # of #source, like #source_file_path. We just want to make sure
+      # that these key values are being set and not changed.)
+
+      it "#root" do
+        document.root.should == @root
       end
 
-      it "guesses its name from the source" do
-        document.name.to_s.should =~ /content/
+      it "#destination" do
+        document.destination.should == @destination
+      end
+      
+      it "#source" do
+        document.source.should == @content_file
       end
 
-      it "renders its content" do
+      # We do have to test #style_destination derivatives because
+      # they do not strictly delegate to #style.destination -- that is,
+      # for some documents, they are not tied to the resource implementation
+      # and so do not benefit from automatic virtual attributes like
+      # #style_destination_file_path.
+
+      it "#style_destination" do
+        document.style_destination.should == @style_destination
+      end
+
+      it "#style_destination_file_path" do
+        document.style_destination_file_path.should ==
+          Pathname.new(@style_destination_file)
+
+        # if document.style_destination
+        #   path = Pathname.new document.style_destination
+        #   dir = path.absolute? ?
+        #     path : document.destination_directory_path + path
+        #   document.style_destination_file_path.should ==
+        #     dir + document.style.name
+        # else
+        #   document.style_destination_file_path.should ==
+        #     document.style.destination_file_path
+        # end
+      end
+
+      it "#style_destination_file" do
+        document.style_destination_file.should ==
+          document.style_destination_file_path.to_s
+      end
+
+      it "#style_destination_directory_path" do
+        document.style_destination_directory_path.should ==
+          Pathname.new(document.style_destination_file).dirname
+      end
+
+      it "#style_destination_directory" do
+        document.style_destination_directory.should ==
+          document.style_destination_directory_path.to_s
+      end
+
+      # Ensure that the document is choosing the right layout and
+      # style templates. We'll leave style generation tests to
+      # style_spec.rb, but we need to test layout and content
+      # generation (in a later context) because the layout
+      # needs to be injected with generated content.
+
+      it "#layout" do
+        document.layout.should be_in_directory(@layout)
+      end
+
+      it "#style" do
+        document.style.should be_in_directory(@style)
+      end
+
+      # Convenience methods
+      
+      it "#stylesheet" do
+        relative_path = 
+          document.destination_file_path.
+            relative_path_from(document.style_destination_file_path)
+
+        document.stylesheet.should == relative_path.to_s
+      end
+
+      it "#inline_style" do
+        pending "the suite doesn't yet support this use case"
+        document.inline_style.should be_nil
+      end
+
+      it "#content" do
         document.content.should =~ /<p>This is just a test.<\/p>/
       end
 
       it "renders its layout, injecting content inside" do
         document.render.should =~ 
-          /.*<html>.*<p>This is just a test.<\/p>.*<\/html>.*/m
+          /.*<html>.*#{document.content}.*<\/html>.*/m
       end
 
-      it "creates a named output file in its specified destination directory" do
-        file = Pathname.getwd + (document.destination || '') + document.name
-        file.should exist
+      it "links to its stylesheet" do 
+        document.render.should =~ /#{document.stylesheet}/
       end
 
-      it "writes its rendered layout and content to that output file" do
+      it "writes its rendered style to #style_destination_file" do
         document.mint
-        file = Pathname.getwd + (document.destination || '') + document.name
-        content = File.read file
-        content.should =~ /.*<html>.*<p>This is just a test.<\/p>.*<\/html>.*/m
+        document.style_destination_file_path.should exist
+      end
+
+      it "writes its rendered layout and content to #destination_file" do
+        document.mint
+        document.destination_file_path.should exist
+        content = File.read document.destination_file
+        content.should == document.render
       end
     end
 
-    shared_examples_for "documents with a static stylesheet" do
-      it "knows not to render its style" do
-        document.style.need_rendering?.should == false
-      end
-      
-      it "does not render or write its style"
-    end
-
-    shared_examples_for "documents with a dynamic stylesheet" do
-      it "knows to render its style" do
-        document.style.need_rendering?.should == true
-      end
-
-      it "writes its rendered style into its style_destination"
-    end
-
-    shared_examples_for "documents with the default template" do
-      it "chooses the default layout" do
-        document.layout.should be_in_directory('default')
-      end
-
-      it "chooses the default style" do
-        document.style.should be_in_directory('default')
-      end
-    end
-
-    shared_examples_for "documents with the pro template" do
-      it "chooses the pro layout" do
-        document.layout.should be_in_directory('pro')
-      end
-
-      it "chooses the pro style" do
-        document.style.should be_in_directory('pro')
-      end
-    end
-
-    shared_examples_for "documents with the local template" do
-      it "chooses the local layout" do
-        document.layout.name.to_s.should =~ /local/
-        document.layout.source.to_s.should == 'local.haml'
-      end
-
-      it "chooses the local style" do
-        document.style.name.to_s.should =~ /local/
-        document.style.source.to_s.should == 'local.css'
-      end
-    end
-
-    shared_examples_for "documents without explicit directories" do
-      it "does not have a nested destination directory" do
-        document.destination.should be_nil
-      end
-
-      it "sets the style's current directory as its style destination" do
-        document.style_destination.should be_nil
-      end
-    end
-
-    shared_examples_for "documents with explicit directories" do
-      it "has a nested destination directory" do
-        document.destination.to_s.should == 'destination'
-      end
-
-      it "sets the destination directory as its style destination" do
-        document.style_destination.to_s.should == 'styles'
-      end
-    end
-
-    context "when it's created without explicit options" do
+    context "when it's created with default options" do
       let(:document) { Document.new @content_file }
 
-      it_behaves_like "all documents"
-      it_behaves_like "documents with the default template"
-      it_behaves_like "documents without explicit directories"
-      it_behaves_like "documents with a dynamic stylesheet"
+      before do
+        # These are the expectations that the "all documents"
+        # shared example will use to validate this example. I'm 
+        # not going to reuse these variables to instantiate document
+        # because in some cases, we don't want the same value back in
+        # our tests, and I want to maintain a clear separation between
+        # test expectations and test input.
+        @root = Dir.getwd
+        @destination = nil
+        @style_destination = nil
+        @style_destination_file = Mint.root + '/templates/default/css/style.css'
+        @style = nil
+        @layout = nil
+      end
+
+      it_should_behave_like "all documents"
     end
 
-    context "when it's created inline with named layouts and styles" do
-      let(:document) { Document.new @content_file, 
-                       :layout => 'pro', :style => 'pro' }
-
-      it_behaves_like "all documents"
-      it_behaves_like "documents with the pro template"
-      it_behaves_like "documents without explicit directories"
-      it_behaves_like "documents with a dynamic stylesheet"
-    end
-
-    context "when it's created inline with local layouts and styles" do
-      let(:document) { Document.new @content_file, 
-                       :layout => 'local.haml', :style => 'local.css' }
-
-      it_behaves_like "all documents"
-      it_behaves_like "documents with the local template"
-      it_behaves_like "documents without explicit directories"
-      it_behaves_like "documents with a static stylesheet"
-    end
-
-    context "when it's created with a template" do
-      let(:document) { Document.new @content_file, :template => 'pro' }
-
-      it_behaves_like "all documents"
-      it_behaves_like "documents with the pro template"
-      it_behaves_like "documents without explicit directories"
-      it_behaves_like "documents with a dynamic stylesheet"
-    end
-
-    context "when it's created with a non-default destinations" do
-      let(:document) { Document.new @content_file, 
-                       :root => 'root', :destination => 'destination',
+    # We need to test explicit directories even though they are tested in
+    # resource_spec.rb because we want to make sure that all relative paths
+    # work correctly in the context of a document. This includes relative
+    # paths like we find in the #stylesheet helper.
+    context "when it's created with explicit destination directories" do
+      let(:document) { Document.new @content_file,
+                       :destination => 'destination',
                        :style_destination => 'styles' }
 
-      it_behaves_like "all documents"
-      it_behaves_like "documents with the default template"
-      it_behaves_like "documents with explicit directories"
-      it_behaves_like "documents with a dynamic stylesheet"
+      before do
+        # Expectations for tests:
+        @root = Dir.getwd
+        @destination = 'destination'
+        @style_destination = 'styles'
+        @style_destination_file = Dir.getwd + '/destination/styles/style.css'
+        @style = 'default'
+        @layout = 'default'
+      end
+
+      it_should_behave_like "all documents"
     end
 
-    context "when it's created with a block" do
+    context "when it's created with an explicit root" do 
+      let(:document) { Document.new @content_file,
+                       :root => '/tmp/mint-test/alternative-root' }
+
+      before do
+        # Expectations for tests:
+        @root = '/tmp/mint-test/alternative-root'
+        @destination = nil
+        @style_destination = nil
+        @style_destination_file = (Mint.root + '/templates/default/css/style.css')
+        @style = 'default'
+        @layout = 'default'
+      end
+
+      it_should_behave_like "all documents"
+    end
+
+    context "when it is created with a block" do
+      before do
+        # Expectations for tests:
+        @root = '/tmp/mint-test/alternative-root'
+        @destination = 'destination'
+        @style_destination = 'styles'
+        @style_destination_file = 
+          '/tmp/mint-test/alternative-root/destination/styles/style.css'
+        @style = 'pro'
+        @layout = 'pro'
+      end
+
       let(:document) do
         Document.new @content_file do |document|
+          document.root = '/tmp/mint-test/alternative-root'
           document.destination = 'destination'
           document.style_destination = 'styles'
           document.layout = 'pro'
@@ -209,13 +198,7 @@ This is just a test.
         end
       end
 
-      it_behaves_like "all documents"
-      it_behaves_like "documents with the pro template"
-      it_behaves_like "documents with explicit directories"
-      it_behaves_like "documents with a dynamic stylesheet"
+      it_should_behave_like "all documents"
     end
-
-    context "when it's created with an existing layout"
-    context "when it's created with an existnig style"
   end
 end

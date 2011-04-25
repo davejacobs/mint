@@ -53,8 +53,10 @@ module Mint
     # I'm going to maintain a document's official style_destination
     # outside of its style object. If a document has no
     # style_destination defined when it needs one, the document will
-    # use the style's source directory. This eliminates edge cases
-    # nicely and lets us maintain document-specific information
+    # use the style's source directory. This happens lazily via
+    # virtual attributes like #style_destination_file, etc.
+    # This eliminates edge cases (like styles we don't want to move
+    # anywhere) nicely and lets us maintain document-specific information
     # separately. (Without this separation, funky things happen when
     # you assign a new style template to an existing document -- if
     # you had specified a custom style_destination before changing
@@ -63,6 +65,29 @@ module Mint
     attr_reader :style_destination
     def style_destination=(style_destination)
       @style_destination = style_destination
+    end
+
+    def style_destination_file_path
+      if style_destination
+        path = Pathname.new style_destination
+        dir = path.absolute? ? 
+          path : destination_directory_path + path
+        dir + style.name
+      else
+        style.destination_file_path
+      end
+    end
+
+    def style_destination_file
+      style_destination_file_path.to_s
+    end
+
+    def style_destination_directory_path
+      style_destination_file_path.dirname
+    end
+
+    def style_destination_directory
+      style_destination_directory_path.to_s
     end
 
     def template=(template)
@@ -74,6 +99,9 @@ module Mint
     
     def initialize(source, opts={})
       options = Mint.default_options.merge opts
+
+      # Loads source and destination, which will be used for
+      # all source_* and destination_* virtual attributes.
       super(source, :document, options)
 
       # Each of these should invoke explicitly defined method
@@ -85,38 +113,32 @@ module Mint
       # The template option will override layout and style choices
       self.template = options[:template]
 
+      # Yield self to block after all other parameters are loaded,
+      # so we only have to tweak. (We don't have to give up our
+      # defaults or re-test blocks beyond them being tweaked.)
       yield self if block_given?
     end
 
+    # Render content in the context of layout
     def render(args={})
       layout.render self, args
     end
 
-    def mint(root=Dir.getwd, render_style=true)      
-      root = Pathname.new root
-      
-      # Only render style if a) it's specified by the options path and
-      # b) it actually needs rendering (i.e., it's in template form and
-      # not raw, browser-parseable CSS).
-      render_style &&= style.need_rendering?
-
-      document_file = root + (self.destination || '') + self.name
-      FileUtils.mkdir_p document_file.dirname
-      document_file.open 'w+' do |f|
+    # Write all rendered content where a) possible, b) required,
+    # and c) specified
+    def mint(render_style=true)      
+      FileUtils.mkdir_p self.destination_directory
+      File.open(self.destination_file, 'w+') do |f|
         f << self.render
       end
 
-      if render_style
-        style_dest = 
-          if style_destination 
-            root + self.destination + style_destination
-          else
-            self.style.destination
-          end
-        style_file = style_dest + self.style.name
-        FileUtils.mkdir_p style_file.dirname
-        
-        style_file.open 'w+' do |f|
+      # Only render style if a) it's specified by the options path and
+      # b) it actually needs rendering (i.e., it's in template form and
+      # not raw, browser-parseable CSS) or it if it doesn't need
+      # rendering but there is an explicit style_destination.
+      if render_style and style_destination
+        FileUtils.mkdir_p style_destination_directory
+        File.open(self.style_destination_file, 'w+') do |f|
           f << self.style.render
         end
       end
@@ -127,10 +149,7 @@ module Mint
     # Returns a relative path from the document to its stylesheet. Can
     # be called directly from inside a layout template.
     def stylesheet
-      style_dest = self.style_destination || self.style.destination
-      destination = self.destination || ''
-      Helpers.normalize_path(style_dest, destination) + 
-        style.name.to_s
+      self.destination_file_path.relative_path_from(self.style_destination_file_path).to_s 
     end
   end
 end
