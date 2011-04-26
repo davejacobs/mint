@@ -3,22 +3,16 @@ require 'spec_helper'
 module Mint
   describe Document do
     shared_examples_for "all documents" do
+      subject { document }
+
       # Re-test key methods defined in resource to make sure
       # they haven't changed. (We are not testing any logical derivatives
       # of #source, like #source_file_path. We just want to make sure
       # that these key values are being set and not changed.)
 
-      it "#root" do
-        document.root.should == @root
-      end
-
-      it "#destination" do
-        document.destination.should == @destination
-      end
-      
-      it "#source" do
-        document.source.should == @content_file
-      end
+      its(:root) { should == @root }
+      its(:destination) { should == @destination }
+      its(:source) { should == @content_file }
 
       # We do have to test #style_destination derivatives because
       # they do not strictly delegate to #style.destination -- that is,
@@ -26,41 +20,19 @@ module Mint
       # and so do not benefit from automatic virtual attributes like
       # #style_destination_file_path.
 
-      it "#style_destination" do
-        document.style_destination.should == @style_destination
-      end
-
-      it "#style_destination_file_path" do
-        document.style_destination_file_path.should ==
-          Pathname.new(@style_destination_file)
-      end
-
-      it "#style_destination_file" do
-        document.style_destination_file.should == @style_destination_file
-      end
-
-      it "#style_destination_directory_path" do
-        document.style_destination_directory_path.should ==
-          Pathname.new(document.style_destination_file).dirname
-      end
-
-      it "#style_destination_directory" do
-        document.style_destination_directory.should ==
-          document.style_destination_directory_path.to_s
-      end
+      its(:style_destination) { should == @style_destination }
+      its(:style_destination_file_path) { should == Pathname.new(@style_destination_file) }
+      its(:style_destination_file) { should == @style_destination_file }
+      its(:style_destination_directory_path) { should == Pathname.new(@style_destination_directory) }
+      its(:style_destination_directory) { should == @style_destination_directory }
 
       # We'll leave style generation tests to style_spec.rb, 
       # but we need to test layout and content generation (in a 
       # later context) because the layout needs to be injected 
       # with generated content.
-
-      it "#layout" do
-        document.layout.should be_in_directory(@layout)
-      end
-
-      it "#style" do
-        document.style.should be_in_directory(@style)
-      end
+      
+      its(:layout) { should be_in_directory(@layout) }
+      its(:style) { should be_in_directory(@style) }
 
       # Convenience methods
       
@@ -76,9 +48,7 @@ module Mint
         document.inline_style.should be_nil
       end
 
-      it "#content" do
-        document.content.should =~ /<p>This is just a test.<\/p>/
-      end
+      its(:content) { should =~ /<p>This is just a test.<\/p>/ }
 
       # Render output
 
@@ -110,16 +80,11 @@ module Mint
       let(:document) { Document.new @content_file }
 
       before do
-        # These are the expectations that the "all documents"
-        # shared example will use to validate this example. I'm 
-        # not going to use these variables to instantiate document
-        # because in some cases, we don't use the same value back in
-        # our tests. I want to maintain a clear separation between
-        # test expectations and test input.
-        @root = Dir.getwd
+        @root = nil
         @destination = nil
         @style_destination = nil
         @style_destination_file = Mint.root + '/templates/default/css/style.css'
+        @style_destination_directory = Mint.root + '/templates/default/css'
         @style = nil
         @layout = nil
       end
@@ -137,13 +102,13 @@ module Mint
                        :style_destination => 'styles' }
 
       before do
-        # Test expectations
-        @root = Dir.getwd
-        @destination = 'destination'
-        @style_destination = 'styles'
-        @style_destination_file = Dir.getwd + '/destination/styles/style.css'
-        @style = 'default'
-        @layout = 'default'
+        @root =                      nil
+        @destination                 = 'destination'
+        @style_destination           = 'styles'
+        @style_destination_file      = Dir.getwd + '/destination/styles/style.css'
+        @style_destination_directory = Dir.getwd + '/destination/styles'
+        @style                       = 'default'
+        @layout                      = 'default'
       end
 
       it_should_behave_like "all documents"
@@ -154,38 +119,39 @@ module Mint
                        :root => '/tmp/mint-test/alternative-root' }
 
       before do
-        # Expectations for tests:
-        @root = '/tmp/mint-test/alternative-root'
-        @destination = nil
-        @style_destination = nil
-        @style_destination_file = (Mint.root + '/templates/default/css/style.css')
-        @style = 'default'
-        @layout = 'default'
+        @root                        = '/tmp/mint-test/alternative-root'
+        @destination                 = nil
+        @style_destination           = nil
+        @style_destination_file      = Mint.root + '/templates/default/css/style.css'
+        @style_destination_directory = Mint.root + '/templates/default/css'
+        @style                       = 'default'
+        @layout                      = 'default'
       end
 
       it_should_behave_like "all documents"
     end
 
     context "when it is created with a block" do
-      before do
-        # Expectations for tests:
-        @root = '/tmp/mint-test/alternative-root'
-        @destination = 'destination'
-        @style_destination = 'styles'
-        @style_destination_file = 
-          '/tmp/mint-test/alternative-root/destination/styles/style.css'
-        @style = 'pro'
-        @layout = 'pro'
+      let(:document) do
+        Document.new @content_file do |doc|
+          doc.root              = '/tmp/mint-test/alternative-root'
+          doc.destination       = 'destination'
+          doc.style_destination = 'styles'
+          doc.layout            = 'pro'
+          doc.style             = 'pro'
+        end
       end
 
-      let(:document) do
-        Document.new @content_file do |document|
-          document.root = '/tmp/mint-test/alternative-root'
-          document.destination = 'destination'
-          document.style_destination = 'styles'
-          document.layout = 'pro'
-          document.style = 'pro'
-        end
+      before do
+        @root                        = '/tmp/mint-test/alternative-root'
+        @destination                 = 'destination'
+        @style_destination           = 'styles'
+        @style_destination_file = 
+          '/tmp/mint-test/alternative-root/destination/styles/style.css'
+        @style_destination_directory = 
+          '/tmp/mint-test/alternative-root/destination/styles'
+        @style                       = 'pro'
+        @layout                      = 'pro'
       end
 
       it_should_behave_like "all documents"
