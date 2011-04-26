@@ -102,7 +102,9 @@ module Mint
 
       # Loads source and destination, which will be used for
       # all source_* and destination_* virtual attributes.
-      super(source, :document, options)
+      super(source, options)
+
+      self.type     = :document
 
       # Each of these should invoke explicitly defined method
       self.content  = source
