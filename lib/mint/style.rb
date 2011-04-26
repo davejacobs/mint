@@ -26,7 +26,7 @@ module Mint
     end
 
     def need_rendering?
-      source.extname !~ /\.css$/
+      source_file_path.extname !~ /\.css$/
     end
   end
 end
