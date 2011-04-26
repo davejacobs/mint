@@ -5,32 +5,27 @@ module Mint
     shared_examples_for "all documents" do
       subject { document }
 
-      # Re-test key methods defined in resource to make sure
-      # they haven't changed. (We are not testing any logical derivatives
-      # of #source, like #source_file_path. We just want to make sure
-      # that these key values are being set and not changed.)
-
+      # resource_spec.rb tells us that if these hold true, then their
+      # derivatives (root_directory, source_file_path, etc.) will be what we
+      # expect, as well.
       its(:root) { should == @root }
       its(:destination) { should == @destination }
       its(:source) { should == @content_file }
 
-      # We do have to test #style_destination derivatives because
-      # they do not strictly delegate to #style.destination -- that is,
-      # for some documents, they are not tied to the resource implementation
-      # and so do not benefit from automatic virtual attributes like
-      # #style_destination_file_path.
-
+      # We do have to test #style_destination derivatives. Those aren't
+      # included in resource_spec.rb.
       its(:style_destination) { should == @style_destination }
-      its(:style_destination_file_path) { should == Pathname.new(@style_destination_file) }
       its(:style_destination_file) { should == @style_destination_file }
-      its(:style_destination_directory_path) { should == Pathname.new(@style_destination_directory) }
       its(:style_destination_directory) { should == @style_destination_directory }
 
-      # We'll leave style generation tests to style_spec.rb, 
-      # but we need to test layout and content generation (in a 
-      # later context) because the layout needs to be injected 
-      # with generated content.
-      
+      its(:style_destination_file_path) do
+        should == Pathname.new(@style_destination_file)
+      end
+
+      its(:style_destination_directory_path) do
+        should == Pathname.new(@style_destination_directory)
+      end
+
       its(:layout) { should be_in_directory(@layout) }
       its(:style) { should be_in_directory(@style) }
 
@@ -43,11 +38,9 @@ module Mint
         document.stylesheet.should == relative_path.to_s
       end
 
-      it "#inline_style" do
-        pending "the suite doesn't yet support this use case"
-        document.inline_style.should be_nil
-      end
-
+      # style_spec.rb ensures that our style generation goes as planned
+      # However, we need to test layout generation because it should now
+      # include our content
       its(:content) { should =~ /<p>This is just a test.<\/p>/ }
 
       # Render output
@@ -92,10 +85,6 @@ module Mint
       it_should_behave_like "all documents"
     end
 
-    # We need to test explicit directories even though they are tested in
-    # resource_spec.rb because we want to make sure that all relative paths
-    # work correctly in the context of a document. This includes relative
-    # paths like we find in the #stylesheet helper.
     context "when it's created with explicit destination directories" do
       let(:document) { Document.new @content_file,
                        :destination => 'destination',
