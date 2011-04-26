@@ -2,33 +2,12 @@ require 'spec_helper'
 
 module Mint
   describe Document do
+    # We're not going to re-test derivative methods like source_file_path
+    # or root_directory. resource_spec.rb tells us that if the master
+    # values hold true, then their derivatives will be what we expect, as well.
+    # We do have to test #style_destination derivatives. Those aren't
+    # covered by resource_spec.rb.
     shared_examples_for "all documents" do
-      subject { document }
-
-      # resource_spec.rb tells us that if these hold true, then their
-      # derivatives (root_directory, source_file_path, etc.) will be what we
-      # expect, as well.
-      its(:root) { should == @root }
-      its(:destination) { should == @destination }
-      its(:source) { should == @content_file }
-
-      # We do have to test #style_destination derivatives. Those aren't
-      # included in resource_spec.rb.
-      its(:style_destination) { should == @style_destination }
-      its(:style_destination_file) { should == @style_destination_file }
-      its(:style_destination_directory) { should == @style_destination_directory }
-
-      its(:style_destination_file_path) do
-        should == Pathname.new(@style_destination_file)
-      end
-
-      its(:style_destination_directory_path) do
-        should == Pathname.new(@style_destination_directory)
-      end
-
-      its(:layout) { should be_in_directory(@layout) }
-      its(:style) { should be_in_directory(@style) }
-
       # Convenience methods
       
       it "#stylesheet" do
@@ -72,15 +51,30 @@ module Mint
     context "when it's created with default options" do
       let(:document) { Document.new @content_file }
 
-      before do
-        @root                        = nil
-        @destination                 = nil
-        @style_destination           = nil
-        @style_destination_file      = Mint.root + '/templates/default/css/style.css'
-        @style_destination_directory = Mint.root + '/templates/default/css'
-        @style                       = nil
-        @layout                      = nil
+      subject { document }
+      its(:root) { should be_nil }
+      its(:destination) { should be_nil }
+      its(:source) { should == 'content.md' }
+      its(:style_destination) { should be_nil }
+
+      its(:style_destination_file) do
+        should == Mint.root + '/templates/default/css/style.css'
       end
+
+      its(:style_destination_directory) do 
+        should == Mint.root + '/templates/default/css'
+      end
+
+      its(:style_destination_file_path) do
+        should == Pathname.new(document.style_destination_file)
+      end
+
+      its(:style_destination_directory_path) do
+        should == Pathname.new(document.style_destination_directory)
+      end
+
+      its(:layout) { should be_in_directory('default') }
+      its(:style) { should be_in_directory('default') }
 
       it_should_behave_like "all documents"
     end
@@ -90,15 +84,30 @@ module Mint
                        :destination => 'destination',
                        :style_destination => 'styles' }
 
-      before do
-        @root =                      nil
-        @destination                 = 'destination'
-        @style_destination           = 'styles'
-        @style_destination_file      = Dir.getwd + '/destination/styles/style.css'
-        @style_destination_directory = Dir.getwd + '/destination/styles'
-        @style                       = 'default'
-        @layout                      = 'default'
+      subject { document }
+      its(:root) { should be_nil }
+      its(:destination) { should == 'destination' }
+      its(:source) { should == 'content.md' }
+      its(:style_destination) { should == 'styles' }
+
+      its(:style_destination_file) do
+        should == '/tmp/mint-test/destination/styles/style.css'
       end
+
+      its(:style_destination_directory) do
+        should == '/tmp/mint-test/destination/styles'
+      end
+
+      its(:style_destination_file_path) do
+        should == Pathname.new(document.style_destination_file)
+      end
+
+      its(:style_destination_directory_path) do
+        should == Pathname.new(document.style_destination_directory)
+      end
+
+      its(:layout) { should be_in_directory('default') }
+      its(:style) { should be_in_directory('default') }
 
       it_should_behave_like "all documents"
     end
@@ -107,15 +116,30 @@ module Mint
       let(:document) { Document.new @content_file,
                        :root => '/tmp/mint-test/alternative-root' }
 
-      before do
-        @root                        = '/tmp/mint-test/alternative-root'
-        @destination                 = nil
-        @style_destination           = nil
-        @style_destination_file      = Mint.root + '/templates/default/css/style.css'
-        @style_destination_directory = Mint.root + '/templates/default/css'
-        @style                       = 'default'
-        @layout                      = 'default'
+      subject { document }
+      its(:root) { should == '/tmp/mint-test/alternative-root' }
+      its(:destination) { should be_nil }
+      its(:source) { should == 'content.md' }
+      its(:style_destination) { should be_nil }
+
+      its(:style_destination_file) do
+        should == Mint.root + '/templates/default/css/style.css'
       end
+
+      its(:style_destination_directory) do
+        should == Mint.root + '/templates/default/css'
+      end
+
+      its(:style_destination_file_path) do
+        should == Pathname.new(document.style_destination_file)
+      end
+
+      its(:style_destination_directory_path) do
+        should == Pathname.new(document.style_destination_directory)
+      end
+
+      its(:layout) { should be_in_directory('default') }
+      its(:style) { should be_in_directory('default') }
 
       it_should_behave_like "all documents"
     end
@@ -131,17 +155,30 @@ module Mint
         end
       end
 
-      before do
-        @root                        = '/tmp/mint-test/alternative-root'
-        @destination                 = 'destination'
-        @style_destination           = 'styles'
-        @style_destination_file = 
-          '/tmp/mint-test/alternative-root/destination/styles/style.css'
-        @style_destination_directory = 
-          '/tmp/mint-test/alternative-root/destination/styles'
-        @style                       = 'pro'
-        @layout                      = 'pro'
+      subject { document }
+      its(:root) { should == '/tmp/mint-test/alternative-root' }
+      its(:destination) { should == 'destination' }
+      its(:source) { should == 'content.md' }
+      its(:style_destination) { should == 'styles' }
+
+      its(:style_destination_file) do
+        should == '/tmp/mint-test/alternative-root/destination/styles/style.css'
       end
+
+      its(:style_destination_directory) do
+        should == '/tmp/mint-test/alternative-root/destination/styles'
+      end
+
+      its(:style_destination_file_path) do
+        should == Pathname.new(document.style_destination_file)
+      end
+
+      its(:style_destination_directory_path) do
+        should == Pathname.new(document.style_destination_directory)
+      end
+
+      its(:layout) { should be_in_directory('pro') }
+      its(:style) { should be_in_directory('pro') }
 
       it_should_behave_like "all documents"
     end
