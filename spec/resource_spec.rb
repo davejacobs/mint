@@ -12,9 +12,6 @@ require 'spec_helper'
 #    destination root? I should probably draw all of this out.
 module Mint
   describe Resource do
-    # Hack because we can't reach into suite scope
-    before { @tmp_dir = Dir.getwd }
-
     shared_examples_for "all resources" do
       subject { resource }
       its(:name)                       { should == @name }
