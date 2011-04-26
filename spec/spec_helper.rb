@@ -13,8 +13,6 @@ RSpec.configure do |config|
 
     FileUtils.mkdir_p @tmp_dir
     Dir.chdir @tmp_dir
-
-    # Set up alternative Mint scope?
   end
 
   config.after(:suite) do
@@ -26,6 +24,9 @@ RSpec.configure do |config|
     @content_file = 'content.md'
     @layout_file = 'layout.haml'
     @style_file = 'style.css'
+
+    @static_style_file = 'static.css'
+    @dynamic_style_file = 'dynamic.sass'
 
     @content = <<-HERE
 Header
@@ -43,22 +44,30 @@ This is just a test.
 
     @style = 'body { font-size: 16px }'
 
-    File.open @content_file, 'w' do |f|
-      f << @content
-    end
+    @static_style = <<-HERE
+body {
+  #container {
+    padding: 1em;
+  }
+}
+    HERE
 
-    File.open @layout_file, 'w' do |f|
-      f << @layout
-    end
+    @dynamic_style = <<-HERE
+body
+  #container
+    padding: 1em
+    HERE
 
-    File.open @style_file, 'w' do |f|
-      f << @style
+    [:content, :layout, :style, :static_style, :dynamic_style ].each do |v|
+      File.open(instance_variable_get(:"@#{v}_file"), 'w') do |f|
+        f << instance_variable_get(:"@#{v}")
+      end
     end
   end
 
   config.after(:each) do
-    File.delete @content_file
-    File.delete @layout_file
-    File.delete @style_file
+    [:content, :layout, :style, :static_style, :dynamic_style ].each do |v|
+      File.delete instance_variable_get(:"@#{v}_file")
+    end
   end
 end
