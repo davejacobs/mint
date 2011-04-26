@@ -11,11 +11,11 @@ module Mint
 
     attr_reader :root
     def root=(root)
-      @root = root || Dir.getwd
+      @root = root
     end
 
     def root_directory_path
-      root ? Pathname.new(root).expand_path : ''
+      Pathname.new(root || Dir.getwd).expand_path
     end
 
     def root_directory
@@ -25,7 +25,7 @@ module Mint
     attr_accessor :source
 
     def source_file_path
-      path = Pathname.new(source || '')
+      path = Pathname.new(source)
       path.absolute? ? 
         path.expand_path : root_directory_path + path
     end
@@ -64,14 +64,17 @@ module Mint
       @renderer = renderer
     end
 
-    def initialize(source, type=:resource, options={})
+    def initialize(source, options={})
       return nil unless source
 
+      self.type = :resource
       self.source = source
-      self.type = type
-      self.name = Mint.guess_name_from source
       self.root = options[:root]
       self.destination = options[:destination]
+
+      yield self if block_given?
+
+      self.name = Mint.guess_name_from source
       self.renderer = Mint.renderer source
     end
 

@@ -33,22 +33,10 @@ module Mint
       it "#style_destination_file_path" do
         document.style_destination_file_path.should ==
           Pathname.new(@style_destination_file)
-
-        # if document.style_destination
-        #   path = Pathname.new document.style_destination
-        #   dir = path.absolute? ?
-        #     path : document.destination_directory_path + path
-        #   document.style_destination_file_path.should ==
-        #     dir + document.style.name
-        # else
-        #   document.style_destination_file_path.should ==
-        #     document.style.destination_file_path
-        # end
       end
 
       it "#style_destination_file" do
-        document.style_destination_file.should ==
-          document.style_destination_file_path.to_s
+        document.style_destination_file.should == @style_destination_file
       end
 
       it "#style_destination_directory_path" do
@@ -61,11 +49,10 @@ module Mint
           document.style_destination_directory_path.to_s
       end
 
-      # Ensure that the document is choosing the right layout and
-      # style templates. We'll leave style generation tests to
-      # style_spec.rb, but we need to test layout and content
-      # generation (in a later context) because the layout
-      # needs to be injected with generated content.
+      # We'll leave style generation tests to style_spec.rb, 
+      # but we need to test layout and content generation (in a 
+      # later context) because the layout needs to be injected 
+      # with generated content.
 
       it "#layout" do
         document.layout.should be_in_directory(@layout)
@@ -78,8 +65,7 @@ module Mint
       # Convenience methods
       
       it "#stylesheet" do
-        relative_path = 
-          document.destination_file_path.
+        relative_path = document.destination_file_path.
             relative_path_from(document.style_destination_file_path)
 
         document.stylesheet.should == relative_path.to_s
@@ -94,6 +80,8 @@ module Mint
         document.content.should =~ /<p>This is just a test.<\/p>/
       end
 
+      # Render output
+
       it "renders its layout, injecting content inside" do
         document.render.should =~ 
           /.*<html>.*#{document.content}.*<\/html>.*/m
@@ -102,6 +90,8 @@ module Mint
       it "links to its stylesheet" do 
         document.render.should =~ /#{document.stylesheet}/
       end
+
+      # Mint output
 
       it "writes its rendered style to #style_destination_file" do
         document.mint
@@ -122,9 +112,9 @@ module Mint
       before do
         # These are the expectations that the "all documents"
         # shared example will use to validate this example. I'm 
-        # not going to reuse these variables to instantiate document
-        # because in some cases, we don't want the same value back in
-        # our tests, and I want to maintain a clear separation between
+        # not going to use these variables to instantiate document
+        # because in some cases, we don't use the same value back in
+        # our tests. I want to maintain a clear separation between
         # test expectations and test input.
         @root = Dir.getwd
         @destination = nil
@@ -147,7 +137,7 @@ module Mint
                        :style_destination => 'styles' }
 
       before do
-        # Expectations for tests:
+        # Test expectations
         @root = Dir.getwd
         @destination = 'destination'
         @style_destination = 'styles'

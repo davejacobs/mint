@@ -6,7 +6,8 @@ module Mint
   # file to use when a template name is specified.
   class Layout < Resource
     def initialize(source, opts=Mint.default_options)
-      super(source, :layout, opts)
+      super(source, opts)
+      self.type = :layout
     end
   end
 end

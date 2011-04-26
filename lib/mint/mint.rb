@@ -115,7 +115,7 @@ module Mint
   # Guesses an appropriate name for the resource output file based on
   # its source file's base name
   def self.guess_name_from(name)
-    name = name.basename if name.respond_to? :basename
+    name = Pathname(name).basename if name
     css = Mint.css_formats.join '|'
     name.to_s.
       gsub(/\.(#{css})$/, '.css').
