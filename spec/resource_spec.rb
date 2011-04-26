@@ -30,6 +30,8 @@ module Mint
     end
 
     context "when created with a relative path and no root" do
+      let(:resource) { Resource.new @content_file }
+
       before do
         @name                  = 'content.html'
         @root                  = nil
@@ -42,11 +44,13 @@ module Mint
         @destination_directory = '/tmp/mint-test'
       end
 
-      let(:resource) { Resource.new @content_file }
       it_behaves_like "all resources"
     end
 
     context "when created with a relative path and absolute root" do
+      let(:resource) { Resource.new @content_file, 
+                       :root => '/tmp/mint-test/alternative-root' }
+
       before do
         # Expectations
         @name                  = 'content.html'
@@ -60,13 +64,12 @@ module Mint
         @destination_directory = '/tmp/mint-test/alternative-root'
       end
 
-      let(:resource) { Resource.new @content_file, 
-                       :root => '/tmp/mint-test/alternative-root' }
-
       it_behaves_like "all resources"
     end
 
     context "when created with an absolute path and no root" do
+      let(:resource) { Resource.new '/tmp/mint-test/content.md' }
+
       before do
         @name                  = 'content.html'
         @root                  = nil
@@ -80,13 +83,15 @@ module Mint
         @destination_directory = '/tmp/mint-test'
       end
 
-      let(:resource) { Resource.new '/tmp/mint-test/content.md' }
       it_behaves_like "all resources"
     end
 
     # The root should *not* override a source file absolute path but
     # *should* affect the destination file path.
     context "when created with an absolute path and root" do
+      let(:resource) { Resource.new '/tmp/mint-test/content.md',
+                       :root => '/tmp/mint-test/alternative-root' }
+
       before do
         @name                  = 'content.html'
         @root                  = '/tmp/mint-test/alternative-root'
@@ -99,13 +104,17 @@ module Mint
         @destination_directory = '/tmp/mint-test/alternative-root'
       end
 
-      let(:resource) { Resource.new '/tmp/mint-test/content.md',
-                       :root => '/tmp/mint-test/alternative-root' }
-
       it_behaves_like "all resources"
     end
 
     context "when it's created with a block" do
+      let(:resource) do
+        Resource.new @content_file do |resource|
+          resource.root = '/tmp/mint-test/alternative-root'
+          resource.destination = 'destination'
+        end
+      end
+
       before do
         @name                  = 'content.html'
         @root                  = '/tmp/mint-test/alternative-root'
@@ -116,13 +125,6 @@ module Mint
         @destination            = 'destination'
         @destination_file      = '/tmp/mint-test/alternative-root/destination/content.html'
         @destination_directory = '/tmp/mint-test/alternative-root/destination'
-      end
-
-      let(:resource) do
-        Resource.new @content_file do |resource|
-          resource.root = '/tmp/mint-test/alternative-root'
-          resource.destination = 'destination'
-        end
       end
 
       it_behaves_like "all resources"
