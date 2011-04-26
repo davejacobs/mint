@@ -80,13 +80,13 @@ module Mint
       let(:document) { Document.new @content_file }
 
       before do
-        @root = nil
-        @destination = nil
-        @style_destination = nil
-        @style_destination_file = Mint.root + '/templates/default/css/style.css'
+        @root                        = nil
+        @destination                 = nil
+        @style_destination           = nil
+        @style_destination_file      = Mint.root + '/templates/default/css/style.css'
         @style_destination_directory = Mint.root + '/templates/default/css'
-        @style = nil
-        @layout = nil
+        @style                       = nil
+        @layout                      = nil
       end
 
       it_should_behave_like "all documents"
