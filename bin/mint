@@ -31,6 +31,15 @@ optparse = OptionParser.new do |opts|
 end
 optparse.parse!
 
+# Minimalist implementation that I want to move to, but
+# will have to refactor commandline.rb code and tests
+#
+# first = ARGV.first.downcase.to_sym
+# commands = [ :install, :edit, :set, :config ]
+# command = commands.include?(first) ? command : :mint
+
+# Mint::CommandLine.send command, commandline_options
+
 case ARGV.first.downcase.to_sym
 when :help
   Mint::CommandLine.help(optparse.help)
