@@ -19,7 +19,7 @@ module Mint
       # Merge config options from all config files on the Mint path,
       # where more local options take precedence over more global
       # options
-      Mint.path.map {|p| p + config_file }.
+      Mint.path(true).map {|p| p + config_file }.
         select(&:exist?).
         map {|p| YAML.load_file p }.
         reverse.
@@ -52,7 +52,7 @@ module Mint
     end
 
     def self.configure(opts, scope=:local)
-      config_directory = Mint.path_for_scope scope
+      config_directory = Mint.path_for_scope(scope, true)
       config_file = config_directory + Mint.files[:config]
       Helpers.ensure_directory config_directory
       Helpers.update_yaml opts, config_file

@@ -5,6 +5,10 @@ RSpec::Matchers.define :be_in_directory do |name|
   match {|resource| resource.source_directory =~ /#{name}/ }
 end
 
+RSpec::Matchers.define :be_in_template do |name|
+  match {|file| file =~ /#{Mint.root}.*#{name}/ }
+end
+
 RSpec.configure do |config|
   config.before(:suite) do
     @old_dir = Dir.getwd

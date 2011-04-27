@@ -20,10 +20,11 @@ module Mint
   # for MINT_PATH environment variable. Otherwise will use smart defaults.
   # Either way, earlier/higher paths take precedence. And is considered to
   # be the directory for "local" config options, templates, etc.
-  def self.path
+  def self.path(as_path=false)
     mint_path = ENV['MINT_PATH'] || 
       "#{Dir.getwd}/.mint:~/.mint:#{Mint.root}"
-    mint_path.split(':').map {|p| Pathname.new(p).expand_path }
+    paths = mint_path.split(':')
+    as_path ? paths.map {|p| Pathname.new(p).expand_path } : paths
   end
 
   # I want to refactor this so that Mint.path is always a Hash...
@@ -31,13 +32,13 @@ module Mint
   # Right now, this is a hack. It assumes a sane MINT_PATH, where the
   # first entry is most local, the second is user-level,
   # and the last entry is most global.
-  def self.path_for_scope(scope=:local)
+  def self.path_for_scope(scope=:local, as_path=false)
     case Mint.path
     when Array
       index = { local: 0, user: 1, global: 2 }[scope]
-      Mint.path[index]
+      Mint.path(as_path)[index]
     when Hash
-      Mint.path[scope]
+      Mint.path(as_path)[scope]
     else
       nil
     end
@@ -87,7 +88,7 @@ module Mint
   # ~/.mint/templates/normal/style.css.
   def self.lookup_template(name_or_file, type=:layout)
     name = name_or_file.to_s
-    File.exist?(name) ? Pathname.new(name) : find_template(name, type)
+    File.exist?(name) ? name : find_template(name, type)
   end
 
   # Finds a template named `name` in the Mint path. If `type` is :layout,
@@ -105,8 +106,8 @@ module Mint
     find_files = lambda {|x| Pathname.glob "#{x.to_s}.*" }
     acceptable = lambda {|x| x.to_s =~ /#{Mint.formats.join '|'}/ }
 
-    template = Mint.path.map(&file_name).map(&find_files).flatten.
-      select(&acceptable).select(&:exist?).first
+    template = Mint.path(true).map(&file_name).map(&find_files).flatten.
+      select(&acceptable).select(&:exist?).first.to_s
     raise TemplateNotFoundException unless template
 
     template
