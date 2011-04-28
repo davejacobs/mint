@@ -6,8 +6,8 @@ module Mint
   # file to use when a template name is specified.
   class Style < Resource
     def initialize(source, opts=Mint.default_options)
-      self.type = :style
       super(source, opts)
+      self.type = :style
 
       # We want to render final stylesheet to css subdirectory if
       # an output directory is not specified. If we don't, the rendered
