@@ -69,7 +69,7 @@ module Mint
 
       self.type = :resource
       self.source = source
-      self.root = options[:root]
+      self.root = options[:root] || source_directory
       self.destination = options[:destination]
 
       yield self if block_given?

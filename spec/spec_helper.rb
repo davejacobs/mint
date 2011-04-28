@@ -49,18 +49,16 @@ This is just a test.
     @style = 'body { font-size: 16px }'
 
     @static_style = <<-HERE
-body {
-  #container {
-    padding: 1em;
-  }
+body #container {
+  padding: 1em;
 }
     HERE
 
-    @dynamic_style = <<-HERE
+    @dynamic_style = <<HERE
 body
   #container
     padding: 1em
-    HERE
+HERE
 
     [:content, :layout, :style, :static_style, :dynamic_style ].each do |v|
       File.open(instance_variable_get(:"@#{v}_file"), 'w') do |f|

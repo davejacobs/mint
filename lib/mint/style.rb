@@ -6,26 +6,29 @@ module Mint
   # file to use when a template name is specified.
   class Style < Resource
     def initialize(source, opts=Mint.default_options)
-      super(source, opts)
       self.type = :style
+      super(source, opts)
 
       # We want to render final stylesheet to css subdirectory if
       # an output directory is not specified. If we don't, the rendered
       # Css file might be picked up next time we look for a named template
       # in this directory, and any changes to the master Sass file
       # won't be picked up.
-      self.destination ||= self.source_directory_path + 'css'
+      
+      if rendered? and self.source_directory =~ /#{Mint.path.join('|')}/
+        self.destination ||= 'css' 
+      end
     end
 
     def render
-      if need_rendering?
+      if rendered?
         super
       else
         File.read source
       end
     end
 
-    def need_rendering?
+    def rendered?
       source_file_path.extname !~ /\.css$/
     end
   end
