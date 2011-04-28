@@ -9,6 +9,10 @@ RSpec::Matchers.define :be_in_template do |name|
   match {|file| file =~ /#{Mint.root}.*#{name}/ }
 end
 
+RSpec::Matchers.define :be_a_template do |name|
+  match {|file| Mint.template? file }
+end
+
 RSpec.configure do |config|
   config.before(:suite) do
     @old_dir = Dir.getwd

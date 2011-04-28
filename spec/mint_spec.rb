@@ -39,6 +39,16 @@ describe Mint do
 
   it "finds the correct template according to scope"
 
+  it "decides whether or not a file is a template file" do
+    actual_template = Mint.lookup_template(:default, :layout)
+    fake_template = Mint.root + "/templates/default.css"
+    obvious_nontemplate = @dynamic_style_file
+
+    actual_template.should be_a_template
+    fake_template.should_not be_a_template
+    obvious_nontemplate.should_not be_a_template
+  end
+
   it "properly guesses destination file names based on source file names" do
     Mint.guess_name_from('content.md').should == 'content.html'
     Mint.guess_name_from('content.textile').should == 'content.html'

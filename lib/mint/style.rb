@@ -9,13 +9,14 @@ module Mint
       super(source, opts)
       self.type = :style
 
-      # We want to render final stylesheet to css subdirectory if
-      # an output directory is not specified. If we don't, the rendered
+      # We want to render final stylesheet to the /css subdirectory if
+      # an output directory is not specified and we are dealing with
+      # a named template (not a local file). If we don't do this, the rendered
       # Css file might be picked up next time we look for a named template
-      # in this directory, and any changes to the master Sass file
-      # won't be picked up.
-      
-      if rendered? and self.source_directory =~ /#{Mint.path.join('|')}/
+      # in this directory, and the (correct) Sass file won't be picked up.
+      # However, if a destination directory is already specified, we
+      # leave it alone.
+      if Mint.template?(self.source_directory) and rendered?
         self.destination ||= 'css' 
       end
     end

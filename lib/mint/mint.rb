@@ -113,6 +113,15 @@ module Mint
     template
   end
 
+  # A non-rigourous check to see if the file is somewhere on the
+  # MINT_PATH
+  def self.template?(file)
+    paths = Mint.path.map {|f| File.expand_path f }
+    file_path = Pathname.new(file)
+    file_path.exist? and 
+      file_path.dirname.expand_path.to_s =~ /#{paths.join('|')}/
+  end
+
   # Guesses an appropriate name for the resource output file based on
   # its source file's base name
   def self.guess_name_from(name)
