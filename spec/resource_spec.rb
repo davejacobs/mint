@@ -7,7 +7,7 @@ module Mint
 
       subject { resource }
       its(:name) { should == 'content.html' }
-      its(:root) { should be_nil }
+      its(:root) { should == '/tmp/mint-test' }
       its(:root_directory_path) { should == Pathname.new(resource.root_directory) }
       its(:source) { should == 'content.md' }
       its(:source_file) { should == '/tmp/mint-test/content.md' }
@@ -46,7 +46,7 @@ module Mint
 
       subject { resource }
       its(:name) { should == 'content.html' }
-      its(:root) { should be_nil }
+      its(:root) { should == '/tmp/mint-test' }
       its(:root_directory_path) { should == Pathname.new(resource.root_directory) }
       its(:source) { should == '/tmp/mint-test/content.md' }
       its(:source_file_path) { should == Pathname.new('/tmp/mint-test/content.md') }

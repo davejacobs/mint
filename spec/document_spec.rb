@@ -52,7 +52,7 @@ module Mint
       let(:document) { Document.new @content_file }
 
       subject { document }
-      its(:root) { should be_nil }
+      its(:root) { should == '/tmp/mint-test' }
       its(:destination) { should be_nil }
       its(:source) { should == 'content.md' }
       its(:style_destination) { should be_nil }
@@ -85,7 +85,7 @@ module Mint
                        :style_destination => 'styles' }
 
       subject { document }
-      its(:root) { should be_nil }
+      its(:root) { should == '/tmp/mint-test' }
       its(:destination) { should == 'destination' }
       its(:source) { should == 'content.md' }
       its(:style_destination) { should == 'styles' }

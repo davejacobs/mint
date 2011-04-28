@@ -57,6 +57,8 @@ module Mint
       end
     end
 
+    # TODO: Create local-scope templates directory that I can test this with,
+    # and use it to beef up other specs (like document_spec and mint_spec)
     context "when it's created from a static template file" do
     #  let(:style) { Style.new(Mint.lookup_template(:static_test, :style)) }
     #  it "#destination" do
