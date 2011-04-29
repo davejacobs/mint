@@ -2,23 +2,45 @@ require 'spec_helper'
 
 module Mint
   describe Resource do
+    shared_examples_for "all resources" do
+      subject { resource }
+
+      its(:root_directory_path) do
+        should == Pathname.new(resource.root_directory)
+      end
+
+      its(:source_file_path) do
+        should == Pathname.new(resource.source_file)
+      end
+
+      its(:source_directory_path) do
+        should == Pathname.new(resource.source_directory)
+      end
+
+      its(:destination_file_path) do
+        should == Pathname.new(resource.destination_file)
+      end
+
+      its(:destination_directory_path) do
+        should == Pathname.new(resource.destination_directory)
+      end
+    end
+
     context "when created with a relative path and no root" do
       let(:resource) { Resource.new @content_file }
 
       subject { resource }
+
       its(:name) { should == 'content.html' }
       its(:root) { should == '/tmp/mint-test' }
-      its(:root_directory_path) { should == Pathname.new(resource.root_directory) }
       its(:source) { should == 'content.md' }
       its(:source_file) { should == '/tmp/mint-test/content.md' }
       its(:source_directory) { should == '/tmp/mint-test' }
-      its(:source_file_path) { should == Pathname.new(resource.source_file) }
-      its(:source_directory_path) { should == Pathname.new(resource.source_directory) }
       its(:destination) { should be_nil }
       its(:destination_file) { should == '/tmp/mint-test/content.html' }
       its(:destination_directory) { should == '/tmp/mint-test' }
-      its(:destination_file_path) { should == Pathname.new(resource.destination_file) }
-      its(:destination_directory_path) { should == Pathname.new(resource.destination_directory) }
+
+      it_should_behave_like "all resources"
     end
 
     context "when created with a relative path and absolute root" do
@@ -28,36 +50,46 @@ module Mint
       subject { resource }
       its(:name) { should == 'content.html' }
       its(:root) { should == '/tmp/mint-test/alternative-root' }
-      its(:root_directory_path) { should == Pathname.new(resource.root_directory) }
+
+      its(:root_directory_path) do
+        should == Pathname.new(resource.root_directory)
+      end
+
       its(:source) { should == 'content.md' }
-      its(:source_file_path) { should == Pathname.new('/tmp/mint-test/alternative-root/content.md') }
-      its(:source_file) { should == '/tmp/mint-test/alternative-root/content.md' }
-      its(:source_directory_path) { should == Pathname.new('/tmp/mint-test/alternative-root') }
+
+      its(:source_file) do
+        should == '/tmp/mint-test/alternative-root/content.md'
+      end
+
       its(:source_directory) { should == '/tmp/mint-test/alternative-root' }
       its(:destination) { should be_nil }
-      its(:destination_file) { should == '/tmp/mint-test/alternative-root/content.html' }
-      its(:destination_directory) { should == '/tmp/mint-test/alternative-root' }
-      its(:destination_file_path) { should == Pathname.new(resource.destination_file) }
-      its(:destination_directory_path) { should == Pathname.new(resource.destination_directory) }
+
+      its(:destination_file) do
+        should == '/tmp/mint-test/alternative-root/content.html'
+      end
+
+      its(:destination_directory) do
+        should == '/tmp/mint-test/alternative-root'
+      end
+
+      it_should_behave_like "all resources"
     end
 
     context "when created with a relative path and absolute root" do
       let(:resource) { Resource.new "/tmp/mint-test/#{@content_file}" }
 
       subject { resource }
+      
       its(:name) { should == 'content.html' }
       its(:root) { should == '/tmp/mint-test' }
-      its(:root_directory_path) { should == Pathname.new(resource.root_directory) }
       its(:source) { should == '/tmp/mint-test/content.md' }
-      its(:source_file_path) { should == Pathname.new('/tmp/mint-test/content.md') }
       its(:source_file) { should == '/tmp/mint-test/content.md' }
-      its(:source_directory_path) { should == Pathname.new('/tmp/mint-test') }
       its(:source_directory) { should == '/tmp/mint-test' }
       its(:destination) { should be_nil }
       its(:destination_file) { should == '/tmp/mint-test/content.html' }
       its(:destination_directory) { should == '/tmp/mint-test' }
-      its(:destination_file_path) { should == Pathname.new(resource.destination_file) }
-      its(:destination_directory_path) { should == Pathname.new(resource.destination_directory) }
+
+      it_should_behave_like "all resources"
     end
 
     # The root should *not* override a source file absolute path but
@@ -67,19 +99,23 @@ module Mint
                        :root => '/tmp/mint-test/alternative-root' }
 
       subject { resource }
+
       its(:name) { should == 'content.html' }
       its(:root) { should == '/tmp/mint-test/alternative-root' }
-      its(:root_directory_path) { should == Pathname.new(resource.root_directory) }
       its(:source) { should == '/tmp/mint-test/content.md' }
-      its(:source_file_path) { should == Pathname.new('/tmp/mint-test/content.md') }
       its(:source_file) { should == '/tmp/mint-test/content.md' }
-      its(:source_directory_path) { should == Pathname.new('/tmp/mint-test') }
       its(:source_directory) { should == '/tmp/mint-test' }
       its(:destination) { should be_nil }
-      its(:destination_file) { should == '/tmp/mint-test/alternative-root/content.html' }
-      its(:destination_directory) { should == '/tmp/mint-test/alternative-root' }
-      its(:destination_file_path) { should == Pathname.new(resource.destination_file) }
-      its(:destination_directory_path) { should == Pathname.new(resource.destination_directory) }
+
+      its(:destination_file) do
+        should == '/tmp/mint-test/alternative-root/content.html'
+      end
+
+      its(:destination_directory) do
+        should == '/tmp/mint-test/alternative-root'
+      end
+
+      it_should_behave_like "all resources"
     end
 
     context "when it's created with a block" do
@@ -91,19 +127,27 @@ module Mint
       end
 
       subject { resource }
+      
       its(:name) { should == 'content.html' }
       its(:root) { should == '/tmp/mint-test/alternative-root' }
-      its(:root_directory_path) { should == Pathname.new(resource.root_directory) }
       its(:source) { should == 'content.md' }
-      its(:source_file_path) { should == Pathname.new('/tmp/mint-test/alternative-root/content.md') }
-      its(:source_file) { should == '/tmp/mint-test/alternative-root/content.md' }
-      its(:source_directory_path) { should == Pathname.new('/tmp/mint-test/alternative-root') }
+
+      its(:source_file) do
+        should == '/tmp/mint-test/alternative-root/content.md'
+      end
+
       its(:source_directory) { should == '/tmp/mint-test/alternative-root' }
       its(:destination) { should == 'destination' }
-      its(:destination_file_path) { should == Pathname.new('/tmp/mint-test/alternative-root/destination/content.html') }
-      its(:destination_file) { should == '/tmp/mint-test/alternative-root/destination/content.html' }
-      its(:destination_directory_path) { should == Pathname.new('/tmp/mint-test/alternative-root/destination') }
-      its(:destination_directory) { should == '/tmp/mint-test/alternative-root/destination' }
+
+      its(:destination_file) do
+        should == '/tmp/mint-test/alternative-root/destination/content.html'
+      end
+
+      its(:destination_directory) do
+        should == '/tmp/mint-test/alternative-root/destination'
+      end
+
+      it_should_behave_like "all resources"
     end
   end
 end
