@@ -41,7 +41,7 @@ describe Mint do
 
   it "decides whether or not a file is a template file" do
     actual_template = Mint.lookup_template(:default, :layout)
-    fake_template = Mint.root + "/templates/default.css"
+    fake_template = "#{Mint.root}/templates/default.css"
     obvious_nontemplate = @dynamic_style_file
 
     actual_template.should be_a_template

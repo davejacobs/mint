@@ -79,7 +79,7 @@ module Mint
 
       it "#destination_file" do
         style.destination_file.should == 
-          Mint.root + '/templates/default/css/style.css'
+          "#{Mint.root}/templates/default/css/style.css"
       end
     end
   end
