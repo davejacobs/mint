@@ -1,7 +1,4 @@
 *~
-*.swp
-.DS_Store
 .sass-cache
-Thumbs.db
 tmp/*
 templates/*/css
