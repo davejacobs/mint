@@ -1,6 +1,6 @@
 require 'pathname'
 require 'yaml'
-require 'mint'
+require 'optparse'
 
 module Mint
   module CommandLine
@@ -11,6 +11,30 @@ module Mint
     def self.options
       options_file = '../../../config/options.yaml'
       YAML.load_file File.expand_path(options_file, __FILE__)
+    end
+
+    def self.parser
+      optparse = OptionParser.new do |opts|
+        opts.banner = 'Usage: mint [command] files [options]'
+
+        Mint::CommandLine.options.each do |k,v|
+          has_param = v['parameter']
+
+          v['short'] = "-#{v['short']}"
+          v['long'] = "--#{v['long']}"
+
+          if has_param
+            v['long'] << " PARAM"
+            opts.on v['short'], v['long'], v['description'] do |p|
+              yield k.to_sym, p
+            end
+          else
+            opts.on v['short'], v['long'], v['description'] do
+              yield k, true
+            end
+          end
+        end
+      end
     end
 
     def self.configuration
@@ -36,18 +60,34 @@ module Mint
 
     # Install the listed file to the scope listed, using 
     # local as the default scope.
-    # def self.install(file, scope=:local)
-    #   directory = path_for_scope(scope)
-    #   FileUtils.copy file, directory
-    # end
+    def self.install(file, commandline_options)
+      commandline_options[:local] = true
+      scope = [:global, :user, :local].
+        select {|e| commandline_options[e] }.
+        first
+
+      directory = path_for_scope(scope)
+      FileUtils.copy file, directory
+    end
 
     # If we get the edit command, will retrieve appropriate file
     # (probably a Mint template) and shell out that file to
     # the user's favorite editor.
-    def self.edit(name, layout_or_style=:layout)
+    def self.edit(name, commandline_options)
+      layout = commandline_options[:layout]
+      style = commandline_options[:style]
+
+      if layout and not style
+        layout_or_style = :layout
+      elsif style
+        layout_or_style = :style
+      else
+        puts optparse.help
+      end
+
       file = Mint.lookup_template name, layout_or_style
       
-      editor = ENV['EDITOR'] || 'vim'
+      editor = ENV['EDITOR'] || 'vi'
       system "#{editor} #{file}"
     end
 
@@ -60,7 +100,12 @@ module Mint
 
     # Try to set a config option (at the specified scope) per 
     # the user's command.
-    def self.set(key, value, scope=:local)
+    def self.set(key, value, commandline_options)
+      commandline_options[:local] = true
+      scope = [:global, :user, :local].
+        select {|e| commandline_options[e] }.
+        first
+
       configure({ key => value }, scope)
     end
 
@@ -80,13 +125,13 @@ module Mint
       documents = []
       options = configuration_with commandline_options
       
-      root = options[:root] || Dir.getwd
+      options[:root] ||= Dir.getwd
 
       # Eventually render_style should be replaced with file 
       # change detection
       render_style = true
       files.each do |file|
-        Document.new(file, options).mint(root, render_style)
+        Document.new(file, options).mint(render_style)
         render_style = false
       end
     end
