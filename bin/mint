@@ -1,35 +1,13 @@
 #!/usr/bin/env ruby
-
 # A script for harnessing Mint at the commandline
 # Usage: mint [options] files
 
-require 'optparse'
 require 'mint'
 
 # Parse options from the commandline
 commandline_options = {}
-optparse = OptionParser.new do |opts|
-  opts.banner = 'Usage: mint [command] files [options]'
-
-  Mint::CommandLine.options.each do |k,v|
-    has_param = v['parameter']
-
-    v['short'] = "-#{v['short']}"
-    v['long'] = "--#{v['long']}"
-
-    if has_param
-      v['long'] << " PARAM"
-      opts.on v['short'], v['long'], v['description'] do |p|
-        commandline_options[k.to_sym] = p
-      end
-    else
-      opts.on v['short'], v['long'], v['description'] do
-        commandline_options[k] = true
-      end
-    end
-  end
-end
-optparse.parse!
+process_opts = lambda {|k,v| commandline_options[k] = v }
+Mint::CommandLine.parser(&process_opts).parse!
 
 # Minimalist implementation that I want to move to, but
 # will have to refactor commandline.rb code and tests

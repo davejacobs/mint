@@ -1,6 +1,6 @@
 require 'pathname'
 require 'yaml'
-require 'mint'
+require 'optparse'
 
 module Mint
   module CommandLine
@@ -11,6 +11,30 @@ module Mint
     def self.options
       options_file = '../../../config/options.yaml'
       YAML.load_file File.expand_path(options_file, __FILE__)
+    end
+
+    def self.parser
+      optparse = OptionParser.new do |opts|
+        opts.banner = 'Usage: mint [command] files [options]'
+
+        Mint::CommandLine.options.each do |k,v|
+          has_param = v['parameter']
+
+          v['short'] = "-#{v['short']}"
+          v['long'] = "--#{v['long']}"
+
+          if has_param
+            v['long'] << " PARAM"
+            opts.on v['short'], v['long'], v['description'] do |p|
+              yield k.to_sym, p
+            end
+          else
+            opts.on v['short'], v['long'], v['description'] do
+              yield k, true
+            end
+          end
+        end
+      end
     end
 
     def self.configuration
