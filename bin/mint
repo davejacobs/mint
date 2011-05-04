@@ -16,44 +16,19 @@ Mint::CommandLine.parser(&process_opts).parse!
 # commands = [ :install, :edit, :set, :config ]
 # command = commands.include?(first) ? command : :mint
 
-# Mint::CommandLine.send command, commandline_options
+# Mint::CommandLine.send(command, commandline_options)
 
 case ARGV.first.downcase.to_sym
 when :help
   Mint::CommandLine.help(optparse.help)
-
 when :install
-  commandline_options[:local] = true
-  scope = [:global, :user, :local].
-    select {|e| commandline_options[e] }.
-    first
-
-  Mint::CommandLine.install ARGV.shift, scope
-
+  Mint::CommandLine.install(ARGV.shift, commandline_options)
 when :edit
-  layout = commandline_options[:layout]
-  style = commandline_options[:style]
-
-  if layout and not style
-    Mint::CommandLine.edit layout, :layout
-  elsif style
-    Mint::CommandLine.edit style, :style
-  else
-    puts optparse.help
-  end
-
+  Mint::CommandLine.edit(ARGV.shift, commandline_options)
 when :set
-  # Determine scope, using local as the default
-  commandline_options[:local] = true
-  scope = [:global, :user, :local].
-    select {|e| commandline_options[e] }.
-    first
-
-  Mint::CommandLine.set ARGV.shift, ARGV.shift, scope
-
+  Mint::CommandLine.set(ARGV.shift, ARGV.shift, commandline_options)
 when :config
   Mint::CommandLine.config
-
 else
   # If no commands were found, search the PATH for commands prefixed
   # with mint-. If no matching executables are found, we know we've
@@ -69,6 +44,6 @@ else
     commandline_options.delete :verbose
     commandline_options.delete :simulation
 
-    Mint::CommandLine.mint ARGV, commandline_options
+    Mint::CommandLine.mint(ARGV, commandline_options)
   # end
 end
