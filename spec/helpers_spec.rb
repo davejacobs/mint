@@ -16,12 +16,12 @@ module Mint
         Helpers.slugize('You     and me').should == 'you-and-me'
       end
 
-      it "parses multiple hyphens" do
-        Helpers.slugize('You-----and me').should == 'you-and-me'
-      end
-
       it "removes non-word/non-digits" do
         Helpers.slugize('You // and :: me').should == 'you-and-me'
+      end
+
+      it "condenses multiple hyphens" do
+        Helpers.slugize('You-----and me').should == 'you-and-me'
       end
     end
 
