@@ -28,7 +28,6 @@ module Mint
 
     context "when created with a relative path and no root" do
       let(:resource) { Resource.new @content_file }
-
       subject { resource }
 
       its(:name) { should == 'content.html' }
@@ -46,15 +45,10 @@ module Mint
     context "when created with a relative path and absolute root" do
       let(:resource) { Resource.new @content_file,
                        :root => '/tmp/mint-test/alternative-root' }
-
       subject { resource }
+
       its(:name) { should == 'content.html' }
       its(:root) { should == '/tmp/mint-test/alternative-root' }
-
-      its(:root_directory_path) do
-        should == Pathname.new(resource.root_directory)
-      end
-
       its(:source) { should == 'content.md' }
 
       its(:source_file) do
@@ -77,7 +71,6 @@ module Mint
 
     context "when created with a relative path and absolute root" do
       let(:resource) { Resource.new "/tmp/mint-test/#{@content_file}" }
-
       subject { resource }
       
       its(:name) { should == 'content.html' }
