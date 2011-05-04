@@ -1,5 +1,4 @@
 require 'pathname'
-require 'fileutils'
 require 'yaml'
 
 module Mint
@@ -7,9 +6,9 @@ module Mint
     def self.slugize(obj)
       obj.to_s.downcase.
         gsub(/&/, 'and').
-        gsub(/\s+/, '-').
-        gsub(/-+/, '-').
-        gsub(/[^a-z0-9-]/, '')
+        gsub(/[\s-]+/, '-').
+        gsub(/[^a-z0-9-]/, '').
+        gsub(/[-]+/, '-')
     end
 
     def self.symbolize(obj)
@@ -25,14 +24,13 @@ module Mint
       end.expand_path
     end
 
-    # Returns the relative path to dir1 from dir2.
+    # Returns the relative path to dir1 from dir2. If dir1 and dir2 
+    # have no directories in common besides /, will return the 
+    # absolute directory of dir1. Right now, assumes no symlinks
     def self.normalize_path(dir1, dir2)
       path1, path2 = [dir1, dir2].map {|d| pathize d }
-      path1.relative_path_from path2
-    end
-
-    def self.ensure_directory(dir)
-      FileUtils.mkdir_p dir
+      root1, root2 = [path1, path2].map {|p| p.each_filename.first }
+      root1 == root2 ? path1.relative_path_from(path2) : path1
     end
 
     def self.update_yaml(new_opts, file)
