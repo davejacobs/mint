@@ -5,6 +5,8 @@ module Mint
     before do 
       @tmp_dir = Dir.getwd 
       @alternative_root = "#{@tmp_dir}/alternative-root"
+      @full_content_file = "#{@tmp_dir}/#{@content_file}"
+      @full_alt_content_file = "#{@alternative_root}/#{@content_file}"
     end
 
     shared_examples_for "all resources" do
@@ -26,7 +28,7 @@ module Mint
       its(:name) { should == 'content.html' }
       its(:root) { should == @tmp_dir }
       its(:source) { should == @content_file }
-      its(:source_file) { should == "#{@tmp_dir}/#{@content_file}" }
+      its(:source_file) { should == @full_content_file }
       its(:source_directory) { should == @tmp_dir }
       its(:destination) { should be_nil }
       its(:destination_file) { should == "#{@tmp_dir}/content.html" }
@@ -35,6 +37,10 @@ module Mint
       it_should_behave_like "all resources"
     end
 
+    # TODO: This is wrong, need to rework this -- probably build slightly
+    # more comprehensive system in spec_helper for these edge cases,
+    # then build up compound variables in before block for this particular 
+    # spec (which has more edge cases than most)
     context "when created with a relative path and absolute root" do
       let(:resource) { Resource.new @content_file, :root => @alternative_root }
       subject { resource }
@@ -42,7 +48,7 @@ module Mint
       its(:name) { should == 'content.html' }
       its(:root) { should == @alternative_root }
       its(:source) { should == @content_file }
-      its(:source_file) { should == "#{@alternative_root}/#{@content_file}" }
+      its(:source_file) { should == @full_alt_content_file }
       its(:source_directory) { should == @alternative_root }
       its(:destination) { should be_nil }
       its(:destination_file) { should == "#{@alternative_root}/content.html" }
@@ -56,18 +62,18 @@ module Mint
         # This is a use case we will only ever test here, so
         # I'm not going to include it in the spec_helper
         FileUtils.mkdir_p @alternative_root
-        File.open("#{@alternative_root}/#{@content_file}", 'w') do |f|
+        File.open(@full_alt_content_file, 'w') do |f|
           f << @content
         end
       end
 
-      let(:resource) { Resource.new "#{@alternative_root}/#{@content_file}" }
+      let(:resource) { Resource.new @full_alt_content_file }
       subject { resource }
       
       its(:name) { should == 'content.html' }
       its(:root) { should == @alternative_root }
-      its(:source) { should == "#{@alternative_root}/#{@content_file}" }
-      its(:source_file) { should == "#{@alternative_root}/#{@content_file}" }
+      its(:source) { should == @full_alt_content_file }
+      its(:source_file) { should == @full_alt_content_file}
       its(:source_directory) { should == @alternative_root }
       its(:destination) { should be_nil }
       its(:destination_file) { should == "#{@alternative_root}/content.html" }
@@ -81,15 +87,15 @@ module Mint
     # I should also test this when neither the source nor the root
     # are in Dir.getwd, which is the default root.
     context "when created with an absolute path and root" do
-      let(:resource) { Resource.new "#{@tmp_dir}/#{@content_file}",
+      let(:resource) { Resource.new @full_content_file,
                        :root => @alternative_root }
 
       subject { resource }
 
       its(:name) { should == 'content.html' }
       its(:root) { should == @alternative_root }
-      its(:source) { should == "#{@tmp_dir}/#{@content_file}" }
-      its(:source_file) { should =="#{@tmp_dir}/#{@content_file}" }
+      its(:source) { should == @full_content_file }
+      its(:source_file) { should == @full_content_file }
       its(:source_directory) { should == @tmp_dir }
       its(:destination) { should be_nil }
       its(:destination_file) { should == "#{@alternative_root}/content.html" }
@@ -111,7 +117,7 @@ module Mint
       its(:name) { should == 'content.html' }
       its(:root) { should == @alternative_root }
       its(:source) { should == @content_file }
-      its(:source_file) { should == "#{@alternative_root}/#{@content_file}" }
+      its(:source_file) { should == @full_alt_content_file }
       its(:source_directory) { should == @alternative_root }
       its(:destination) { should == 'destination' }
 
