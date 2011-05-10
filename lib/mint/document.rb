@@ -137,7 +137,7 @@ module Mint
       # b) it actually needs rendering (i.e., it's in template form and
       # not raw, browser-parseable CSS) or it if it doesn't need
       # rendering but there is an explicit style_destination.
-      if render_style and style_destination
+      if render_style
         FileUtils.mkdir_p style_destination_directory
         File.open(self.style_destination_file, 'w+') do |f|
           f << self.style.render
