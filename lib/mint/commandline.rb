@@ -13,11 +13,11 @@ module Mint
       YAML.load_file File.expand_path(options_file, __FILE__)
     end
 
-    def self.parser
+    def self.parser(options_metadata=Mint::CommandLine.options)
       optparse = OptionParser.new do |opts|
         opts.banner = 'Usage: mint [command] files [options]'
 
-        Mint::CommandLine.options.each do |k,v|
+        options_metadata.each do |k,v|
           has_param = v['parameter']
 
           v['short'] = "-#{v['short']}"
