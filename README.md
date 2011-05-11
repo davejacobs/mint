@@ -43,7 +43,7 @@ This section discusses the Mint library API. This library encapsulates the idea 
 Mint is loaded with smart defaults, so if you don't want to configure something--say, the basic HTML skeleton of your document or the output directory--you don't have to. You'll probably be surprised at how easy it is to use out of the box, and how configurable it is.
 
     document = Document.new 'Minimalism.md'
-    document.mint
+    document.publish!
 
 And voil&agrave;, Minimalism.html will show up next to Minimalism.md.
 

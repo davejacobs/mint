@@ -5,6 +5,10 @@ RSpec::Matchers.define :be_in_directory do |name|
   match {|resource| resource.source_directory =~ /#{name}/ }
 end
 
+RSpec::Matchers.define :be_path do |name|
+  match {|resource| resource == Pathname.new(name) }
+end
+
 RSpec::Matchers.define :be_in_template do |name|
   match {|file| file =~ /#{Mint.root}.*#{name}/ }
 end
@@ -17,7 +21,6 @@ RSpec.configure do |config|
   config.before(:suite) do
     @old_dir = Dir.getwd
     @tmp_dir = '/tmp/mint-test'
-    @alternative_root = "#{@tmp_dir}/alternative-root"
 
     FileUtils.mkdir_p @tmp_dir
     Dir.chdir @tmp_dir

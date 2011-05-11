@@ -7,7 +7,8 @@ require 'mint'
 # Parse options from the commandline
 commandline_options = {}
 process_opts = lambda {|k,v| commandline_options[k] = v }
-Mint::CommandLine.parser(&process_opts).parse!
+parser = Mint::CommandLine.parser(&process_opts)
+parser.parse!
 
 # Minimalist implementation that I want to move to, but
 # will have to refactor commandline.rb code and tests
@@ -20,7 +21,7 @@ Mint::CommandLine.parser(&process_opts).parse!
 
 case ARGV.first.downcase.to_sym
 when :help
-  Mint::CommandLine.help(optparse.help)
+  Mint::CommandLine.help(parser.help)
 when :install
   Mint::CommandLine.install(ARGV.shift, commandline_options)
 when :edit

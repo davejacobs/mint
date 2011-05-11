@@ -55,4 +55,19 @@ describe Mint do
     Mint.guess_name_from('layout.haml').should == 'layout.html'
     Mint.guess_name_from('dynamic.sass').should == 'dynamic.css'
   end
+
+  # These are copied from document_spec.rb. I eventually want to move
+  # to this non-OO style of publishing, and this is the transition
+  context "when it publishes a document" do
+    let(:document) { Mint::Document.new @content_file }
+    before { Mint.publish!(document) }
+
+    it "writes its rendered style to #style_destination_file" do
+      document.style_destination_file_path.should exist
+    end
+
+    it "writes its rendered layout and content to #destination_file" do
+      document.destination_file_path.should exist
+    end
+  end
 end
