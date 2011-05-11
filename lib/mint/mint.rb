@@ -137,4 +137,8 @@ module Mint
   def self.renderer(path)
     Tilt.new path.to_s, :smart => true, :ugly => true
   end
+
+  def self.publish!(document)
+    document.publish!
+  end
 end
