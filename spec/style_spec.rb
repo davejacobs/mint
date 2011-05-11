@@ -2,12 +2,14 @@ require 'spec_helper'
 
 module Mint
   describe Style do
+    before { @tmp_dir = Dir.getwd }
+
     context "when it's created from a static file" do
       let(:style) { Style.new @static_style_file }
       subject { style }
 
       its(:destination) { should be_nil }
-      its(:destination_file) { should == '/tmp/mint-test/static.css' }
+      its(:destination_file) { should == "#{@tmp_dir}/static.css" }
 
       it { should_not be_rendered }
       it "'renders' itself verbatim" do
@@ -20,7 +22,7 @@ module Mint
       subject { style }
 
       its(:destination) { should be_nil }
-      its(:destination_file) { should == '/tmp/mint-test/dynamic.css' }
+      its(:destination_file) { should == "#{@tmp_dir}/dynamic.css" }
 
       it { should be_rendered }
       it "renders itself from a templating language to Html" do
@@ -36,7 +38,7 @@ module Mint
 
       its(:destination) { should == 'destination' }
       its(:destination_file) do
-        should == '/tmp/mint-test/destination/static.css'
+        should == "#{@tmp_dir}/destination/static.css"
       end
     end
 

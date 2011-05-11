@@ -2,6 +2,8 @@ require 'spec_helper'
 
 module Mint
   describe Document do
+    before { @tmp_dir = Dir.getwd }
+
     # We're not going to re-test derivative methods like source_file_path
     # or root_directory. resource_spec.rb tells us that if the master
     # values hold true, then their derivatives will be what we expect, as well.
@@ -52,7 +54,7 @@ module Mint
       let(:document) { Document.new @content_file }
 
       subject { document }
-      its(:root) { should == '/tmp/mint-test' }
+      its(:root) { should == @tmp_dir }
       its(:destination) { should be_nil }
       its(:source) { should == 'content.md' }
       its(:style_destination) { should be_nil }
@@ -85,17 +87,17 @@ module Mint
                        :style_destination => 'styles' }
 
       subject { document }
-      its(:root) { should == '/tmp/mint-test' }
+      its(:root) { should == @tmp_dir }
       its(:destination) { should == 'destination' }
       its(:source) { should == 'content.md' }
       its(:style_destination) { should == 'styles' }
 
       its(:style_destination_file) do
-        should == '/tmp/mint-test/destination/styles/style.css'
+        should == "#{@tmp_dir}/destination/styles/style.css"
       end
 
       its(:style_destination_directory) do
-        should == '/tmp/mint-test/destination/styles'
+        should == "#{@tmp_dir}/destination/styles"
       end
 
       its(:style_destination_file_path) do
@@ -114,10 +116,10 @@ module Mint
 
     context "when it's created with an explicit root" do 
       let(:document) { Document.new @content_file,
-                       :root => '/tmp/mint-test/alternative-root' }
+                       :root => "#{@tmp_dir}/alternative-root" }
 
       subject { document }
-      its(:root) { should == '/tmp/mint-test/alternative-root' }
+      its(:root) { should == "#{@tmp_dir}/alternative-root" }
       its(:destination) { should be_nil }
       its(:source) { should == 'content.md' }
       its(:style_destination) { should be_nil }
@@ -147,7 +149,7 @@ module Mint
     context "when it is created with a block" do
       let(:document) do
         Document.new @content_file do |doc|
-          doc.root              = '/tmp/mint-test/alternative-root'
+          doc.root              = "#{@tmp_dir}/alternative-root"
           doc.destination       = 'destination'
           doc.style_destination = 'styles'
           doc.layout            = 'pro'
@@ -156,17 +158,17 @@ module Mint
       end
 
       subject { document }
-      its(:root) { should == '/tmp/mint-test/alternative-root' }
+      its(:root) { should == "#{@tmp_dir}/alternative-root" }
       its(:destination) { should == 'destination' }
       its(:source) { should == 'content.md' }
       its(:style_destination) { should == 'styles' }
 
       its(:style_destination_file) do
-        should == '/tmp/mint-test/alternative-root/destination/styles/style.css'
+        should == "#{@tmp_dir}/alternative-root/destination/styles/style.css"
       end
 
       its(:style_destination_directory) do
-        should == '/tmp/mint-test/alternative-root/destination/styles'
+        should == "#{@tmp_dir}/alternative-root/destination/styles"
       end
 
       its(:style_destination_file_path) do
