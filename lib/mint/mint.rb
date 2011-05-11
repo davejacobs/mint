@@ -139,6 +139,6 @@ module Mint
   end
 
   def self.publish!(document)
-    document.mint
+    document.publish!
   end
 end

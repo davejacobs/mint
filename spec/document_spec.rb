@@ -36,12 +36,12 @@ module Mint
       # Mint output
 
       it "writes its rendered style to #style_destination_file" do
-        document.mint
+        document.publish!
         document.style_destination_file_path.should exist
       end
 
       it "writes its rendered layout and content to #destination_file" do
-        document.mint
+        document.publish!
         document.destination_file_path.should exist
         content = File.read document.destination_file
         content.should == document.render

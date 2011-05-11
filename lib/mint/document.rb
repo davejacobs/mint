@@ -127,7 +127,7 @@ module Mint
 
     # Write all rendered content where a) possible, b) required,
     # and c) specified
-    def mint(render_style=true)      
+    def publish!(render_style=true)      
       FileUtils.mkdir_p self.destination_directory
       File.open(self.destination_file, 'w+') do |f|
         f << self.render
