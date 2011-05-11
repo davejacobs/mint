@@ -22,7 +22,7 @@ Mint manages your documents in a decentralized but consistent way. It frees you 
 
 In a few more: *Mint processes words so you don't have to.*
 
-I. Use cases
+Use cases
 ------------
 
 1. Jake has text files formatted as Markdown-style text. He has traditionally published these as blog entries, which works well because his webserver takes care of processing the Markdown, generating HTML, and styling it with his static CSS. Jake has no way of visualizing his documents without a webserver running. He likes the convenience of centralized CSS styles that he can update once and cascade everywhere. He does not like depending on a webserver for static pages, i.e., his local documents. Jake wants a document management system where source files are written in Markdown but are "printed" into HTML and styled with centralized sheets he creates himself. In some cases, he merely wants to tweak the typography settings of a solid existing style. Above all, he wants simplicity: he does not want to have to put his documents into a certain structure in order for them to be rendered. And he wants default styles so that he doesn't have to create them on his own.
@@ -33,7 +33,7 @@ I. Use cases
 
 4. Santosh stores his blog entries in Markdown and wants to see how they look using his blog engine's stylesheet. He doesn't want to upload his entry until he's finished with it, but he wants to preview it with that stylesheet along the way.
 
-II. The Mint library
+The Mint library
 --------------------
 
 This section discusses the Mint library API. This library encapsulates the idea of a styled document, which is composed of a stylesheet, a layout and content. Mint makes combining those seemless. See **The `mint` command** for more information on an easy-to-use binary.
@@ -126,7 +126,7 @@ Block-style indentation passes the block to you *after* initializing the documen
 
 [Dir::chdir method]: http://ruby-doc.org/core/classes/Dir.html#M002314 "You can change the current directory context with Dir::chdir(path)"
 
-III. Designing a template
+Designing a template
 -------------------------
 
 Templates can be written in any format accepted by the Tilt template interface library. (See [the Tilt TEMPLATES file][Tilt templates] for more information.)
@@ -194,7 +194,7 @@ Mint comes preloaded with several styles and layouts.
 
 I've included a base stylesheet that is useful for setting sensible typographic defaults.
 
-IV. The Mint path
+The Mint path
 -----------------
 
 Mint's path tells the library where to search for named templates. It can be useful for other things, too, especially for extensions and tools that use the library (for example, for storing config files for the `mint` command). The Mint path is flexible and something that you can modify, even from the command line. (Just export `MINT_PATH`=`your:colon-separated-paths:here`. Just make sure to specify higher-priority paths before lower-priority ones.)
@@ -217,7 +217,7 @@ Templates should be in a directory named templates. Inside this directory, there
 
 Normally a style will go best with its layout complement. However, layouts and styles can be mixed and matched at your discretion. This is especially true where you are primarily customizing DOM elements with your stylesheet instead of targeting specific IDs or classes you're expecting to find. (In other words, this works best when your stylesheet focuses on modifying typography and not page layout.)
 
-V. The `mint` command
+The `mint` command
 ---------------------
 
 *The `mint` command is almost functional. Testing is in development.*
@@ -332,7 +332,7 @@ Mint will open the appropriate file in the editor specified by EDITOR. The same 
     mint edit -l normal
     mint edit -s normal
 
-VI. The future of Mint
+The future of Mint
 ----------------------
 
 This section documents features that do not yet exist, but that I would like to have in future versions of Mint.
