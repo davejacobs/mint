@@ -76,6 +76,18 @@ module Mint
     css_formats = ['css', 'sass', 'scss', 'less']
   end
 
+  # Lists the full path for each known template in the
+  # Mint path
+  def self.templates
+    templates_dir = Mint.directories[:templates]
+
+    Mint.path(true).
+      map {|p| p + directories[:templates] }.
+      select(&:exist?).
+      map {|p| p.children.select(&:directory?).map(&:to_s) }.
+      flatten
+  end
+
   # Decides whether the template specified by `name_or_file` is a real
   # file or the name of a template. If it is a real file, Mint will
   # return a that file. Otherwise, Mint will look for a file with that

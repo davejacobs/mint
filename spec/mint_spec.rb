@@ -8,6 +8,7 @@ describe Mint do
   its(:files) { should == { config: 'config.yaml' } }
   its(:formats) { should include('md') }
   its(:css_formats) { should include('sass') }
+  its(:templates) { should include(Mint.root + '/templates/default') }
 
   its(:default_options) do
     should == {
