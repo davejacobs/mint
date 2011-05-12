@@ -76,12 +76,20 @@ HERE
   end
 
   config.after(:each) do
-    erase = lambda do |file|
-      filename = instance_variable_get(:"@#{file}_file")
-      File.delete(filename) if File.file?(filename)
+    instance = lambda do |name|
+      instance_variable_get(:"@#{name}_file")
     end
 
-    [:content, :destination, :layout, 
-     :style, :static_style, :dynamic_style].each &erase
+    [:content, :destination, :layout, :style, :static_style, :dynamic_style].
+      map(&instance).
+      select {|file| File.file? file }.
+      each {|file| File.delete(file) }
+
+    Mint.templates.
+      map {|template| Pathname.new(template) + 'css' }.
+      select(&:exist?).
+      map(&:children).
+      flatten.
+      each {|cache| File.delete(cache) }
   end
 end
