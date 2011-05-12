@@ -33,6 +33,7 @@ RSpec.configure do |config|
 
   config.before(:each) do
     @content_file = 'content.md'
+    @destination_file = 'content.html'
     @layout_file = 'layout.haml'
     @style_file = 'style.css'
 
@@ -75,8 +76,12 @@ HERE
   end
 
   config.after(:each) do
-    [:content, :layout, :style, :static_style, :dynamic_style ].each do |v|
-      File.delete instance_variable_get(:"@#{v}_file")
+    erase = lambda do |file|
+      filename = instance_variable_get(:"@#{file}_file")
+      File.delete(filename) if File.file?(filename)
     end
+
+    [:content, :destination, :layout, 
+     :style, :static_style, :dynamic_style].each &erase
   end
 end
