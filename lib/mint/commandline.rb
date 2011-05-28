@@ -37,17 +37,20 @@ module Mint
       end
     end
 
-    def self.configuration
-      config_file = Pathname.new(Mint.files[:config])      
+    def self.configuration(file=Mint.files[:config])
+      return nil unless file
+      config_file = Pathname.new file
 
       # Merge config options from all config files on the Mint path,
       # where more local options take precedence over more global
       # options
-      Mint.path(true).map {|p| p + config_file }.
+      configuration = Mint.path(true).map {|p| p + config_file }.
         select(&:exist?).
         map {|p| YAML.load_file p }.
         reverse.
         reduce(Mint.default_options) {|r,p| r.merge p }
+
+      Helpers.symbolize_keys configuration
     end
 
     def self.configuration_with(opts)

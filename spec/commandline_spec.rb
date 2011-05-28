@@ -42,8 +42,42 @@ module Mint
       end
     end
 
-    it "displays the sum of all applicable configuration files" do
+    describe "#configuration" do
+      context "when no config syntax file is loaded" do
+        it "returns nil" do
+          CommandLine.configuration(nil).should be_nil
+        end
+      end
 
+      context "when a config syntax file is loaded but there is no .config file" do
+        it "returns a default set of options" do
+          expected_map = {
+            layout: 'default',
+            style: 'default',
+            destination: nil,
+            style_destination: nil
+          }
+
+          CommandLine.configuration.should == expected_map 
+        end
+      end
+
+      context "when a config syntax file is loaded and there is a .config file" do
+        before do
+          FileUtils.mkdir_p '.mint'
+          File.open('.mint/config.yaml', 'w') do |file|
+            file << 'layout: pro'
+          end
+        end
+
+        after do
+          File.delete '.mint/config.yaml'
+        end
+
+        it "merges all specified options with precedence according to scope" do
+          CommandLine.configuration[:layout].should == 'pro'
+        end
+      end
     end
 
     it "displays the sum of all configuration files with other options added"
