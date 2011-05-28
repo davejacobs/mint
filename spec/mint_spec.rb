@@ -4,8 +4,6 @@ describe Mint do
   subject { Mint }
   its(:root) { should == File.expand_path('../../../mint', __FILE__) }
   its(:path) { should == ["#{Dir.getwd}/.mint", "~/.mint", Mint.root] }
-  its(:directories) { should == { templates: 'templates' } }
-  its(:files) { should == { config: 'config.yaml' } }
   its(:formats) { should include('md') }
   its(:css_formats) { should include('sass') }
   its(:templates) { should include(Mint.root + '/templates/default') }
@@ -16,6 +14,20 @@ describe Mint do
       style: 'default',
       destination: nil,
       style_destination: nil
+    }
+  end
+
+  its(:directories) do 
+    should == { 
+      templates: 'templates',
+      config: 'config'
+    }
+  end
+
+  its(:files) do 
+    should == { 
+      syntax: Mint.directories[:config] + '/syntax.yaml',
+      config: Mint.directories[:config] + '/config.yaml' 
     }
   end
 

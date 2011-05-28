@@ -46,12 +46,18 @@ module Mint
 
   # Returns a hash with key Mint directories
   def self.directories
-    { templates: 'templates' }
+    { 
+      templates: 'templates',
+      config: 'config'
+    }
   end
 
   # Returns a hash with key Mint files
   def self.files
-    { config: 'config.yaml' }
+    { 
+      syntax: directories[:config] + '/syntax.yaml',
+      config: directories[:config] + '/config.yaml'
+    }
   end
 
   def self.default_options
