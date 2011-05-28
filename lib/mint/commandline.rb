@@ -9,7 +9,7 @@ module Mint
     # the commandline. (All other arguments are taken to be
     # filenames.)
     def self.options
-      options_file = '../../../config/options.yaml'
+      options_file = '../../../config/syntax.yaml'
       YAML.load_file File.expand_path(options_file, __FILE__)
     end
 
