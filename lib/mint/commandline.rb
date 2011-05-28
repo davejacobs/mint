@@ -17,19 +17,19 @@ module Mint
       optparse = OptionParser.new do |opts|
         opts.banner = 'Usage: mint [command] files [options]'
 
-        options_metadata.each do |k,v|
-          has_param = v['parameter']
+        Helpers.symbolize_keys(options_metadata).each do |k,v|
+          has_param = v[:parameter]
 
-          v['short'] = "-#{v['short']}"
-          v['long'] = "--#{v['long']}"
+          v[:short] = "-#{v[:short]}"
+          v[:long] = "--#{v[:long]}"
 
           if has_param
-            v['long'] << " PARAM"
-            opts.on v['short'], v['long'], v['description'] do |p|
+            v[:long] << " PARAM"
+            opts.on v[:short], v[:long], v[:description] do |p|
               yield k.to_sym, p
             end
           else
-            opts.on v['short'], v['long'], v['description'] do
+            opts.on v[:short], v[:long], v[:description] do
               yield k, true
             end
           end
