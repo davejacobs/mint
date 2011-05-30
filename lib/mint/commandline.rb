@@ -4,7 +4,9 @@ require 'optparse'
 
 module Mint
   module CommandLine
-    # A map of all options that mint allows by default. Mint will
+    # Commandline-related helper methods
+
+    # Returns a map of all options that mint allows by default. Mint will
     # consume these arguments, with optional parameters, from 
     # the commandline. (All other arguments are taken to be
     # filenames.)
@@ -13,6 +15,9 @@ module Mint
       YAML.load_file File.expand_path(options_file, __FILE__)
     end
 
+    # Yields each commandline option specified by options_metadata as
+    # a key/value pair to a block. If the option does not take a param, the value
+    # will be specified as true.
     def self.parser(options_metadata=Mint::CommandLine.options)
       optparse = OptionParser.new do |opts|
         opts.banner = 'Usage: mint [command] files [options]'
@@ -37,6 +42,10 @@ module Mint
       end
     end
 
+    # Returns a hash of all active options specified by file (for all scopes).
+    # That is, if you specify file as 'config.yaml', this will return the aggregate
+    # of all config.yaml-specified options in the Mint path, where more local
+    # members of the path take precedence over more global ones.
     def self.configuration(file=Mint.files[:config])
       return nil unless file
       config_file = Pathname.new file
@@ -53,29 +62,33 @@ module Mint
       Helpers.symbolize_keys configuration
     end
 
+    # Returns all configuration options (as specified by the aggregate
+    # of all config files), along with opts, where opts take precedence.
     def self.configuration_with(opts)
       configuration.merge opts
     end
 
+    # Mint built-in commands
+    
+    # Prints a help banner
     def self.help(message)
       puts message
     end
 
-    # Install the listed file to the scope listed, using 
+    # Installs the listed file to the scope listed, using 
     # local as the default scope.
-    def self.install(file, commandline_options)
+    def self.install(file, commandline_options={})
       commandline_options[:local] = true
       scope = [:global, :user, :local].
         select {|e| commandline_options[e] }.
         first
 
-      directory = path_for_scope(scope)
+      directory = Mint.path_for_scope(scope)
       FileUtils.copy file, directory
     end
 
-    # If we get the edit command, will retrieve appropriate file
-    # (probably a Mint template) and shell out that file to
-    # the user's favorite editor.
+    # Retrieve named template file (probably a built-in or installed 
+    # template) and shell out that file to the user's favorite editor.
     def self.edit(name, commandline_options)
       layout = commandline_options[:layout]
       style = commandline_options[:style]
@@ -94,6 +107,8 @@ module Mint
       system "#{editor} #{file}"
     end
 
+    # Updates configuration options persistently in the appropriate scope, 
+    # which defaults to local.
     def self.configure(opts, scope=:local)
       config_directory = Mint.path_for_scope(scope, true)
       config_file = config_directory + Mint.files[:config]
@@ -101,7 +116,7 @@ module Mint
       Helpers.update_yaml opts, config_file
     end
 
-    # Try to set a config option (at the specified scope) per 
+    # Tries to set a config option (at the specified scope) per 
     # the user's command.
     def self.set(key, value, commandline_options)
       commandline_options[:local] = true
@@ -112,18 +127,18 @@ module Mint
       configure({ key => value }, scope)
     end
 
-    # Display all active configurations, where local 
+    # Displays the sum of all active configurations, where local 
     # configurations override global ones.
     def self.config
       puts YAML.dump(configuration)
     end
     
     # Renders and writes to file all resources described by a document.
-    # Specifically: it renders itself (inside of its own layout) and then
-    # renders its style. This method will overwrite any existing content
-    # in a document's destination files. The `render_style` option
-    # provides an easy way to stop Mint from rendering a style, even
-    # if the document's style is not nil.
+    # Specifically: it publishes a document, using the document's accessors
+    # to determine file placement and naming, and then renders its style. 
+    # This method will overwrite any existing content in a document's destination 
+    # files. The `render_style` option provides an easy way to stop Mint from 
+    # rendering a style, even if the document's style is not nil.
     def self.mint(files, commandline_options)
       documents = []
       options = configuration_with commandline_options
