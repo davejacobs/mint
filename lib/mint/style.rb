@@ -1,10 +1,9 @@
 require 'mint/resource'
 
 module Mint
-  # Style describes a resource whose type is `:style`. Beyond its type,
-  # it is a simple resource. However, its type helps decide which template
-  # file to use when a template name is specified.
   class Style < Resource
+    # Creates a new Layout object using a mandatory source file
+    # and optional configuration options.
     def initialize(source, opts=Mint.default_options)
       super(source, opts)
       self.type = :style
@@ -21,16 +20,19 @@ module Mint
       end
     end
 
+    # Determines whether a Style object is supposed to be rendered.
+    def rendered?
+      source_file_path.extname !~ /\.css$/
+    end
+
+    # Renders a Style object if necessary. Otherwise, returns the contents
+    # of its source file.
     def render
       if rendered?
         super
       else
         File.read source
       end
-    end
-
-    def rendered?
-      source_file_path.extname !~ /\.css$/
     end
   end
 end

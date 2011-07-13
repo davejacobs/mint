@@ -3,6 +3,8 @@ require 'yaml'
 
 module Mint
   module Helpers    
+    # Transforms a String into a URL-ready slug. Properly handles
+    # ampersands, non-alphanumeric characters, extra hyphens and spaces.
     def self.slugize(obj)
       obj.to_s.downcase.
         gsub(/&/, 'and').
@@ -11,10 +13,12 @@ module Mint
         gsub(/[-]+/, '-')
     end
 
+    # Transforms a potentially hyphenated String into a symbol name.
     def self.symbolize(obj)
       slugize(obj).gsub(/-/, '_').to_sym
     end
   
+    # Transforms a String or Pathname into a fully expanded Pathname.
     def self.pathize(str_or_path)
       case str_or_path
       when String
@@ -24,6 +28,7 @@ module Mint
       end.expand_path
     end
 
+    # Recursively transforms all keys in a Hash into Symbols.
     def self.symbolize_keys(map)
       map.reduce(Hash.new) do |syms,(k,v)| 
         syms[k.to_sym] = 
@@ -39,13 +44,15 @@ module Mint
 
     # Returns the relative path to dir1 from dir2. If dir1 and dir2 
     # have no directories in common besides /, will return the 
-    # absolute directory of dir1. Right now, assumes no symlinks
+    # absolute directory of dir1. Assumes no symlinks.
     def self.normalize_path(dir1, dir2)
       path1, path2 = [dir1, dir2].map {|d| pathize d }
       root1, root2 = [path1, path2].map {|p| p.each_filename.first }
       root1 == root2 ? path1.relative_path_from(path2) : path1
     end
 
+    # Reads Yaml options from file. Updates values with new_opts. Writes
+    # merged data back to the same file, overwriting previous data.
     def self.update_yaml(new_opts, file)
       curr_opts = file.exist? ? YAML.load_file(file) : {}
 

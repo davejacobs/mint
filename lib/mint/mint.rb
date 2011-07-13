@@ -6,7 +6,7 @@ require 'tilt'
 require 'mint/exceptions'
 
 module Mint
-  # Assume that someone using an Html template has formatted it
+  # Assumes that someone using an Html template has formatted it
   # in Erb and that a Css stylesheet will pass untouched through
   # a Less parser.
   Tilt.register 'html', Tilt::ERBTemplate
@@ -16,7 +16,7 @@ module Mint
     (Pathname.new(__FILE__).realpath.dirname + '../..').to_s
   end
 
-  # Return the an array with the Mint template path. Will first look
+  # Returns the an array with the Mint template path. Will first look
   # for MINT_PATH environment variable. Otherwise will use smart defaults.
   # Either way, earlier/higher paths take precedence. And is considered to
   # be the directory for "local" config options, templates, etc.
@@ -27,6 +27,7 @@ module Mint
     as_path ? paths.map {|p| Pathname.new(p).expand_path } : paths
   end
 
+  # Returns the part of Mint.path relevant to scope.
   # I want to refactor this so that Mint.path is always a Hash...
   # should take care of this in the Mint.path=() method.
   # Right now, this is a hack. It assumes a sane MINT_PATH, where the
@@ -44,7 +45,7 @@ module Mint
     end
   end
 
-  # Returns a hash with key Mint directories
+  # Returns a Hash with key Mint directories
   def self.directories
     { 
       templates: 'templates',
@@ -52,7 +53,7 @@ module Mint
     }
   end
 
-  # Returns a hash with key Mint files
+  # Returns a Hash with key Mint files
   def self.files
     { 
       syntax: directories[:config] + '/syntax.yaml',
@@ -60,6 +61,7 @@ module Mint
     }
   end
 
+  # Returns last-resort options for creating Mint documents.
   def self.default_options
     {
       # Do not set default `template`--will override style and
@@ -76,10 +78,10 @@ module Mint
     Tilt.mappings.keys
   end
 
-  # Registered Css formats, for source -> destination
+  # Registers Css formats, for source -> destination
   # name guessing/conversion only.
   def self.css_formats
-    css_formats = ['css', 'sass', 'scss', 'less']
+    ['css', 'sass', 'scss', 'less']
   end
 
   # Lists the full path for each known template in the
@@ -131,7 +133,7 @@ module Mint
     template
   end
 
-  # A non-rigourous check to see if the file is somewhere on the
+  # Checks (non-rigorously) to see if the file is somewhere on the
   # MINT_PATH
   def self.template?(file)
     paths = Mint.path.map {|f| File.expand_path f }
@@ -156,6 +158,7 @@ module Mint
     Tilt.new path.to_s, :smart => true, :ugly => true
   end
 
+  # Publishes a Document object according to its internal specifications.
   def self.publish!(document)
     document.publish!
   end
