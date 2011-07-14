@@ -6,8 +6,8 @@ require 'tilt'
 require 'mint/exceptions'
 
 module Mint
-  # Assumes that someone using an Html template has formatted it
-  # in Erb and that a Css stylesheet will pass untouched through
+  # Assumes that someone using an HTML template has formatted it
+  # in ERB and that a CSS stylesheet will pass untouched through
   # a Less parser.
   Tilt.register 'html', Tilt::ERBTemplate
   Tilt.register 'css', Tilt::LessTemplate
@@ -78,7 +78,7 @@ module Mint
     Tilt.mappings.keys
   end
 
-  # Registers Css formats, for source -> destination
+  # Registers CSS formats, for source -> destination
   # name guessing/conversion only.
   def self.css_formats
     ['css', 'sass', 'scss', 'less']

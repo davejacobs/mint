@@ -137,13 +137,13 @@ Templates are rendered in the context of the document they are "about", so Mint 
 
 In Mint layouts, Ruby calls are sparse but necessary.
 
-If you're designing a layout, you need to indicate where Mint should place your content. For that simple reason, raw Html files cannot be layouts. Instead, if you want to use Html templates, you should use the Erb format. These files are essentially Html with the possibility for Ruby calls. You can even use the .html extension for your files. Just code the dynamic portion using Erb syntax.
+If you're designing a layout, you need to indicate where Mint should place your content. For that simple reason, raw HTML files cannot be layouts. Instead, if you want to use HTML templates, you should use the ERB format. These files are essentially HTML with the possibility for Ruby calls. You can even use the .html extension for your files. Just code the dynamic portion using ERB syntax.
 
 Inside your template, use the `content` method to place your source's content.
 
 You will want to point to your document's stylesheet (via a relative URL) from within your layout, usually in the `<head/>` element. Use the `stylesheet` method.
 
-So if you're writing your layout using Erb, the template might look like this:
+So if you're writing your layout using ERB, the template might look like this:
 
     <!doctype html>
     <html>
@@ -170,13 +170,13 @@ The same layout in Haml would be:
 
 ### Style your content ###
 
-You can build stylesheets using [Css][], [Sass/Scss][] or [Less][]. They will
+You can build stylesheets using [CSS][], [SASS/SCSS][] or [Less][]. They will
 always be compiled. They will only be copied, though, if you specify a style
 destination.
 
 [Tilt templates]: http://github.com/rtomayko/tilt/blob/master/TEMPLATES.md "A listing of all templates supported by Tilt."
-[Css]: http://en.wikipedia.org/wiki/Cascading_Style_Sheets
-[Sass/Scss]: http://sass-lang.com/
+[CSS]: http://en.wikipedia.org/wiki/Cascading_Style_Sheets
+[SASS/SCSS]: http://sass-lang.com/
 [Less]: http://lesscss.org/
 
 Mint comes preloaded with several styles and layouts.
@@ -339,7 +339,7 @@ This section documents features that do not yet exist, but that I would like to 
 
 ### Composed styles ###
 
-Not everyone wants to code an entire stylesheet every time he wants a new look. In fact, the most common use case for stylesheets is probably tweaking typography. For this reason (and to make this tool as accessible as possible), I want to implement a feature where you can select one stylesheet as a base and implement tweaks on top of that file, using a Yaml-based DSL. Of course Css makes this easy enough, but I want to implement this feature in such a way that it is easy and intuitive for everyone.
+Not everyone wants to code an entire stylesheet every time he wants a new look. In fact, the most common use case for stylesheets is probably tweaking typography. For this reason (and to make this tool as accessible as possible), I want to implement a feature where you can select one stylesheet as a base and implement tweaks on top of that file, using a Yaml-based DSL. Of course CSS makes this easy enough, but I want to implement this feature in such a way that it is easy and intuitive for everyone.
 
 ### Packages ###
 
