@@ -10,6 +10,9 @@ module Mint
     # consume these arguments, with optional parameters, from 
     # the commandline. (All other arguments are taken to be
     # filenames.)
+    #
+    # @return [Hash] a structured set of options that the commandline
+    #   executable accepts
     def self.options
       options_file = "../../../#{Mint.files[:syntax]}"
       YAML.load_file File.expand_path(options_file, __FILE__)
@@ -18,6 +21,10 @@ module Mint
     # Yields each commandline option specified by options_metadata as
     # a key/value pair to a block. If the option does not take a param, the value
     # will be specified as true.
+    #
+    # @param [Hash, #[]] options_metadata a structured set of options that the executable 
+    #   can use to parse commandline configuration options
+    # @return [OptionParser] an object that will parse ARGV when called
     def self.parser(options_metadata=Mint::CommandLine.options)
       optparse = OptionParser.new do |opts|
         opts.banner = 'Usage: mint [command] files [options]'
@@ -46,6 +53,9 @@ module Mint
     # That is, if you specify file as 'config.yaml', this will return the aggregate
     # of all config.yaml-specified options in the Mint path, where more local
     # members of the path take precedence over more global ones.
+    #
+    # @param [String] file a filename pointing to a Mint configuration file
+    # @return [Hash] a structured set of configuration options
     def self.configuration(file=Mint.files[:config])
       return nil unless file
       config_file = Pathname.new file
@@ -64,6 +74,10 @@ module Mint
 
     # Returns all configuration options (as specified by the aggregate
     # of all config files), along with opts, where opts take precedence.
+    #
+    # @param [Hash] additional options to add to the current configuration
+    # @return [Hash] a structured set of configuration options with opts
+    #   overriding any options from config files
     def self.configuration_with(opts)
       configuration.merge opts
     end
@@ -71,12 +85,19 @@ module Mint
     # Mint built-in commands
     
     # Prints a help banner
+    #
+    # @param [String, #to_s] message a message to output
     def self.help(message)
       puts message
     end
 
     # Installs the listed file to the scope listed, using 
     # local as the default scope.
+    #
+    # @param [File] file the file to install to the appropriate Mint directory
+    # @param [Hash] commandline_options a structured set of options, including 
+    #   a scope label that the method will use to choose the appropriate 
+    #   installation directory
     def self.install(file, commandline_options={})
       commandline_options[:local] = true
       scope = [:global, :user, :local].
@@ -89,6 +110,11 @@ module Mint
 
     # Retrieve named template file (probably a built-in or installed 
     # template) and shell out that file to the user's favorite editor.
+    #
+    # @param [String] name the name of a layout or style to edit
+    # @param [Hash] commandline_options a structured set of options, including 
+    #   a layout or style flag that the method will use to choose the appropriate 
+    #   file to edit
     def self.edit(name, commandline_options)
       layout = commandline_options[:layout]
       style = commandline_options[:style]
@@ -109,6 +135,10 @@ module Mint
 
     # Updates configuration options persistently in the appropriate scope, 
     # which defaults to local.
+    #
+    # @param [Hash] opts a structured set of options to set on Mint at the specified 
+    #   scope
+    # @param [Symbol] scope the scope at which to apply the set of options
     def self.configure(opts, scope=:local)
       config_directory = Mint.path_for_scope(scope, true)
       config_file = config_directory + Mint.files[:config]
@@ -118,6 +148,12 @@ module Mint
 
     # Tries to set a config option (at the specified scope) per 
     # the user's command.
+    #
+    # @param key the key to set
+    # @param value the value to set key to
+    # @param [Hash, #[]] commandline_options a structured set of options, including 
+    #   a scope label that the method will use to choose the appropriate 
+    #   scope
     def self.set(key, value, commandline_options)
       commandline_options[:local] = true
       scope = [:global, :user, :local].
@@ -139,6 +175,10 @@ module Mint
     # This method will overwrite any existing content in a document's destination 
     # files. The `render_style` option provides an easy way to stop Mint from 
     # rendering a style, even if the document's style is not nil.
+    #
+    # @param [Array, #each] files a group of filenames
+    # @param [Hash, #[]] commandline_options a structured set of configuration options
+    #   that will guide Mint.publish!
     def self.mint(files, commandline_options)
       documents = []
       options = configuration_with commandline_options
