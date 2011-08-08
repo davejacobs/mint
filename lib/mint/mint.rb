@@ -3,8 +3,6 @@ require 'fileutils'
 require 'yaml'
 require 'tilt'
 
-require 'mint/exceptions'
-
 module Mint
   # Assumes that someone using an HTML template has formatted it
   # in ERB and that a CSS stylesheet will pass untouched through
