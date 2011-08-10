@@ -6,18 +6,24 @@ module Mint
   class Document < Resource
     # Implicit readers are paired with explicit accessors. This
     # allows for processing variables before storing them.
-    
-    # Setting content gives the document a renderer based on the content 
-    # file. The document processes the templated content into
-    # Html, which the content reader exposes.
-    attr_reader :content
+    attr_reader :content, :layout, :style
+
+    # Passes content through a renderer before assigning it to be
+    # the Document's content
+    #
+    # @param [File, #read, #basename] content the content to be rendered
+    #   from a templating language into HTML
+    # @return [void]
     def content=(content)
       @renderer = Mint.renderer content
       @content = @renderer.render
     end
 
     # Sets layout to an existing Layout object or looks it up by name
-    attr_reader :layout
+    #
+    # @param [String, Layout, #render] layout a Layout object or name
+    #   of a layout to be looked up
+    # @return [void]
     def layout=(layout)      
       @layout = 
         if layout.respond_to? :render
@@ -31,7 +37,10 @@ module Mint
     end
     
     # Sets layout to an existing Style object or looks it up by name
-    attr_reader :style
+    #
+    # @param [String, Style, #render] layout a Layout object or name
+    #   of a layout to be looked up
+    # @return [void]
     def style=(style)
       @style = 
         if style.respond_to? :render
@@ -62,11 +71,17 @@ module Mint
     # The style_destination attribute is lazy. It's exposed via
     # virtual attributes like #style_destination_file.
     attr_reader :style_destination
+    #
+    # @param [String] style_destination the subdirectory into
+    #   which styles will be rendered or copied
+    # @return [void]
     def style_destination=(style_destination)
       @style_destination = style_destination
     end
 
     # Exposes style_destination as a Pathname object.
+    #
+    # @return [Pathname]
     def style_destination_file_path
       if style_destination
         path = Pathname.new style_destination
