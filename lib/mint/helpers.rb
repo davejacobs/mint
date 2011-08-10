@@ -24,6 +24,19 @@ module Mint
       end.expand_path
     end
 
+    def self.symbolize_keys(map)
+      map.reduce(Hash.new) do |syms,(k,v)| 
+        syms[k.to_sym] = 
+          case v
+          when Hash
+            self.symbolize_keys(v)
+          else
+            v
+          end
+        syms
+      end
+    end
+
     # Returns the relative path to dir1 from dir2. If dir1 and dir2 
     # have no directories in common besides /, will return the 
     # absolute directory of dir1. Right now, assumes no symlinks

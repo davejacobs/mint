@@ -9,7 +9,7 @@ module Mint
     # the commandline. (All other arguments are taken to be
     # filenames.)
     def self.options
-      options_file = '../../../config/options.yaml'
+      options_file = "../../../#{Mint.files[:syntax]}"
       YAML.load_file File.expand_path(options_file, __FILE__)
     end
 
@@ -17,19 +17,19 @@ module Mint
       optparse = OptionParser.new do |opts|
         opts.banner = 'Usage: mint [command] files [options]'
 
-        options_metadata.each do |k,v|
-          has_param = v['parameter']
+        Helpers.symbolize_keys(options_metadata).each do |k,v|
+          has_param = v[:parameter]
 
-          v['short'] = "-#{v['short']}"
-          v['long'] = "--#{v['long']}"
+          v[:short] = "-#{v[:short]}"
+          v[:long] = "--#{v[:long]}"
 
           if has_param
-            v['long'] << " PARAM"
-            opts.on v['short'], v['long'], v['description'] do |p|
+            v[:long] << " PARAM"
+            opts.on v[:short], v[:long], v[:description] do |p|
               yield k.to_sym, p
             end
           else
-            opts.on v['short'], v['long'], v['description'] do
+            opts.on v[:short], v[:long], v[:description] do
               yield k, true
             end
           end
@@ -37,17 +37,20 @@ module Mint
       end
     end
 
-    def self.configuration
-      config_file = Pathname.new(Mint.files[:config])      
+    def self.configuration(file=Mint.files[:config])
+      return nil unless file
+      config_file = Pathname.new file
 
       # Merge config options from all config files on the Mint path,
       # where more local options take precedence over more global
       # options
-      Mint.path(true).map {|p| p + config_file }.
+      configuration = Mint.path(true).map {|p| p + config_file }.
         select(&:exist?).
         map {|p| YAML.load_file p }.
         reverse.
         reduce(Mint.default_options) {|r,p| r.merge p }
+
+      Helpers.symbolize_keys configuration
     end
 
     def self.configuration_with(opts)
@@ -131,7 +134,7 @@ module Mint
       # change detection
       render_style = true
       files.each do |file|
-        Document.new(file, options).mint(render_style)
+        Document.new(file, options).publish!(render_style)
         render_style = false
       end
     end

@@ -19,6 +19,7 @@ Gem::Specification.new do |s|
     bin/mint
     lib/mint.rb
     lib/mint/helpers.rb
+    lib/mint/exceptions.rb
     lib/mint/mint.rb
     lib/mint/resource.rb
     lib/mint/layout.rb
@@ -27,7 +28,7 @@ Gem::Specification.new do |s|
     lib/mint/version.rb
     lib/mint/css.rb
     lib/mint/commandline.rb
-    config/options.yaml
+    config/syntax.yaml
     templates/default/layout.haml
     templates/default/style.sass
     templates/pro/layout.haml
@@ -53,7 +54,8 @@ Gem::Specification.new do |s|
   s.add_dependency 'tilt'
   s.add_dependency 'rdiscount'
   s.add_dependency 'erubis'
-  s.add_dependency 'haml', '>= 2.2.11'
+  s.add_dependency 'haml'
+  s.add_dependency 'sass'
   s.add_dependency 'rdiscount'
   s.add_dependency 'liquid'
   s.add_dependency 'less'

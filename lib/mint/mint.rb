@@ -8,9 +8,9 @@ require 'mint/exceptions'
 module Mint
   # Assume that someone using an Html template has formatted it
   # in Erb and that a Css stylesheet will pass untouched through
-  # a Less parser.
-  Tilt.register 'html', Tilt::ERBTemplate
-  Tilt.register 'css', Tilt::LessTemplate
+  # a Scss parser.
+  Tilt.register Tilt::ERBTemplate, :html
+  Tilt.register Tilt::ScssTemplate, :css
 
   def self.root
     (Pathname.new(__FILE__).realpath.dirname + '../..').to_s
@@ -46,12 +46,18 @@ module Mint
 
   # Returns a hash with key Mint directories
   def self.directories
-    { templates: 'templates' }
+    { 
+      templates: 'templates',
+      config: 'config'
+    }
   end
 
   # Returns a hash with key Mint files
   def self.files
-    { config: 'config.yaml' }
+    { 
+      syntax: directories[:config] + '/syntax.yaml',
+      config: directories[:config] + '/config.yaml'
+    }
   end
 
   def self.default_options
@@ -74,6 +80,18 @@ module Mint
   # name guessing/conversion only.
   def self.css_formats
     css_formats = ['css', 'sass', 'scss', 'less']
+  end
+
+  # Lists the full path for each known template in the
+  # Mint path
+  def self.templates
+    templates_dir = Mint.directories[:templates]
+
+    Mint.path(true).
+      map {|p| p + directories[:templates] }.
+      select(&:exist?).
+      map {|p| p.children.select(&:directory?).map(&:to_s) }.
+      flatten
   end
 
   # Decides whether the template specified by `name_or_file` is a real

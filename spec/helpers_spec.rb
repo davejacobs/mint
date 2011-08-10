@@ -43,6 +43,48 @@ module Mint
       end
     end
 
+    describe "#symbolize_keys" do
+      it "turns all string keys in a flat map into symbols" do
+        flat_map = {
+          'key1' => 'value1',
+          'key2' => 'value2',
+          'key3' => 'value3'
+        }
+
+        expected_map = {
+          key1: 'value1',
+          key2: 'value2',
+          key3: 'value3'
+        }
+
+        Helpers.symbolize_keys(flat_map).should == expected_map
+      end
+
+      it "recursively turns all string keys in a nested map into symbols" do
+        nested_map = {
+          'key1' => 'value1',
+          'key2' => 'value2',
+          'key3' => 'value3',
+          'key4' => {
+            'nested_key1' => 'nested_value1',
+            'nested_key2' => 'nested_value2'
+          }
+        }
+
+        expected_map = {
+          key1: 'value1',
+          key2: 'value2',
+          key3: 'value3',
+          key4: {
+            nested_key1: 'nested_value1',
+            nested_key2: 'nested_value2'
+          }
+        }
+
+        Helpers.symbolize_keys(nested_map).should == expected_map
+      end
+    end
+
     describe "#normalize_path" do
       it "handles two files in the same directory" do
         path1 = '~/file1'

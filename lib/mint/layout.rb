@@ -9,6 +9,5 @@ module Mint
       super(source, opts)
       self.type = :layout
     end
-
   end
 end

@@ -4,10 +4,9 @@ describe Mint do
   subject { Mint }
   its(:root) { should == File.expand_path('../../../mint', __FILE__) }
   its(:path) { should == ["#{Dir.getwd}/.mint", "~/.mint", Mint.root] }
-  its(:directories) { should == { templates: 'templates' } }
-  its(:files) { should == { config: 'config.yaml' } }
   its(:formats) { should include('md') }
   its(:css_formats) { should include('sass') }
+  its(:templates) { should include(Mint.root + '/templates/default') }
 
   its(:default_options) do
     should == {
@@ -15,6 +14,20 @@ describe Mint do
       style: 'default',
       destination: nil,
       style_destination: nil
+    }
+  end
+
+  its(:directories) do 
+    should == { 
+      templates: 'templates',
+      config: 'config'
+    }
+  end
+
+  its(:files) do 
+    should == { 
+      syntax: Mint.directories[:config] + '/syntax.yaml',
+      config: Mint.directories[:config] + '/config.yaml' 
     }
   end
 
@@ -37,7 +50,11 @@ describe Mint do
     Mint.lookup_template('dynamic.sass').should == 'dynamic.sass'
   end
 
-  it "finds the correct template according to scope"
+  it "finds the correct template according to scope" do
+    Mint.find_template('default', :layout).should be_in_template('default')
+    Mint.find_template('pro', :layout).should be_in_template('pro')
+    Mint.find_template('pro', :style).should be_in_template('pro')
+  end
 
   it "decides whether or not a file is a template file" do
     actual_template = Mint.lookup_template(:default, :layout)
@@ -56,18 +73,22 @@ describe Mint do
     Mint.guess_name_from('dynamic.sass').should == 'dynamic.css'
   end
 
+  context "before it publishes a document" do
+    let(:document) { Mint::Document.new @content_file }
+    subject { document }
+
+    its(:destination_file_path) { should_not exist }
+    its(:style_destination_file_path) { should_not exist }
+  end
+
   # These are copied from document_spec.rb. I eventually want to move
   # to this non-OO style of publishing, and this is the transition
   context "when it publishes a document" do
     let(:document) { Mint::Document.new @content_file }
     before { Mint.publish!(document) }
+    subject { document }
 
-    it "writes its rendered style to #style_destination_file" do
-      document.style_destination_file_path.should exist
-    end
-
-    it "writes its rendered layout and content to #destination_file" do
-      document.destination_file_path.should exist
-    end
+    its(:destination_file_path) { should exist }
+    its(:style_destination_file_path) { should exist }
   end
 end

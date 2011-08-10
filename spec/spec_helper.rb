@@ -33,6 +33,7 @@ RSpec.configure do |config|
 
   config.before(:each) do
     @content_file = 'content.md'
+    @destination_file = 'content.html'
     @layout_file = 'layout.haml'
     @style_file = 'style.css'
 
@@ -75,8 +76,20 @@ HERE
   end
 
   config.after(:each) do
-    [:content, :layout, :style, :static_style, :dynamic_style ].each do |v|
-      File.delete instance_variable_get(:"@#{v}_file")
+    instance = lambda do |name|
+      instance_variable_get(:"@#{name}_file")
     end
+
+    [:content, :destination, :layout, :style, :static_style, :dynamic_style].
+      map(&instance).
+      select {|file| File.file? file }.
+      each {|file| File.delete(file) }
+
+    Mint.templates.
+      map {|template| Pathname.new(template) + 'css' }.
+      select(&:exist?).
+      map(&:children).
+      flatten.
+      each {|cache| File.delete(cache) }
   end
 end
