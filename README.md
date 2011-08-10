@@ -73,8 +73,8 @@ Notes:
 
 1. If you specify a template name here, Mint will search its paths in order (see **The Mint Path** for more details) for a template with that name. A template file looks like the following:
 
-      ${MINT_PATH}/templates/template_name/style.css
-      ${MINT_PATH}/templates/template_name/layout.haml
+      MINT_PATH/templates/template_name/style.css
+      MINT_PATH/templates/template_name/layout.haml
 
 2. If you specify a template name that is also the name of an existing file in your working directory, Mint will use the file and not look for a template. (It is unlikely you'll have an extension-less file named 'normal' or 'default' in your working directory, so don't worry about this edge case.) If you do specify an existing file, the path/file will be resolved from the directory where you're calling Mint (the 'working directory'). To use Mint this way (and I don't see this as more than a temporary solution) you'll probably want to call Mint from within your source's directory. Alternatively, you can use [`Dir.chdir`][Dir::chdir method] for the same effect.
 
@@ -212,8 +212,8 @@ The default Mint path (in order) is:
 
 Templates should be in a directory named templates. Inside this directory, there should be a subdirectory for each template:
 
-- `${MINT_PATH}/templates/normal/style.sass`
-- `${MINT_PATH}/templates/normal/layout.haml`
+- `MINT_PATH/templates/normal/style.sass`
+- `MINT_PATH/templates/normal/layout.haml`
 
 Normally a style will go best with its layout complement. However, layouts and styles can be mixed and matched at your discretion. This is especially true where you are primarily customizing DOM elements with your stylesheet instead of targeting specific IDs or classes you're expecting to find. (In other words, this works best when your stylesheet focuses on modifying typography and not page layout.)
 

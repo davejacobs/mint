@@ -7,8 +7,8 @@ module Mint
   # Assumes that someone using an HTML template has formatted it
   # in ERB and that a CSS stylesheet will pass untouched through
   # a Less parser.
-  Tilt.register 'html', Tilt::ERBTemplate
-  Tilt.register 'css', Tilt::LessTemplate
+  Tilt.register Tilt::ERBTemplate, :html
+  Tilt.register Tilt::ScssTemplate, :css
 
   def self.root
     (Pathname.new(__FILE__).realpath.dirname + '../..').to_s
@@ -110,8 +110,8 @@ module Mint
   end
 
   # Finds a template named `name` in the Mint path. If `type` is :layout,
-  # will look for `${MINT_PATH}/templates/layout.*`. If it is :style, will
-  # look for `${MINT_PATH}/templates/template_name/style.*`. Mint assumes
+  # will look for `MINT_PATH/templates/layout.*`. If it is :style, will
+  # look for `MINT_PATH/templates/template_name/style.*`. Mint assumes
   # that a named template will hold only one layout and one style template.
   # It does not know how to decide between style.css and style.less, for
   # example. For predictable results, only include one template file
