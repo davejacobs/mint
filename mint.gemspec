@@ -29,6 +29,7 @@ Gem::Specification.new do |s|
     lib/mint/css.rb
     lib/mint/commandline.rb
     config/syntax.yaml
+    templates/base/style.sass
     templates/default/layout.haml
     templates/default/style.sass
     templates/pro/layout.haml
