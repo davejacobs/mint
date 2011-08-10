@@ -87,17 +87,16 @@ module Mint
     # Prints a help banner
     #
     # @param [String, #to_s] message a message to output
+    # @return [void]
     def self.help(message)
       puts message
     end
 
-    # Installs the listed file to the scope listed, using 
-    # local as the default scope.
-    #
     # @param [File] file the file to install to the appropriate Mint directory
     # @param [Hash] commandline_options a structured set of options, including 
     #   a scope label that the method will use to choose the appropriate 
     #   installation directory
+    # @return [void]
     def self.install(file, commandline_options={})
       commandline_options[:local] = true
       scope = [:global, :user, :local].
@@ -115,6 +114,7 @@ module Mint
     # @param [Hash] commandline_options a structured set of options, including 
     #   a layout or style flag that the method will use to choose the appropriate 
     #   file to edit
+    # @return [void]
     def self.edit(name, commandline_options)
       layout = commandline_options[:layout]
       style = commandline_options[:style]
@@ -139,6 +139,7 @@ module Mint
     # @param [Hash] opts a structured set of options to set on Mint at the specified 
     #   scope
     # @param [Symbol] scope the scope at which to apply the set of options
+    # @return [void]
     def self.configure(opts, scope=:local)
       config_directory = Mint.path_for_scope(scope, true)
       config_file = config_directory + Mint.files[:config]
@@ -154,6 +155,7 @@ module Mint
     # @param [Hash, #[]] commandline_options a structured set of options, including 
     #   a scope label that the method will use to choose the appropriate 
     #   scope
+    # @return [void]
     def self.set(key, value, commandline_options)
       commandline_options[:local] = true
       scope = [:global, :user, :local].
@@ -165,6 +167,8 @@ module Mint
 
     # Displays the sum of all active configurations, where local 
     # configurations override global ones.
+    #
+    # @return [void]
     def self.config
       puts YAML.dump(configuration)
     end
@@ -179,6 +183,7 @@ module Mint
     # @param [Array, #each] files a group of filenames
     # @param [Hash, #[]] commandline_options a structured set of configuration options
     #   that will guide Mint.publish!
+    # @return [void]
     def self.mint(files, commandline_options)
       documents = []
       options = configuration_with commandline_options
