@@ -94,21 +94,30 @@ module Mint
     end
 
     # Exposes style_destination as a String.
+    #
+    # @return [String]
     def style_destination_file
       style_destination_file_path.to_s
     end
 
     # Exposes style_destination directory as a Pathname object.
+    #
+    # @return [Pathname]
     def style_destination_directory_path
       style_destination_file_path.dirname
     end
 
     # Exposes style_destination directory as a String.
+    #
+    # @return [String]
     def style_destination_directory
       style_destination_directory_path.to_s
     end
 
     # Overrides layout and style settings with named template.
+    #
+    # @param [String] template the name of the template to set as
+    #   layout and string
     def template=(template)
       if template
         self.layout = template
