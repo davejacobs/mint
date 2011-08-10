@@ -82,7 +82,6 @@ module Mint
         }
 
         Helpers.symbolize_keys(nested_map).should == expected_map
-
       end
     end
 
