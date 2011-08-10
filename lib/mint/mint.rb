@@ -8,9 +8,9 @@ require 'mint/exceptions'
 module Mint
   # Assume that someone using an Html template has formatted it
   # in Erb and that a Css stylesheet will pass untouched through
-  # a Less parser.
-  Tilt.register 'html', Tilt::ERBTemplate
-  Tilt.register 'css', Tilt::LessTemplate
+  # a Scss parser.
+  Tilt.register Tilt::ERBTemplate, :html
+  Tilt.register Tilt::ScssTemplate, :css
 
   def self.root
     (Pathname.new(__FILE__).realpath.dirname + '../..').to_s
