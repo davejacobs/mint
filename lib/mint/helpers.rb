@@ -5,6 +5,9 @@ module Mint
   module Helpers    
     # Transforms a String into a URL-ready slug. Properly handles
     # ampersands, non-alphanumeric characters, extra hyphens and spaces.
+    #
+    # @param [String, #to_s] obj an object to be turned into a slug
+    # @return [String] a URL-ready slug
     def self.slugize(obj)
       obj.to_s.downcase.
         gsub(/&/, 'and').
@@ -14,11 +17,17 @@ module Mint
     end
 
     # Transforms a potentially hyphenated String into a symbol name.
+    #
+    # @param [String, #to_s] obj an object to be turned into a symbol name
+    # @return [Symbol] a symbol representation of obj
     def self.symbolize(obj)
       slugize(obj).gsub(/-/, '_').to_sym
     end
   
     # Transforms a String or Pathname into a fully expanded Pathname.
+    #
+    # @param [String, Pathname] str_or_path a path to be expanded
+    # @return [Pathname] an expanded representation of str_or_path
     def self.pathize(str_or_path)
       case str_or_path
       when String
@@ -29,6 +38,9 @@ module Mint
     end
 
     # Recursively transforms all keys in a Hash into Symbols.
+    #
+    # @param [Hash, #[]] map a potentially nested Hash containing symbolizable keys
+    # @return [Hash] a version of map where all keys are symbols
     def self.symbolize_keys(map)
       map.reduce(Hash.new) do |syms,(k,v)| 
         syms[k.to_sym] = 
@@ -45,6 +57,11 @@ module Mint
     # Returns the relative path to dir1 from dir2. If dir1 and dir2 
     # have no directories in common besides /, will return the 
     # absolute directory of dir1. Assumes no symlinks.
+    #
+    # @param [String, Pathname] dir1 the target directory
+    # @param [String, Pathname] dir2 the starting directory
+    # @return [Pathname] the relative path to dir1 from dir2, or an absolute
+    #   path if they have no parent directories other than / in common
     def self.normalize_path(dir1, dir2)
       path1, path2 = [dir1, dir2].map {|d| pathize d }
       root1, root2 = [path1, path2].map {|p| p.each_filename.first }
@@ -53,6 +70,10 @@ module Mint
 
     # Reads Yaml options from file. Updates values with new_opts. Writes
     # merged data back to the same file, overwriting previous data.
+    #
+    # @param [Hash, #[]] new_opts a set of options to add to the Yaml file
+    # @param [Pathname, #exist] file a file to read from and write to
+    # @return [void] 
     def self.update_yaml(new_opts, file)
       curr_opts = file.exist? ? YAML.load_file(file) : {}
 
