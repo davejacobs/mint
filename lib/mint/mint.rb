@@ -10,14 +10,18 @@ module Mint
   Tilt.register Tilt::ERBTemplate, :html
   Tilt.register Tilt::ScssTemplate, :css
 
+  # @return [String] the Mint root path name
   def self.root
     (Pathname.new(__FILE__).realpath.dirname + '../..').to_s
   end
 
-  # Returns the an array with the Mint template path. Will first look
+  # Returns an array with the Mint template path. Will first look
   # for MINT_PATH environment variable. Otherwise will use smart defaults.
   # Either way, earlier/higher paths take precedence. And is considered to
   # be the directory for "local" config options, templates, etc.
+  #
+  # @param [Boolean] as_path if as_path is true, will return Pathname objects
+  # @return [String] the Mint path as a String or Pathname
   def self.path(as_path=false)
     mint_path = ENV['MINT_PATH'] || 
       "#{Dir.getwd}/.mint:~/.mint:#{Mint.root}"
@@ -31,6 +35,10 @@ module Mint
   # Right now, this is a hack. It assumes a sane MINT_PATH, where the
   # first entry is most local, the second is user-level,
   # and the last entry is most global.
+  #
+  # @param [Symbol] scope the scope we want to find the path for
+  # @param [Boolean] as_path if as_path is true, will return Pathname object
+  # @return [String] the Mint path for +scope+ as a String or Pathname
   def self.path_for_scope(scope=:local, as_path=false)
     case Mint.path
     when Array
@@ -43,7 +51,7 @@ module Mint
     end
   end
 
-  # Returns a Hash with key Mint directories
+  # @return [Hash] key Mint directories
   def self.directories
     { 
       templates: 'templates',
@@ -51,7 +59,7 @@ module Mint
     }
   end
 
-  # Returns a Hash with key Mint files
+  # @return [Hash] key Mint files
   def self.files
     { 
       syntax: directories[:config] + '/syntax.yaml',
@@ -59,7 +67,7 @@ module Mint
     }
   end
 
-  # Returns last-resort options for creating Mint documents.
+  # @return [Hash] last-resort options for creating Mint documents.
   def self.default_options
     {
       # Do not set default `template`--will override style and
@@ -71,19 +79,18 @@ module Mint
     }
   end
 
-  # Returns a list of all file extensions that Tilt will render
+  # @return [Array] all file extensions that Tilt will render
   def self.formats
     Tilt.mappings.keys
   end
 
-  # Registers CSS formats, for source -> destination
-  # name guessing/conversion only.
+  # @return [Array] CSS formats, for source -> destination
+  #   name guessing/conversion only.
   def self.css_formats
     ['css', 'sass', 'scss', 'less']
   end
 
-  # Lists the full path for each known template in the
-  # Mint path
+  # @return [Array] the full path for each known template in the Mint path
   def self.templates
     templates_dir = Mint.directories[:templates]
 
@@ -104,6 +111,11 @@ module Mint
   # referring to the file ~/.mint/templates/normal/layout.erb.
   # Adding :style as a second argument returns
   # ~/.mint/templates/normal/style.css.
+  #
+  # @param [String, File, #to_s] name_or_file a name or template file 
+  #   to look up
+  # @param [Symbol] type the resource type to look up
+  # @return [File] the named, typed template file
   def self.lookup_template(name_or_file, type=:layout)
     name = name_or_file.to_s
     File.exist?(name) ? name : find_template(name, type)
@@ -117,6 +129,11 @@ module Mint
   # example. For predictable results, only include one template file
   # called `layout.*` in the `template_name` directory. Returns nil if
   # it cannot find a template.
+  #
+  # @param [String, #to_s] name the name of a template to find
+  # @param [Symbol] type the resource type to find
+  #
+  # @return [File] the named, typed template file
   def self.find_template(name, type)
     templates_dir = Mint.directories[:templates]
 
@@ -133,6 +150,9 @@ module Mint
 
   # Checks (non-rigorously) to see if the file is somewhere on the
   # MINT_PATH
+  #
+  # @param [String, File, #to_s] file the file to look up
+  # @return [Boolean] true if template file is found in Mint path
   def self.template?(file)
     paths = Mint.path.map {|f| File.expand_path f }
     file_path = Pathname.new(file)
@@ -142,6 +162,9 @@ module Mint
 
   # Guesses an appropriate name for the resource output file based on
   # its source file's base name
+  #
+  # @param [String] name source file name
+  # @return [String] probably output file name
   def self.guess_name_from(name)
     name = Pathname(name).basename if name
     css = Mint.css_formats.join '|'
@@ -152,11 +175,16 @@ module Mint
 
   # Transforms a path into a template that will render the file specified
   # at that path
+  #
+  # @param [Path, File, String, #to_s] path the file to render
   def self.renderer(path)
     Tilt.new path.to_s, :smart => true, :ugly => true
   end
 
   # Publishes a Document object according to its internal specifications.
+  #
+  # @param [Document] document a Mint document
+  # @return [void]
   def self.publish!(document)
     document.publish!
   end
