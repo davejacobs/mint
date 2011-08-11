@@ -1,10 +1,12 @@
 require 'mint/resource'
 
 module Mint
-  # Layout describes a resource whose type is `:layout`. Beyond its type,
-  # it is a simple resource. However, its type helps decide which template
-  # file to use when a template name is specified.
   class Layout < Resource
+    # Creates a new Layout object using a mandatory source file
+    # and optional configuration options.
+    #
+    # @param [String] source the absolute or relative file path
+    # @param [Hash, #[]] opts layout options
     def initialize(source, opts=Mint.default_options)
       super(source, opts)
       self.type = :layout
