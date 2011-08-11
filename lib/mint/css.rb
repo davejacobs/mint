@@ -4,8 +4,15 @@ module Mint
       'container'
     end
 
-    # Mappings from "DSL" to actual CSS. This is not yet implemented, but 
-    # the plan is to translate this into something like:
+    # Maps a "DSL" onto actual CSS. This is not yet implemented, but 
+    # the plan is to translate this ...
+    #
+    # ---
+    # Font: Helvetica
+    # Margin: 1 in
+    # Line spacing: 1.25
+    #
+    # ... into something like:
     #
     # #container {
     #   font: (value specified and cleaned up)

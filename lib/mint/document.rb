@@ -4,24 +4,26 @@ require 'mint/style'
 
 module Mint
   class Document < Resource
-    # The following provide reader/accessor methods for the objects's
-    # important attributes. Each implicit reader is paired with an
-    # explicit assignment method that processes a variety of input to a 
-    # standardized state.
-    
-    # When you set content, you are giving the document a renderer based
-    # on the content file and are processing the templated content into
-    # Html, which you can then access using via the content reader.
-    attr_reader :content
+    # Implicit readers are paired with explicit accessors. This
+    # allows for processing variables before storing them.
+    attr_reader :content, :layout, :style
+
+    # Passes content through a renderer before assigning it to be
+    # the Document's content
+    #
+    # @param [File, #read, #basename] content the content to be rendered
+    #   from a templating language into HTML
+    # @return [void]
     def content=(content)
       @renderer = Mint.renderer content
       @content = @renderer.render
     end
 
-    # The explicit assignment method allows you to pass the document an existing
-    # layout or the name of a layout template in the Mint path or an
-    # existing layout file.
-    attr_reader :layout
+    # Sets layout to an existing Layout object or looks it up by name
+    #
+    # @param [String, Layout, #render] layout a Layout object or name
+    #   of a layout to be looked up
+    # @return [void]
     def layout=(layout)      
       @layout = 
         if layout.respond_to? :render
@@ -34,10 +36,11 @@ module Mint
       abort "Template '#{layout}' does not exist."
     end
     
-    # The explicit assignment method allows you to pass the document an existing
-    # style or the name of a style template in the Mint path or an
-    # existing style file.
-    attr_reader :style
+    # Sets layout to an existing Style object or looks it up by name
+    #
+    # @param [String, Style, #render] layout a Layout object or name
+    #   of a layout to be looked up
+    # @return [void]
     def style=(style)
       @style = 
         if style.respond_to? :render
@@ -50,23 +53,35 @@ module Mint
       abort "Template '#{style}' does not exist."
     end
 
+    # Explanation of style_destination:
+    #
     # I'm going to maintain a document's official style_destination
     # outside of its style object. If a document has no
     # style_destination defined when it needs one, the document will
-    # use the style's source directory. This happens lazily via
-    # virtual attributes like #style_destination_file, etc.
-    # This eliminates edge cases (like styles we don't want to move
-    # anywhere) nicely and lets us maintain document-specific information
-    # separately. (Without this separation, funky things happen when
+    # use the original style's source directory.
+    #
+    # This decision eliminates edge cases, including the case where
+    # we want to generate, but not move, a document's style. It also
+    # lets us keep style information separate from document-specific
+    # information. (Without this separation, funky things happen when
     # you assign a new style template to an existing document -- if
     # you had specified a custom style_destination before changing
-    # the template, that custom destination would be overridden.
-
+    # the template, that custom destination would be overridden.)
+    #
+    # The style_destination attribute is lazy. It's exposed via
+    # virtual attributes like #style_destination_file.
     attr_reader :style_destination
+    #
+    # @param [String] style_destination the subdirectory into
+    #   which styles will be rendered or copied
+    # @return [void]
     def style_destination=(style_destination)
       @style_destination = style_destination
     end
 
+    # Exposes style_destination as a Pathname object.
+    #
+    # @return [Pathname]
     def style_destination_file_path
       if style_destination
         path = Pathname.new style_destination
@@ -78,18 +93,31 @@ module Mint
       end
     end
 
+    # Exposes style_destination as a String.
+    #
+    # @return [String]
     def style_destination_file
       style_destination_file_path.to_s
     end
 
+    # Exposes style_destination directory as a Pathname object.
+    #
+    # @return [Pathname]
     def style_destination_directory_path
       style_destination_file_path.dirname
     end
 
+    # Exposes style_destination directory as a String.
+    #
+    # @return [String]
     def style_destination_directory
       style_destination_directory_path.to_s
     end
 
+    # Overrides layout and style settings with named template.
+    #
+    # @param [String] template the name of the template to set as
+    #   layout and string
     def template=(template)
       if template
         self.layout = template
@@ -97,6 +125,9 @@ module Mint
       end
     end
     
+    # Creates a new Mint Document object. Can be block initialized.
+    # Accepts source and options. Block initialization occurs after
+    # all defaults are set, so not all options must be specified.
     def initialize(source, opts={})
       options = Mint.default_options.merge opts
 
@@ -120,20 +151,20 @@ module Mint
       yield self if block_given?
     end
 
-    # Render content in the context of layout
+    # Renders content in the context of layout and returns as a String.
     def render(args={})
       layout.render self, args
     end
 
-    # Write all rendered content where a) possible, b) required,
-    # and c) specified
+    # Writes all rendered content where a) possible, b) required,
+    # and c) specified. Outputs to specified file.
     def publish!(render_style=true)      
       FileUtils.mkdir_p self.destination_directory
       File.open(self.destination_file, 'w+') do |f|
         f << self.render
       end
 
-      # Only render style if a) it's specified by the options path and
+      # Only renders style if a) it's specified by the options path and
       # b) it actually needs rendering (i.e., it's in template form and
       # not raw, browser-parseable CSS) or it if it doesn't need
       # rendering but there is an explicit style_destination.
