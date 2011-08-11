@@ -24,12 +24,16 @@ module Mint
     end
 
     # Determines whether a Style object is supposed to be rendered.
+    #
+    # @return [Boolean] whether or not style should be rendered
     def rendered?
       source_file_path.extname !~ /\.css$/
     end
 
     # Renders a Style object if necessary. Otherwise, returns the contents
     # of its source file.
+    #
+    # @return [String] a rendered stylesheet
     def render
       if rendered?
         super
