@@ -181,7 +181,8 @@ module Mint
     # Returns a relative path from the document to its stylesheet. Can
     # be called directly from inside a layout template.
     def stylesheet
-      self.destination_file_path.relative_path_from(self.style_destination_file_path).to_s 
+      Helpers.normalize_path(self.style_destination_file,
+                             self.destination_directory).to_s
     end
   end
 end
