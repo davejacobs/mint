@@ -1,16 +1,27 @@
-Introduction
-------------
+What is Mint?
+-------------
 
-Mint is an agile, lightweight solution for your documents.
+Mint transforms your plain text documents into beautiful documents. It makes that process as simple (but customizable) as possible.
 
-Mint manages your documents in a decentralized but consistent way. It frees you from bloated word processors. Mint brings together standards and common templating languages for a clean, agile approach to documents. It uses HTML outside of the web. Leverages text for loads of different views. Keeps your data and formatting separate. In a word: simplifies. In a couple of words: kicks ass.
+Why would you want to keep all of your documents as plain text?
 
-In a few more: *Mint processes words so you don't have to.*
+- To focus on words and structure when you write
+- To be able to apply one style to an entire set of documents with one command
+- To keep your documents under version control
+- To make your documents available for scripting--for example, text analysis
 
-The `mint` command
----------------------
+What does Mint create from these source files? Beautiful, styled HTML ready to print, e-mail, and present.
 
-The easiest Mint command doesn't require configuration. It will transform the specified document into HTML and link it to the default stylesheet, which will be output in the same directory as the source documents. (If you have a ./templates/default/ subdirectory, the templates found in that directory will be used.)
+In a few words: *Mint processes words so you don't have to.*
+
+The mint command
+----------------
+
+If you have a plain text document formatted in Markdown or Textile or almost any other templating language, you're ready to go.
+
+The easiest Mint command doesn't require configuration. It transforms a document into HTML and links it to the default stylesheet, which I've designed for you.
+
+Simply type:
 
     mint Minimalism.md                    # creates Minimalism.html
 
@@ -29,7 +40,7 @@ This command can be tweaked with options and arguments to be more flexible:
     mint Minimalism.md --template resume  # specifies a style template
     mint Minimalism.md --destination final --style-destination=styles
 
-You can pass several options to `mint`. For a listing of these options, take [a look at the API][API].
+For a listing of mint options, take [a look at the API][API].
 
 A basic Mint document
 ---------------------
@@ -46,15 +57,11 @@ To understand Mint's flexibility, you'll want to [take a look at the API][API].
 [Firefox typography]: http://opentype.info/blog/2008/06/14/kerning-and-opentype-features-in-firefox-3/ "Firefox 3 supports kerning and automatic ligatures"
 
 Designing a template
--------------------------
+--------------------
 
 Templates can be written in any format accepted by the Tilt template interface library. (See [the Tilt TEMPLATES file][Tilt templates] for more information.)
 
-Templates are rendered in the context of the document they are "about", so Mint documents give you convenience methods you can easily use in your templates.
-
-### Place your content, point to your styles ###
-
-In Mint layouts, Ruby calls are sparse but necessary.
+In a template layouts, Ruby calls are sparse but necessary.
 
 If you're designing a layout, you need to indicate where Mint should place your content. For that simple reason, raw HTML files cannot be layouts. Instead, if you want to use HTML templates, you should use the ERB format. These files are essentially HTML with the possibility for Ruby calls. You can even use the .html extension for your files. Just code the dynamic portion using ERB syntax.
 
@@ -72,16 +79,7 @@ So if you're writing your layout using Haml, the template might look like this:
       %body
         #container= content
 
-### Style your content ###
-
-You can build stylesheets using [CSS][], [SASS/SCSS][] or [Less][]. They will
-always be compiled. They will only be copied, though, if you specify a style
-destination.
-
-[Tilt templates]: http://github.com/rtomayko/tilt/blob/master/TEMPLATES.md "A listing of all templates supported by Tilt."
-[CSS]: http://en.wikipedia.org/wiki/Cascading_Style_Sheets
-[SASS/SCSS]: http://sass-lang.com/
-[Less]: http://lesscss.org/
+You can build stylesheets using [CSS][], [SASS/SCSS][] or [Less][]. They will always be compiled for you.
 
 Mint comes preloaded with several styles and layouts.
 
@@ -98,4 +96,14 @@ Mint comes preloaded with several styles and layouts.
 
 I've included a base stylesheet that is useful for setting sensible typographic defaults.
 
+Plugins coming soon
+-------------------
+
+I have the beginnings of a plugin system planned. Essentially, I want to be able to create and modify a document workflow to my liking without modifying the Mint core. This is going to be useful for things like creating actual office documents or e-books or even bound novels. More on this soon. 
+
 [API]: http://github.com/davejacobs/mint/tree/master/doc/API.md
+[Tilt templates]: http://github.com/rtomayko/tilt/blob/master/TEMPLATES.md "A listing of all templates supported by Tilt."
+[CSS]: http://en.wikipedia.org/wiki/Cascading_Style_Sheets
+[SASS/SCSS]: http://sass-lang.com/
+[Less]: http://lesscss.org/
+
