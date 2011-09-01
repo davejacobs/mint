@@ -195,7 +195,7 @@ Mint comes preloaded with several styles and layouts.
 I've included a base stylesheet that is useful for setting sensible typographic defaults.
 
 The Mint path
------------------
+-------------
 
 Mint's path tells the library where to search for named templates. It can be useful for other things, too, especially for extensions and tools that use the library (for example, for storing config files for the `mint` command). The Mint path is flexible and something that you can modify, even from the command line. (Just export `MINT_PATH`=`your:colon-separated-paths:here`. Just make sure to specify higher-priority paths before lower-priority ones.)
 
@@ -217,12 +217,12 @@ Templates should be in a directory named templates. Inside this directory, there
 
 Normally a style will go best with its layout complement. However, layouts and styles can be mixed and matched at your discretion. This is especially true where you are primarily customizing DOM elements with your stylesheet instead of targeting specific IDs or classes you're expecting to find. (In other words, this works best when your stylesheet focuses on modifying typography and not page layout.)
 
-The `mint` command
----------------------
+The mint command
+----------------
 
-### The basic `mint` command ###
+### The basic mint command ###
 
-The easiest Mint command doesn't require configuration. It will transform the specified document into HTML and link it to the default stylesheet, which will be output in the same directory as the source documents. (If you have a ./templates/default/ subdirectory, the templates found in that directory will be used.)
+The easiest Mint command doesn't require configuration. It will transform the specified document into HTML and link it to the default stylesheet.
 
     mint Minimalism.md                    # creates Minimalism.html
 
@@ -236,8 +236,6 @@ This command can be tweaked with options and arguments to be more flexible:
     mint Minimalism.md --destination final --style-destination=styles
 
 ### Mint options & shortcuts ###
-
-You can pass several options to `mint`. Following the Unix tradition, common options have a short and long form.
 
 The following correspond to the parameters you can pass to `Mint::Document.new`, as described in [The Mint library][]:
 
