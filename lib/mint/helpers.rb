@@ -54,18 +54,21 @@ module Mint
       end
     end
 
-    # Returns the relative path to dir1 from dir2. If dir1 and dir2 
-    # have no directories in common besides /, will return the 
-    # absolute directory of dir1. Assumes no symlinks.
+    # Returns the relative path to to_directory from from_directory. 
+    # If to_directory and from_directory have no parents in common besides 
+    # /, returns the absolute directory of to_directory. Assumes no symlinks.
     #
-    # @param [String, Pathname] dir1 the target directory
-    # @param [String, Pathname] dir2 the starting directory
-    # @return [Pathname] the relative path to dir1 from dir2, or an absolute
-    #   path if they have no parent directories other than / in common
-    def self.normalize_path(dir1, dir2)
-      path1, path2 = [dir1, dir2].map {|d| pathize d }
-      root1, root2 = [path1, path2].map {|p| p.each_filename.first }
-      root1 == root2 ? path1.relative_path_from(path2) : path1
+    # @param [String, Pathname] to_directory the target directory
+    # @param [String, Pathname] from_directory the starting directory
+    # @return [Pathname] the relative path to to_directory from 
+    #   from_directory, or an absolute path if they have no parents in common
+    #   other than /
+    def self.normalize_path(to_directory, from_directory)
+      to_path, from_path = [to_directory, from_directory].map {|d| pathize d }
+      to_root, from_root = [to_path, from_path].map {|p| p.each_filename.first }
+      to_root == from_root ? 
+        to_path.relative_path_from(from_path) :
+        to_path
     end
 
     # Reads Yaml options from file. Updates values with new_opts. Writes

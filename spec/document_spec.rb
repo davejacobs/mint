@@ -13,10 +13,9 @@ module Mint
       # Convenience methods
       
       it "#stylesheet" do
-        relative_path = document.destination_file_path.
-            relative_path_from(document.style_destination_file_path)
-
-        document.stylesheet.should == relative_path.to_s
+        document.stylesheet.should == 
+          Helpers.normalize_path(document.style_destination_file, 
+                                 document.destination_directory).to_s
       end
 
       # style_spec.rb ensures that our style generation goes as planned
@@ -25,7 +24,7 @@ module Mint
       its(:content) { should =~ /<p>This is just a test.<\/p>/ }
 
       # Render output
-
+      
       it "renders its layout, injecting content inside" do
         document.render.should =~ 
           /.*<html>.*#{document.content}.*<\/html>.*/m
