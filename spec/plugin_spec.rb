@@ -70,7 +70,7 @@ describe Mint do
     after { Mint.clear_plugins! }
 
     it "calls each registered plugin in order, passing it a document" do
-      # Mint.after_publish(document)
+      Mint.after_publish('fake document')
     end
   end
 

@@ -27,9 +27,9 @@ module Mint
     end
   end
 
-  def self.after_publish(file)
+  def self.after_publish(document)
     plugins.each do |plugin|
-      plugin.after_publish(file)
+      plugin.after_publish(document)
     end
   end
 
@@ -77,6 +77,6 @@ module Mint
     # NOTE: Unlike the other two callbacks, this doesn't use the result of 
     #   the callback expression for anything. This callback is purely for 
     #   side effects like rearranging the file system.
-    def self.after_publish(file); end
+    def self.after_publish(document); end
   end
 end
