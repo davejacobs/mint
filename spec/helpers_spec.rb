@@ -118,5 +118,25 @@ module Mint
       it "loads existing YAML data from file"
       it "combines existing YAML data with new data and writes to file"
     end
+
+    describe "#generate_temp_file!" do
+      before do
+        @file = Helpers.generate_temp_file! 'content.md'
+        @path = Pathname.new @file
+      end
+
+      it "creates a randomly named temp file" do
+        @path.should exist
+      end
+
+      it "creates a temp file with the correct name and extension" do
+        @path.basename.to_s.should =~ /content/
+        @path.extname.should == '.md'
+      end
+
+      it "fills the temp file with the specified content" do
+        @path.read.should =~ /This is just a test/
+      end
+    end
   end
 end

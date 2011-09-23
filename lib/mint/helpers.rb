@@ -1,4 +1,5 @@
 require 'pathname'
+require 'tempfile'
 require 'yaml'
 
 module Mint
@@ -80,6 +81,16 @@ module Mint
       File.open file, 'w' do |f|
         YAML.dump(curr_opts.merge(new_opts), f)
       end
+    end
+
+    def self.generate_temp_file!(file)
+      basename  = File.basename file
+      extension = File.extname file
+      content   = File.read file
+
+      tempfile = Tempfile.new([basename, extension])
+      File.open(tempfile, 'w') {|file| file << content }
+      tempfile.path
     end
   end
 end
