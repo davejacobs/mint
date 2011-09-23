@@ -75,7 +75,7 @@ module Mint
     # @param [Hash, #[]] new_opts a set of options to add to the Yaml file
     # @param [Pathname, #exist] file a file to read from and write to
     # @return [void] 
-    def self.update_yaml(new_opts, file)
+    def self.update_yaml!(new_opts, file)
       curr_opts = file.exist? ? YAML.load_file(file) : {}
 
       File.open file, 'w' do |f|

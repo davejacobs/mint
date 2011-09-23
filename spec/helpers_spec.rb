@@ -114,7 +114,7 @@ module Mint
       end
     end
 
-    describe "#update_yaml" do
+    describe "#update_yaml!" do
       it "loads existing YAML data from file"
       it "combines existing YAML data with new data and writes to file"
     end
