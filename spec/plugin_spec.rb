@@ -1,7 +1,18 @@
 require 'spec_helper'
 
 describe Mint do
-  describe "#plugins"
+  describe "#plugins" do
+    after { Mint.clear_plugins! }
+
+    it "returns all registered plugins" do
+      plugin = Class.new(Mint::Plugin)
+      Mint.plugins.should == [plugin]
+    end
+
+    it "returns an empty array if there are no registered plugins" do
+      Mint.plugins.should == []
+    end
+  end
 
   describe "#register_plugin!" do
     before { @plugin = Class.new }
