@@ -74,6 +74,11 @@ describe Mint do
     end
   end
 
+  # TODO: Document expected document functionality changes related to plugins
+  describe Mint::Document do
+    context "when plugins are registered with Mint"
+  end
+
   describe Mint::Plugin do
     before do
       @base_plugin   = Class.new(Mint::Plugin)

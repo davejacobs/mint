@@ -15,8 +15,19 @@ module Mint
     #   from a templating language into HTML
     # @return [void]
     def content=(content)
-      @renderer = Mint.renderer content
-      @content = @renderer.render
+      if Mint.plugins.empty?
+        @renderer = Mint.renderer content
+        @content  = @renderer.render
+      else
+        tempfile             = Helpers.generate_temp_file! content
+        original_content     = File.read content
+        intermediate_content = Mint.before_render content
+
+        File.open(tempfile, 'w') {|file| file << intermediate_content }
+
+        @renderer = Mint.renderer tempfile
+        @content = @renderer.render
+      end
     end
 
     # Sets layout to an existing Layout object or looks it up by name
@@ -153,7 +164,8 @@ module Mint
 
     # Renders content in the context of layout and returns as a String.
     def render(args={})
-      layout.render self, args
+      intermediate_content = layout.render self, args
+      Mint.after_render(intermediate_content)
     end
 
     # Writes all rendered content where a) possible, b) required,
@@ -174,6 +186,8 @@ module Mint
           f << self.style.render
         end
       end
+
+      # Mint.after_publish(document)
     end
 
     # Convenience methods for views

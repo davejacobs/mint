@@ -22,10 +22,15 @@ module Mint
       # style_spec.rb ensures that our style generation goes as planned
       # However, we need to test layout generation because it should now
       # include our content
+      #
+      # This test doesn't cover any plugin transformations. Those
+      # transformations are covered in the Plugin spec.
       its(:content) { should =~ /<p>This is just a test.<\/p>/ }
 
       # Render output
 
+      # This test doesn't cover any plugin transformations. Those
+      # transformations are covered in the Plugin spec.
       it "renders its layout, injecting content inside" do
         document.render.should =~ 
           /.*<html>.*#{document.content}.*<\/html>.*/m

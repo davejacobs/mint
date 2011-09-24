@@ -89,7 +89,9 @@ module Mint
       content   = File.read file
 
       tempfile = Tempfile.new([basename, extension])
-      File.open(tempfile, 'w') {|file| file << content }
+      tempfile << content
+      tempfile.flush
+      tempfile.close
       tempfile.path
     end
   end

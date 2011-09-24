@@ -3,7 +3,8 @@ require 'set'
 
 module Mint
   def self.plugins
-    (@@plugins || Set.new).to_a
+    @@plugins ||= Set.new
+    @@plugins.to_a
   end
 
   def self.register_plugin!(plugin)
