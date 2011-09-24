@@ -4,3 +4,4 @@ tmp/*
 templates/*/css
 .pt
 *.gem
+Gemfile.lock
