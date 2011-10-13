@@ -187,7 +187,7 @@ module Mint
         end
       end
 
-      # Mint.after_publish(document)
+      Mint.after_publish(self)
     end
 
     # Convenience methods for views
