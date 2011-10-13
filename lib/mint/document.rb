@@ -21,7 +21,7 @@ module Mint
       else
         tempfile             = Helpers.generate_temp_file! content
         original_content     = File.read content
-        intermediate_content = Mint.before_render content
+        intermediate_content = Mint.before_render original_content
 
         File.open(tempfile, 'w') {|file| file << intermediate_content }
 
