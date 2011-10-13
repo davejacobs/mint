@@ -44,6 +44,8 @@ module Mint
 
       # Mint output
 
+      # These tests doesn't cover any plugin transformations. Those
+      # transformations are covered in the Plugin spec.
       it "writes its rendered style to #style_destination_file" do
         document.publish!
         document.style_destination_file_path.should exist
