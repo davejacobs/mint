@@ -82,7 +82,7 @@ module Mint
     # The style_destination attribute is lazy. It's exposed via
     # virtual attributes like #style_destination_file.
     attr_reader :style_destination
-    #
+    
     # @param [String] style_destination the subdirectory into
     #   which styles will be rendered or copied
     # @return [void]
