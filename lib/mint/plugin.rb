@@ -48,7 +48,9 @@ module Mint
     # Use cases:
     # - Add footnote syntax on top of Markdown
     # - Perform text analysis for use in later callbacks (?)
-    def self.before_render(text_document); end
+    def self.before_render(text_document)
+      text_document
+    end
 
     # Supports:
     # - Change preview HTML
@@ -60,7 +62,9 @@ module Mint
     #
     # Questions:
     # - Could I allow jQuery use here?
-    def self.after_render(html_document); end
+    def self.after_render(html_document)
+      html_document
+    end
 
     # Supports:
     # - Change file, filesystem once written
@@ -78,6 +82,7 @@ module Mint
     # NOTE: Unlike the other two callbacks, this doesn't use the result of 
     #   the callback expression for anything. This callback is purely for 
     #   side effects like rearranging the file system.
-    def self.after_publish(document); end
+    def self.after_publish(document)
+    end
   end
 end
