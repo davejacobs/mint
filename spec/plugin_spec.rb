@@ -87,7 +87,13 @@ describe Mint do
 
   # TODO: Document expected document functionality changes related to plugins
   describe Mint::Document do
-    context "when plugins are registered with Mint"
+    context "when plugins are registered with Mint" do
+      describe "#content=" do
+        it "applies each registered plugin's before_render filter"
+        it "applies each registered plugin's after_render filter"
+        it "applies each registered plugin's after_publish filter"
+      end
+    end
   end
 
   describe Mint::Plugin do
@@ -112,45 +118,118 @@ describe Mint do
 
       it "does not change the order of a plugin when it is monkey-patched" do
         lambda do
-          @base_plugin.instance_eval { def monkey_patch; end }
+          @base_plugin.instance_eval do 
+            def monkey_patch
+            end
+          end
         end.should_not change { Mint.plugins }
       end
     end
 
-    describe "#commandline_options"
+    describe "#commandline_options" do
+      before do
+        @plugin = Class.new(Mint::Plugin)
+        @plugin.instance_eval do
+          def commandline_options
+          end
+        end
+      end
+
+      it "returns a hash of options the plugin can take, including constraints" do
+
+      end
+    end
 
     context "plugin callbacks" do
       before do
-        @base_plugin   = Class.new(Mint::Plugin)
-        @first_plugin  = Class.new(@base_plugin)
-        @second_plugin = Class.new(@base_plugin)
-
-        @base_plugin.should_receive(:before_render).
-          ordered.and_return('transformed by base')
-        @first_plugin.should_receive(:before_render).
-          ordered.and_return('transformed by first')
-        @second_plugin.should_receive(:before_render).
-          ordered.and_return('transformed by second')
+        @plugin = Class.new(Mint::Plugin)
       end
 
-      describe "#before_render"
-      describe "#after_render"
-      describe "#after_mint" do
-        # let(:document) { Document.new 'content.md' }
-        #
-        # it "allows changes to the document extension" do
-          # Mint.should_call(:process_with).once.with(plugin)
-          # Mint.publish!(document)
-        # end
-        # it "allows changes to the document type"
-        # it "allows changes to the document structure"
-        # it "allows changes to the document content"
+      describe "#before_render" do
+        it "allows changes to the un-rendered content" do
+          @plugin.instance_eval do
+            def before_render(text_document)
+              'transformed by base'
+            end
+          end
 
-        it "allows changes to final published document file"
-        it "allows changes to final published style file"
-        it "allows changes to final published document directory"
-        it "allows changes to final published style directory"
-        it "allows changes to final published style directory"
+          @plugin.before_render('text').should == 'transformed by base'
+        end
+      end
+
+      describe "#after_render" do
+        it "allows changes to the rendered HTML" do
+          @plugin.instance_eval do
+            def after_render(html_document)
+              '<!doctype html>'
+            end
+          end
+
+          @plugin.after_render('<html></html>').should == '<!doctype html>'
+        end
+      end
+
+      describe "#after_mint" do
+        before do
+          @document = Mint::Document.new 'content.md' 
+        end
+
+        it "allows changes to the document extension" do
+          @plugin.instance_eval do
+            def after_publish(document)
+              document.name.gsub! /html$/, 'htm'
+            end
+          end
+
+          lambda do
+            @plugin.after_publish(@document)
+          end.should change { @document.name.length }.by(-1)
+        end
+
+        it "allows changes to the document type" do
+          pending "figuring out what I actually meant by this"
+        end
+
+        it "allows splitting up the document into two, without garbage" do
+          @plugin.instance_eval do
+            def after_publish(document)
+              content = document.content
+              fake_splitting_point = content.length / 2
+
+              first  = content[0..fake_splitting_point]
+              second = content[fake_splitting_point..-1]
+
+              File.open 'first-half.html', 'w+' do |file|
+                file << first
+              end
+
+              File.open 'second-half.html', 'w+' do |file|
+                file << second
+              end
+
+              File.delete document.destination_file
+            end
+          end
+
+          @document.publish!
+          File.exist?(@document.destination_file).should be_false
+          File.exist?('first-half.html').should be_true
+          File.exist?('second-half.html').should be_true
+        end
+
+        it "allows changes to the style file" do
+          @plugin.instance_eval do
+            def after_publish(document)
+
+              File.delete document.destination_file
+            end
+          end
+        end
+
+        it "allows changes to the document directory"
+        it "allows changes to the style directory"
+        it "allows changes to the style directory"
+        it "allows packaging of the final output"
       end
     end
   end
