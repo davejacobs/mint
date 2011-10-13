@@ -220,7 +220,6 @@ describe Mint do
         it "allows changes to the style file" do
           @plugin.instance_eval do
             def after_publish(document)
-
               File.delete document.destination_file
             end
           end
