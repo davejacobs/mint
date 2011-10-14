@@ -218,11 +218,25 @@ describe Mint do
         end
 
         it "allows changes to the style file" do
+          pending "figure out a better strategy for style manipulation"
+          @document = Mint::Document.new 'content.md', :style => 'style.css' 
+
           @plugin.instance_eval do
             def after_publish(document)
-              File.delete document.destination_file
+              # I'd like to take document.style_destination_file,
+              # but the current Mint API doesn't allow for this
+              # if we're setting the style via a concrete
+              # stylesheet in our current directory
+              style_source = document.style.source_file
+              style = File.read style_source
+              File.open style_source, 'w' do |file|
+                file << style.gsub(/#/, '.')
+              end
             end
           end
+
+          @document.publish!
+          File.read(@document.style.source_file).should =~ /\#container/
         end
 
         it "allows changes to the document directory"
