@@ -297,6 +297,31 @@ describe Mint do
             directory_size.should > compressed_size
           end
         end
+
+        context "when the style output is a new directory" do
+          it "allows changes to the style directory" do
+            @document = Mint::Document.new 'content.md', :style_destination => 'styles'
+            @plugin.instance_eval do
+              def after_publish(document)
+                original = document.style_destination_directory
+                new = File.expand_path('looks')
+                FileUtils.mv original, new
+                document.style_destination = 'looks'
+              end
+            end
+
+            @document.publish!
+
+            File.exist?('styles').should be_false
+            File.exist?('looks').should be_true
+            @document.style_destination_directory.should == 
+              File.expand_path('looks')
+          end
+
+          after do
+            FileUtils.rm_r File.expand_path('looks')
+          end
+        end
       end
     end
   end
