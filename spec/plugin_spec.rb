@@ -239,10 +239,6 @@ describe Mint do
           File.read(@document.style.source_file).should =~ /\#container/
         end
 
-        it "allows changes to the document directory"
-        it "allows changes to the style directory"
-        it "allows changes to the style directory"
-        it "allows packaging of the final output"
         context "when the output is in the default directory"
 
         context "when the output is a new directory" do
