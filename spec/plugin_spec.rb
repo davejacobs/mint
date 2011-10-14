@@ -243,6 +243,8 @@ describe Mint do
         it "allows changes to the style directory"
         it "allows changes to the style directory"
         it "allows packaging of the final output"
+        context "when the output is in the default directory"
+
       end
     end
   end
