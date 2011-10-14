@@ -263,6 +263,39 @@ describe Mint do
             File.exist?('book').should be_true
             @document.destination_directory.should == File.expand_path('book')
           end
+
+          it "allows compression of the final output" do
+            require 'zip/zip'
+            require 'zip/zipfilesystem'
+
+            @document = Mint::Document.new 'content.md', :destination => 'destination'
+            @plugin.instance_eval do
+              def after_publish(document)
+                Zip::ZipOutputStream.open 'book.zip' do |zos|
+                  # zos.put_next_entry('mimetype', nil, nil, Zip::ZipEntry::STORED)
+                  # zos.puts 'text/epub'
+                  zos.put_next_entry('chapter-1', nil, nil, Zip::ZipEntry::DEFLATED)
+                  zos.puts File.read(document.destination_file)
+                end
+
+                FileUtils.mv 'book.zip', 'book.epub'
+              end
+            end
+
+            @document.publish!
+
+            File.exist?('destination').should be_true
+            File.exist?('book.zip').should be_false
+            File.exist?('book.epub').should be_true
+
+            directory_size = 
+              Dir["#{@document.destination_directory}/**/*"].
+              flatten.
+              map {|file| File.stat(file).size }.
+              reduce(&:+)
+            compressed_size = File.stat('book.epub').size
+            directory_size.should > compressed_size
+          end
         end
       end
     end
