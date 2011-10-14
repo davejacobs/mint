@@ -245,6 +245,25 @@ describe Mint do
         it "allows packaging of the final output"
         context "when the output is in the default directory"
 
+        context "when the output is a new directory" do
+          it "allows changes to the document directory" do
+            @document = Mint::Document.new 'content.md', :destination => 'destination'
+            @plugin.instance_eval do
+              def after_publish(document)
+                original = document.destination_directory
+                new = File.expand_path('book')
+                FileUtils.mv original, new
+                document.destination = 'book'
+              end
+            end
+
+            @document.publish!
+
+            File.exist?('destination').should be_false
+            File.exist?('book').should be_true
+            @document.destination_directory.should == File.expand_path('book')
+          end
+        end
       end
     end
   end
