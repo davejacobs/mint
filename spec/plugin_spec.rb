@@ -134,9 +134,7 @@ describe Mint do
         end
       end
 
-      it "returns a hash of options the plugin can take, including constraints" do
-
-      end
+      it "returns a hash of options the plugin can take, including constraints"
     end
 
     context "plugin callbacks" do
@@ -179,10 +177,6 @@ describe Mint do
           lambda do
             plugin.after_publish(document)
           end.should change { document.name.length }.by(-1)
-        end
-
-        it "allows changes to the document type" do
-          pending "figuring out what I actually meant by this"
         end
 
         it "allows splitting up the document into two, without garbage" do
@@ -243,14 +237,13 @@ describe Mint do
             plugin.instance_eval do
               def after_publish(document)
                 original = document.destination_directory
-                new = File.expand_path('book')
+                new = File.expand_path 'book'
                 FileUtils.mv original, new
                 document.destination = 'book'
               end
             end
 
             document.publish!
-
             File.exist?('destination').should be_false
             File.exist?('book').should be_true
             document.destination_directory.should == File.expand_path('book')
