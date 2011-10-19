@@ -229,7 +229,24 @@ describe Mint do
           File.read(document.style.source_file).should =~ /\#container/
         end
 
-        context "when the output is in the default directory"
+        context "when the output is in the default directory" do
+          it "doesn't allow changes to the document directory" do
+            pending "figuring out the best way to prevent directory manipulation"
+            document = Mint::Document.new 'content.md'
+            plugin.instance_eval do
+              def after_publish
+                original = document.destination_directory
+                new = File.expand_path 'invalid'
+                FileUtils.mv original, new
+                document.destination = 'invalid'
+              end
+
+              lambda do
+                document.publish!
+              end.should raise_error(InvalidPluginAction)
+            end
+          end
+        end
 
         context "when the output is a new directory" do
           it "allows changes to the document directory" do
