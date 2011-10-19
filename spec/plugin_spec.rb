@@ -207,6 +207,7 @@ describe Mint do
           end
 
           document.publish!
+
           File.exist?(document.destination_file).should be_false
           File.exist?('first-half.html').should be_true
           File.exist?('second-half.html').should be_true
@@ -295,7 +296,7 @@ describe Mint do
             plugin.instance_eval do
               def after_publish(document)
                 original = document.style_destination_directory
-                new = File.expand_path('looks')
+                new = File.expand_path 'looks'
                 FileUtils.mv original, new
                 document.style_destination = 'looks'
               end
