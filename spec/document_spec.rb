@@ -10,17 +10,6 @@ module Mint
     # We do have to test #style_destination derivatives. Those aren't
     # covered by resource_spec.rb.
     shared_examples_for "all documents" do
-      # Convenience methods
-      
-      describe "#stylesheet" do
-        it "returns a relative path to the document's rendered stylesheet from its rendered content file" do
-          relative_path = document.destination_file_path.
-              relative_path_from(document.style_destination_file_path)
-
-          document.stylesheet.should == relative_path.to_s
-        end
-      end
-
       # style_spec.rb ensures that our style generation goes as planned
       # However, we need to test layout generation because it should now
       # include our content
@@ -87,6 +76,8 @@ module Mint
       its(:layout) { should be_in_directory('default') }
       its(:style) { should be_in_directory('default') }
 
+      its(:stylesheet) { should == Mint.root + '/templates/default/css/style.css' }
+
       it_should_behave_like "all documents"
     end
 
@@ -120,6 +111,8 @@ module Mint
       its(:layout) { should be_in_directory('default') }
       its(:style) { should be_in_directory('default') }
 
+      its(:stylesheet) { should == 'styles/style.css' }
+
       it_should_behave_like "all documents"
     end
 
@@ -151,6 +144,8 @@ module Mint
 
       its(:layout) { should be_in_directory('default') }
       its(:style) { should be_in_directory('default') }
+
+      its(:stylesheet) { should == Mint.root + '/templates/default/css/style.css' }
 
       it_should_behave_like "all documents"
     end
@@ -190,6 +185,8 @@ module Mint
 
       its(:layout) { should be_in_directory('pro') }
       its(:style) { should be_in_directory('pro') }
+
+      its(:stylesheet) { should == 'styles/style.css' }
 
       it_should_behave_like "all documents"
     end
