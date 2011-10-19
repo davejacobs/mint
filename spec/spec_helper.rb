@@ -1,6 +1,12 @@
 require 'pathname'
 require 'mint'
 
+def delete_class(klass)
+  klass = nil
+  GC.start
+  sleep 1
+end
+
 RSpec::Matchers.define :be_in_directory do |name|
   match {|resource| resource.source_directory =~ /#{name}/ }
 end
@@ -45,6 +51,15 @@ Header
 ------
 
 This is just a test.
+
+Paragraph number two.
+
+Header 2
+--------
+
+Third sentence.
+
+Fourth sentence.
     HERE
 
     @layout = <<-HERE

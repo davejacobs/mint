@@ -12,19 +12,27 @@ module Mint
     shared_examples_for "all documents" do
       # Convenience methods
       
-      it "#stylesheet" do
-        document.stylesheet.should == 
-          Helpers.normalize_path(document.style_destination_file, 
-                                 document.destination_directory).to_s
+      describe "#stylesheet" do
+        it "returns a relative path to the document's rendered stylesheet from its rendered content file" do
+          relative_path = document.destination_file_path.
+              relative_path_from(document.style_destination_file_path)
+
+          document.stylesheet.should == relative_path.to_s
+        end
       end
 
       # style_spec.rb ensures that our style generation goes as planned
       # However, we need to test layout generation because it should now
       # include our content
+      #
+      # This test doesn't cover any plugin transformations. Those
+      # transformations are covered in the Plugin spec.
       its(:content) { should =~ /<p>This is just a test.<\/p>/ }
 
       # Render output
-      
+
+      # This test doesn't cover any plugin transformations. Those
+      # transformations are covered in the Plugin spec.
       it "renders its layout, injecting content inside" do
         document.render.should =~ 
           /.*<html>.*#{document.content}.*<\/html>.*/m
@@ -36,6 +44,8 @@ module Mint
 
       # Mint output
 
+      # These tests doesn't cover any plugin transformations. Those
+      # transformations are covered in the Plugin spec.
       it "writes its rendered style to #style_destination_file" do
         document.publish!
         document.style_destination_file_path.should exist

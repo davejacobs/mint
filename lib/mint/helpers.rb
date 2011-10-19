@@ -1,4 +1,5 @@
 require 'pathname'
+require 'tempfile'
 require 'yaml'
 
 module Mint
@@ -77,12 +78,24 @@ module Mint
     # @param [Hash, #[]] new_opts a set of options to add to the Yaml file
     # @param [Pathname, #exist] file a file to read from and write to
     # @return [void] 
-    def self.update_yaml(new_opts, file)
+    def self.update_yaml!(new_opts, file)
       curr_opts = file.exist? ? YAML.load_file(file) : {}
 
       File.open file, 'w' do |f|
         YAML.dump(curr_opts.merge(new_opts), f)
       end
+    end
+
+    def self.generate_temp_file!(file)
+      basename  = File.basename file
+      extension = File.extname file
+      content   = File.read file
+
+      tempfile = Tempfile.new([basename, extension])
+      tempfile << content
+      tempfile.flush
+      tempfile.close
+      tempfile.path
     end
   end
 end

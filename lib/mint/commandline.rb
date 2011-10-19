@@ -144,7 +144,7 @@ module Mint
       config_directory = Mint.path_for_scope(scope, true)
       config_file = config_directory + Mint.files[:config]
       Helpers.ensure_directory config_directory
-      Helpers.update_yaml opts, config_file
+      Helpers.update_yaml! opts, config_file
     end
 
     # Tries to set a config option (at the specified scope) per 
