@@ -2,6 +2,17 @@ require 'spec_helper'
 
 module Mint
   describe Helpers do
+    describe "#underscore" do
+      it "underscores class names per ActiveSupport conventions" do
+        Helpers.underscore('ClassName').should == 'class_name'
+      end
+
+      it "allows for camel case prefixes" do
+        Helpers.underscore('EPub').should == 'e_pub'
+        Helpers.underscore('EPub', :ignore_prefix => true).should == 'epub'
+      end
+    end
+    
     describe "#slugize" do
       it "downcases everything" do
         Helpers.slugize('This could use FEWER CAPITALS').should ==

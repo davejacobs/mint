@@ -4,6 +4,21 @@ require 'yaml'
 
 module Mint
   module Helpers    
+    def self.underscore(obj, opts={})
+      require 'active_support/core_ext/string/inflections'
+      temp_str = obj.to_s
+      string = 
+        # :ignore_first_letter option prevents snake-casing of words
+        # like ePub and iMac
+        if opts[:ignore_prefix]
+          temp_str[0..1].downcase + temp_str[2..-1]
+        else
+          temp_str
+        end
+
+      string.underscore
+    end
+
     # Transforms a String into a URL-ready slug. Properly handles
     # ampersands, non-alphanumeric characters, extra hyphens and spaces.
     #
