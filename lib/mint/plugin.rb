@@ -16,6 +16,10 @@ module Mint
     @@plugins.clear
   end
 
+  def self.template_directory(plugin)
+    Mint.root + '/plugins/templates/' + plugin.underscore
+  end
+
   def self.before_render(plain_text)
     plugins.reduce(plain_text) do |intermediate, plugin|
       plugin.before_render(intermediate)

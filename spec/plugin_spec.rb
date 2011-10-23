@@ -43,6 +43,18 @@ describe Mint do
     end
   end
 
+  describe ".template_directory" do
+    let(:plugin) { Class.new(Mint::Plugin) }
+
+    after { Mint.clear_plugins! }
+
+    it "gives access to a directory where template files can be stored" do
+      plugin.should_receive(:name).and_return('DocBook')
+      Mint.template_directory(plugin).should == 
+        Mint.root + '/plugins/templates/doc_book'
+    end
+  end
+
   [:before_render, :after_render].each do |callback|
     describe ".#{callback}" do
       let(:first_plugin) { Class.new(Mint::Plugin) }
