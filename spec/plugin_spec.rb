@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Mint do
-  describe "#plugins" do
+  describe ".plugins" do
     after { Mint.clear_plugins! }
 
     it "returns all registered plugins" do
@@ -14,7 +14,7 @@ describe Mint do
     end
   end
 
-  describe "#register_plugin!" do
+  describe ".register_plugin!" do
     let(:plugin) { Class.new }
     after { Mint.clear_plugins! }
 
@@ -30,7 +30,7 @@ describe Mint do
     end
   end
 
-  describe "#clear_plugins!" do
+  describe ".clear_plugins!" do
     let(:plugin) { Class.new }
 
     it "does nothing if no plugins are registered" do
@@ -44,7 +44,7 @@ describe Mint do
   end
 
   [:before_render, :after_render].each do |callback|
-    describe "##{callback}" do
+    describe ".#{callback}" do
       let(:first_plugin) { Class.new(Mint::Plugin) }
       let(:second_plugin) { Class.new(Mint::Plugin) }
 
@@ -55,13 +55,13 @@ describe Mint do
 
       after { Mint.clear_plugins! }
 
-      it "reduces ##{callback} across all registered plugins in order" do
+      it "reduces .#{callback} across all registered plugins in order" do
         Mint.send(callback, 'text').should == 'second'
       end
     end
   end
 
-  describe "#after_publish" do
+  describe ".after_publish" do
     let(:first_plugin) { Class.new(Mint::Plugin) }
     let(:second_plugin) { Class.new(Mint::Plugin) }
 
@@ -104,7 +104,6 @@ describe Mint do
 
     after { Mint.clear_plugins! }
 
-    describe "#inherited" do
     describe ".underscore" do
       let(:plugin) { Class.new(Mint::Plugin) }
 
@@ -115,6 +114,8 @@ describe Mint do
         plugin.underscore.should == 'epub'
       end
     end
+
+    describe ".inherited" do
       it "registers the subclass with Mint as a plugin" do
         lambda do
           Class.new(Mint::Plugin)
@@ -135,7 +136,7 @@ describe Mint do
       end
     end
 
-    describe "#commandline_options" do
+    describe ".commandline_options" do
       let(:plugin) { Class.new(Mint::Plugin) }
       before do
         plugin.instance_eval do
@@ -152,7 +153,7 @@ describe Mint do
     context "plugin callbacks" do
       let(:plugin) { Class.new(Mint::Plugin) }
 
-      describe "#before_render" do
+      describe ".before_render" do
         it "allows changes to the un-rendered content" do
           plugin.instance_eval do
             def before_render(text_document)
@@ -164,7 +165,7 @@ describe Mint do
         end
       end
 
-      describe "#after_render" do
+      describe ".after_render" do
         it "allows changes to the rendered HTML" do
           plugin.instance_eval do
             def after_render(html_document)
@@ -176,7 +177,7 @@ describe Mint do
         end
       end
 
-      describe "#after_mint" do
+      describe ".after_mint" do
         let(:document) { Mint::Document.new 'content.md' } 
 
         it "allows changes to the document extension" do
