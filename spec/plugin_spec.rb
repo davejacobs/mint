@@ -105,6 +105,16 @@ describe Mint do
     after { Mint.clear_plugins! }
 
     describe "#inherited" do
+    describe ".underscore" do
+      let(:plugin) { Class.new(Mint::Plugin) }
+
+      it "when anonymous, returns a random identifier"
+
+      it "when named, returns its name, underscored" do
+        plugin.should_receive(:name).and_return('EPub')
+        plugin.underscore.should == 'epub'
+      end
+    end
       it "registers the subclass with Mint as a plugin" do
         lambda do
           Class.new(Mint::Plugin)
