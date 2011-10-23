@@ -39,12 +39,12 @@ module Mint
       Mint.register_plugin! plugin
     end
 
-    def commandline_options
     def self.underscore(opts={})
       opts[:ignore_prefix] ||= true
       Helpers.underscore self.name, :ignore_prefix => opts[:ignore_prefix]
     end
 
+    def commandline_options
     end
 
     # Supports:
