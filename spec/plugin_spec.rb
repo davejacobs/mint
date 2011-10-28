@@ -14,6 +14,12 @@ describe Mint do
     end
   end
 
+  describe "#activated_plugins" do
+    it "returns a list of plugins activated for a document"
+    it "returns a list of plugins activated for a set of documents"
+    it "returns a list of plugins activated for all documents"
+  end
+
   describe ".register_plugin!" do
     let(:plugin) { Class.new }
     after { Mint.clear_plugins! }
@@ -30,7 +36,77 @@ describe Mint do
     end
   end
 
-  describe ".clear_plugins!" do
+  # describe "#activate_plugin!" do
+    # pending "activation variables & framework not yet in place"
+    # let(:plugin) { Class.new(Mint::Plugin) }
+
+    # after do 
+      # Mint.clear_plugins!
+      # Mint.plugins.each &:deactivate!
+    # end
+
+    # it "activates a plugin for a specified document" do
+      # document = Document.new 'content.md'
+
+      # lambda do
+        # Mint.activate_plugin! plugin, :only => document
+      # end.should_change { Mint.active_plugins(document.name).length }.by(1)
+    # end
+
+    # it "activates a plugin for a specified set of documents" do
+      # document1 = Document.new 'content.md'
+      # document2 = Document.new 'content.md'
+
+      # lambda do
+        # Mint.activate_plugin! plugin, :only => [document1, document2]
+      # end.should_change { Mint.active_plugins(document).length }.by(2)
+    # end
+
+    # it "activates a plugin for all documents" do
+      # lambda do
+        # Mint.activate_plugin! plugin
+      # end.should change { Mint.active_plugins.length }.by(1)
+    # end
+  # end
+
+  # describe "#deactivate_plugin!" do
+    # pending "activation variables & framework not yet in place"
+    # let(:plugin) { Class.new(Mint::Plugin) }
+
+    # before do
+      # Mint.activate_plugin! plugin
+    # end
+
+    # after do 
+      # Mint.clear_plugins!
+      # Mint.plugins.each &:deactivate!
+    # end
+
+    # it "deactivates a plugin for a specified document" do
+      # document = Document.new 'content.md'
+
+      # lambda do
+        # Mint.deactivate_plugin! plugin, :only => document
+      # end.should_change { Mint.active_plugins(document).length }.by(-1)
+    # end
+
+    # it "activates a plugin for a specified set of documents" do
+      # document1 = Document.new 'content.md'
+      # document2 = Document.new 'content.md'
+
+      # lambda do
+        # Mint.activate_plugin! plugin, :only => [document1, document2]
+      # end.should_change { Mint.active_plugins(document).length }.by(2)
+    # end
+
+    # it "deactivates a plugin for all documents" do
+      # lambda do
+        # Mint.deactivate_plugin! plugin
+      # end.should change { Mint.active_plugins.length }.by(-1)
+    # end
+  # end
+
+  describe "#clear_plugins!" do
     let(:plugin) { Class.new }
 
     it "does nothing if no plugins are registered" do
