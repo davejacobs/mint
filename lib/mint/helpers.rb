@@ -1,11 +1,11 @@
 require 'pathname'
 require 'tempfile'
 require 'yaml'
+require 'active_support/core_ext/string/inflections'
 
 module Mint
   module Helpers    
     def self.underscore(obj, opts={})
-      require 'active_support/core_ext/string/inflections'
       temp_str = obj.to_s
       string = 
         # :ignore_first_letter option prevents snake-casing of words
