@@ -11,6 +11,16 @@ module Mint
         Helpers.underscore('EPub').should == 'e_pub'
         Helpers.underscore('EPub', :ignore_prefix => true).should == 'epub'
       end
+
+      it "allows for namespace removal" do
+        Helpers.underscore('Mint::EPub', 
+                           :namespaces => true).should == 'mint/e_pub'
+        Helpers.underscore('Mint::EPub', 
+                           :namespaces => false).should == 'e_pub'
+        Helpers.underscore('Mint::EPub', 
+                           :namespaces => true, 
+                           :ignore_prefix => true).should == 'mint/epub'
+      end
     end
     
     describe "#slugize" do
