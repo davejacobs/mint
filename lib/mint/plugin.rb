@@ -13,7 +13,9 @@ module Mint
   end
 
   def self.clear_plugins!
-    @@plugins.clear
+    if defined? @@plugins
+      @@plugins.clear
+    end
   end
 
   def self.template_directory(plugin)
