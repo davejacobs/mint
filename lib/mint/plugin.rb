@@ -53,6 +53,10 @@ module Mint
       Helpers.underscore self.name, :ignore_prefix => opts[:ignore_prefix]
     end
 
+    def self.template_directory
+      Mint.template_directory(self)
+    end
+
     def commandline_options
     end
 
