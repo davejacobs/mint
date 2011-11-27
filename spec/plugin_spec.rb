@@ -17,7 +17,7 @@ describe Mint do
     end
   end
 
-  describe "#activated_plugins" do
+  describe ".activated_plugins" do
     it "returns a list of plugins activated for a document"
     it "returns a list of plugins activated for a set of documents"
     it "returns a list of plugins activated for all documents"
