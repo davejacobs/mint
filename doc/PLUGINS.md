@@ -10,13 +10,13 @@ I have two competing goals to balance:
 - Plugins should not have to follow a hierarchical or class-heavy architecture 
   to work out of the box.
 
-With those goals in mind, my plugin is going to take this:
+With those goals in mind, my plugin system is going to work like this:
 
   mint PLUGIN several named files --option1 param --option2 param
 
 Mint will parse what it can (the options it cares about).
 
-And give your plugin (which is in a file named mint-{plugin-name} somewhere in your PATH, probably as a binary distributed with a gem) this:
+And give your plugin (which is in a file named mint-{plugin-name} somewhere in your PATH, probably as a 'binary' distributed with a gem) this:
 
   documents = [Document.new('several'), 
                Document.new('named'),
@@ -134,6 +134,27 @@ The configuration:
           directory: /home/david/example.com/documents
       - my-blog:
         # ... etc., etc.
+
+### Bringing it together ###
+
+This document is inconsistent because I have a lot of competing goals
+desgining this plugin system.
+
+How do I want to build a plugin?
+
+- Build a full-fledged gem with its own bin, lib, 
+  templates directories. Install via `gem install`
+
+- Put a mint-prefixed executable file on my PATH. Expect templates, etc.,
+  to be generated into a directory -- global or user level. This puts
+  undue burden on plugin designer to generate templates from a code file.
+  Probably not good.
+
+- Some plugins are prepackaged and come with Mint. I have the option
+  of including more plugins in the default install, if they're good
+  plugins. Mint should provide an infrastructure for deciding whether
+  a plugin is a default plugin or not and delegating directories
+  appropriately.
 
 ### Intellectual property plugins ###
 
