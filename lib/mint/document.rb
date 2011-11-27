@@ -170,7 +170,7 @@ module Mint
 
     # Writes all rendered content where a) possible, b) required,
     # and c) specified. Outputs to specified file.
-    def publish!(render_style=true)      
+    def publish!(render_style=true, opts={})      
       FileUtils.mkdir_p self.destination_directory
       File.open(self.destination_file, 'w+') do |f|
         f << self.render
@@ -187,7 +187,7 @@ module Mint
         end
       end
 
-      Mint.after_publish(self)
+      Mint.after_publish(self, opts)
     end
 
     # Convenience methods for views

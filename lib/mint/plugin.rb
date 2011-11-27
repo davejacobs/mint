@@ -22,20 +22,23 @@ module Mint
     Mint.root + '/plugins/templates/' + plugin.underscore
   end
 
-  def self.before_render(plain_text)
-    plugins.reduce(plain_text) do |intermediate, plugin|
+  def self.before_render(plain_text, opts={})
+    active_plugins = opts[:plugins] || []
+    active_plugins.reduce(plain_text) do |intermediate, plugin|
       plugin.before_render(intermediate)
     end
   end
 
-  def self.after_render(html_text)
-    plugins.reduce(html_text) do |intermediate, plugin|
+  def self.after_render(html_text, opts={})
+    active_plugins = opts[:plugins] || []
+    active_plugins.reduce(html_text) do |intermediate, plugin|
       plugin.after_render(intermediate)
     end
   end
 
-  def self.after_publish(document)
-    plugins.each do |plugin|
+  def self.after_publish(document, opts={})
+    active_plugins = opts[:plugins] || []
+    active_plugins.each do |plugin|
       plugin.after_publish(document)
     end
   end
