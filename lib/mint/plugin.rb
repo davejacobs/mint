@@ -57,7 +57,7 @@ module Mint
       Mint.template_directory(self)
     end
 
-    def commandline_options
+    def self.commandline_options
     end
 
     # Supports:
