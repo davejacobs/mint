@@ -1,9 +1,12 @@
 require 'spec_helper'
 
 describe Mint do
-  describe ".plugins" do
-    after { Mint.clear_plugins! }
+  # Remove unintended side effects of creating
+  # new plugins in other files.
+  before { Mint.clear_plugins! }
+  after { Mint.clear_plugins! }
 
+  describe ".plugins" do
     it "returns all registered plugins" do
       plugin = Class.new(Mint::Plugin)
       Mint.plugins.should == [plugin]
@@ -22,7 +25,6 @@ describe Mint do
 
   describe ".register_plugin!" do
     let(:plugin) { Class.new }
-    after { Mint.clear_plugins! }
 
     it "registers a plugin once" do
       Mint.register_plugin! plugin
@@ -51,8 +53,6 @@ describe Mint do
 
   describe ".template_directory" do
     let(:plugin) { Class.new(Mint::Plugin) }
-
-    after { Mint.clear_plugins! }
 
     it "gives access to a directory where template files can be stored" do
       plugin.should_receive(:name).and_return('DocBook')
@@ -83,7 +83,6 @@ describe Mint do
     let(:first_plugin) { Class.new(Mint::Plugin) }
     let(:second_plugin) { Class.new(Mint::Plugin) }
 
-    after { Mint.clear_plugins! }
 
     it "calls each registered plugin in order, passing it a document" do
       first_plugin.should_receive(:after_publish).ordered.and_return(nil)
@@ -119,8 +118,6 @@ describe Mint do
       @first_plugin = Class.new(Mint::Plugin)
       @second_plugin = Class.new(Mint::Plugin)
     end
-
-    after { Mint.clear_plugins! }
 
     describe ".underscore" do
       let(:plugin) { Class.new(Mint::Plugin) }
