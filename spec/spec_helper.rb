@@ -47,6 +47,9 @@ RSpec.configure do |config|
     @dynamic_style_file = 'dynamic.sass'
 
     @content = <<-HERE
+---
+metadata: true
+
 Header
 ------
 

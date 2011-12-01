@@ -4,9 +4,12 @@ require 'mint/style'
 
 module Mint
   class Document < Resource
+    METADATA_DELIM = "\n\n"
+
     # Implicit readers are paired with explicit accessors. This
     # allows for processing variables before storing them.
     attr_reader :content, :layout, :style
+    attr_accessor :metadata
 
     # Passes content through a renderer before assigning it to be
     # the Document's content
@@ -15,19 +18,17 @@ module Mint
     #   from a templating language into HTML
     # @return [void]
     def content=(content)
-      if Mint.plugins.empty?
-        @renderer = Mint.renderer content
-        @content  = @renderer.render
-      else
-        tempfile             = Helpers.generate_temp_file! content
-        original_content     = File.read content
-        intermediate_content = Mint.before_render original_content
+      tempfile = Helpers.generate_temp_file! content
+      original_content = File.read content
 
-        File.open(tempfile, 'w') {|file| file << intermediate_content }
+      metadata, text = Document.parse_metadata_from original_content
+      self.metadata = metadata
+      intermediate_content = Mint.before_render text
 
-        @renderer = Mint.renderer tempfile
-        @content = @renderer.render
-      end
+      File.open(tempfile, 'w') {|file| file << intermediate_content }
+
+      @renderer = Mint.renderer tempfile
+      @content = @renderer.render
     end
 
     # Sets layout to an existing Layout object or looks it up by name
@@ -197,6 +198,31 @@ module Mint
     def stylesheet
       Helpers.normalize_path(self.style_destination_file,
                              self.destination_directory).to_s
+    end
+
+    protected
+
+    def self.metadata_chunk(text)
+      text.split(METADATA_DELIM).first
+    end
+
+    def self.metadata_from(text)
+      raw_metadata = YAML.load metadata_chunk(text)
+      raw_metadata.is_a?(String) ? {} : raw_metadata
+    rescue
+      {}
+    end
+
+    def self.parse_metadata_from(text)
+      metadata = metadata_from text
+      new_text =
+        if !metadata.empty?
+          text.sub metadata_chunk(text) + METADATA_DELIM, ''
+        else
+          text
+        end
+
+      [metadata, new_text]
     end
   end
 end
