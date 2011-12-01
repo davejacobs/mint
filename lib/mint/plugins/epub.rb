@@ -7,6 +7,17 @@ require 'zip/zipfilesystem'
 # to follow.
 
 module Mint
+  # Add chapters to document -- this is probably not a sustainable pattern
+  # for all plugins, but it's useful here.
+  class Document
+    def chapters
+      html_document = Nokogiri::HTML::Document.parse render
+      chapter_contents = EPub.split_on(html_document, 'h2').map &:to_s
+      chapter_ids = (1..chapter_contents.length).to_a
+      chapters = Hash[chapter_ids.zip chapter_contents]
+    end
+  end
+
   class InvalidDocumentError < StandardError; end
 
   class EPub < Plugin

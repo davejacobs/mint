@@ -5,6 +5,17 @@ require 'spec_helper'
 require 'mint/plugins/epub'
 
 module Mint
+  describe Document do
+    describe "#chapters" do
+      it "splits a document's final text into chapters and maps onto IDs" do
+        # TODO: Clean up these long lines
+        chapters = Document.new('content.md').chapters
+        chapters[1].should =~ /This is just a test.*Paragraph number two/m 
+        chapters[2].should =~ /Third sentence.*Fourth sentence/m
+      end
+    end
+  end
+
   describe EPub do
     describe "#after_publish" do
       let(:document) { Document.new 'content.md', :destination => 'directory' }
