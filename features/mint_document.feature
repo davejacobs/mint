@@ -21,7 +21,7 @@ Feature: Mint document with varying options at the command line
       the Markdown templating language.
       """
   Scenario: Mint document with defaults
-    When I run "mint content.md"
+    When I run `mint publish content.md`
     Then a file named "content.md" should exist
     And a file named "content.html" should exist
 
@@ -30,7 +30,7 @@ Feature: Mint document with varying options at the command line
     # Therefore, we're not testing anything except that our content made it
     # into our destination file.
     
-    When I run "mint <template> <layout> <style> content.md"
+    When I run `mint publish <template> <layout> <style> content.md`
     Then a file named "content.html" should exist
     And the file "content.html" should contain "This is a test"
     And a file named "<style file>" should exist
@@ -44,5 +44,5 @@ Feature: Mint document with varying options at the command line
       |          | -l pro | -s pro | ../../templates/pro/css/style.css     |
 
   Scenario: Mint document with non-existent template
-    When I run "mint -t nonexistent content.md"
-    Then the stdout should contain "Template 'nonexistent' does not exist."
+    When I run `mint publish -t nonexistent content.md`
+    Then the stderr should contain "Template 'nonexistent' does not exist."

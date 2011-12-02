@@ -58,7 +58,7 @@ module Mint
                 :mimetype => 'application/epub+zip',
                 :extension => 'epub'
 
-      # TODO: I'm not sure what I should actually be doing here
+      # TODO: I'm not if this is the right thing to do here
       FileUtils.rm_r document.destination_directory
     end
     

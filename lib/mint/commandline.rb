@@ -184,7 +184,7 @@ module Mint
     # @param [Hash, #[]] commandline_options a structured set of configuration options
     #   that will guide Mint.publish!
     # @return [void]
-    def self.mint(files, commandline_options)
+    def self.publish!(files, commandline_options)
       documents = []
       options = configuration_with commandline_options
       
