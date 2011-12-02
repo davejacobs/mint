@@ -124,6 +124,25 @@ module Mint
       end
     end
 
+    # def self.unzip!(directory)
+      # zip_regex = /.(zip|epub)$/
+      # destination = directory.gsub(zip_regex, '')
+      # qualifier = (1..1000).to_a.detect {|x| !File.exist? "#{destination}-#{x}" }
+      # qualified_destination = "#{destination}-#{qualifier}"
+
+      # Zip::ZipEntry.new(directory).extract(qualified_destination)
+
+      # Zip::ZipFile.open(directory, destination) do |dir|
+        # dir.extract(directory, destination)
+      # end
+      
+      # Zip::ZipFile.open "Directory.zip" do |zipfile|
+        # zipfile.file.foreach('.') do |file|
+          # puts zipfile.file.read(file) #"Directory/zip.rb")
+        # end
+      # end
+    # end
+    
     def self.create!
       options = Hashie::Mash.new
       yield options if block_given?

@@ -182,6 +182,42 @@ module Mint
       end
     end
 
+    # describe "#unzip!" do
+      # before do
+        # FileUtils.mkdir 'directory'
+        
+        # files = {
+          # first: 'First content',
+          # second: 'Second content',
+          # third: 'Third content'
+        # }
+
+        # files.each do |name, content|
+          # File.open "directory/#{name}", 'w' do |f|
+            # f.puts content
+          # end
+        # end
+
+        # EPub.zip! 'directory'
+      # end
+
+      # after do
+        # FileUtils.rm 'directory.zip'
+        # FileUtils.rm_r 'directory'
+      # end
+
+      # it "uncompresses the named file into a directory" do
+        # File.exist?('directory').should be_false
+
+        # EPub.unzip! 'directory.zip'
+
+        # File.exist?('directory').should be_true
+        # File.exist?('directory/first').should be_true
+        # File.exist?('directory/second').should be_true
+        # File.exist?('directory/third').should be_true
+      # end
+    # end
+
     describe "#create!" do
       before do
         EPub.should_receive(:create_from_template!).and_return
