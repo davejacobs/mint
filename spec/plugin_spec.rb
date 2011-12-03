@@ -108,7 +108,7 @@ describe Mint do
           third_plugin.should_receive(callback).never
         end
         
-        it "retruns the parameter text" do
+        it "returns the parameter text" do
           Mint.activate_plugin! first_plugin
           Mint.send(callback, 'text').should == 'first'
         end
@@ -121,7 +121,7 @@ describe Mint do
           third_plugin.should_receive(callback).never
         end
         
-        it "retruns the parameter text" do
+        it "returns the parameter text" do
           Mint.send(callback, 'text').should == 'text'
         end
       end
@@ -153,7 +153,7 @@ describe Mint do
         third_plugin.should_receive(:after_publish).never
       end
       
-      it "retruns the parameter text" do
+      it "iterates across all active plugins in order" do
         Mint.activate_plugin! first_plugin
         Mint.after_publish('fake document')
       end
@@ -166,7 +166,7 @@ describe Mint do
         third_plugin.should_receive(:after_publish).never
       end
       
-      it "calls each plugin in order" do
+      it "does not iterate over any plugins" do
         Mint.after_publish('fake document')
       end
     end
