@@ -38,7 +38,22 @@ describe Mint do
     end
   end
 
-  describe "#clear_plugins!" do
+  describe ".activate_plugin!" do
+    let(:plugin) { Class.new }
+
+    it "activates a plugin once" do
+      Mint.activate_plugin! plugin
+      Mint.activated_plugins.should == [plugin]
+    end
+
+    it "does not register a plugin more than once" do
+      Mint.activate_plugin! plugin
+      lambda { Mint.activate_plugin! plugin }.should_not change { Mint.activated_plugins }
+      Mint.activated_plugins.should == [plugin]
+    end
+  end
+
+  describe ".clear_plugins!" do
     let(:plugin) { Class.new }
 
     it "does nothing if no plugins are registered" do
@@ -48,6 +63,11 @@ describe Mint do
     it "removes all registered plugins" do
       Mint.register_plugin! plugin
       lambda { Mint.clear_plugins! }.should change { Mint.plugins.length }.by(-1)
+    end
+
+    it "removes all activated plugins" do
+      Mint.activate_plugin! plugin
+      lambda { Mint.clear_plugins! }.should change { Mint.activated_plugins.length }.by(-1)
     end
   end
 
@@ -81,6 +101,19 @@ describe Mint do
         end
       end
 
+      context "when plugins are activated, but no active plugins are specified" do
+        before do
+          first_plugin.should_receive(callback).and_return('first')
+          second_plugin.should_receive(callback).never
+          third_plugin.should_receive(callback).never
+        end
+        
+        it "retruns the parameter text" do
+          Mint.activate_plugin! first_plugin
+          Mint.send(callback, 'text').should == 'first'
+        end
+      end
+
       context "when active plugins are not specified" do
         before do
           first_plugin.should_receive(callback).never
@@ -110,6 +143,19 @@ describe Mint do
       it "iterates across all active plugins in order" do
         active_plugins = [first_plugin, second_plugin]
         Mint.after_publish('fake document', :plugins => active_plugins)
+      end
+    end
+
+    context "when plugins are activated, but no active plugins are specified" do
+      before do
+        first_plugin.should_receive(:after_publish).once
+        second_plugin.should_receive(:after_publish).never
+        third_plugin.should_receive(:after_publish).never
+      end
+      
+      it "retruns the parameter text" do
+        Mint.activate_plugin! first_plugin
+        Mint.after_publish('fake document')
       end
     end
 
