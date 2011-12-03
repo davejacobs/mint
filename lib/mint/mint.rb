@@ -184,7 +184,7 @@ module Mint
   #
   # @param [Document] document a Mint document
   # @return [void]
-  def self.publish!(document)
-    document.publish!
+  def self.publish!(document, opts={})
+    document.publish! opts
   end
 end

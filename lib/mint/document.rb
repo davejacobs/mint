@@ -171,7 +171,8 @@ module Mint
 
     # Writes all rendered content where a) possible, b) required,
     # and c) specified. Outputs to specified file.
-    def publish!(render_style=true, opts={})      
+    def publish!(opts={})      
+      options = { :render_style => true }.merge(opts)
       FileUtils.mkdir_p self.destination_directory
       File.open(self.destination_file, 'w+') do |f|
         f << self.render
@@ -181,7 +182,7 @@ module Mint
       # b) it actually needs rendering (i.e., it's in template form and
       # not raw, browser-parseable CSS) or it if it doesn't need
       # rendering but there is an explicit style_destination.
-      if render_style
+      if options[:render_style]
         FileUtils.mkdir_p style_destination_directory
         File.open(self.style_destination_file, 'w+') do |f|
           f << self.style.render

@@ -266,7 +266,7 @@ describe Mint do
             end
           end
 
-          document.publish!(true, :plugins => [plugin])
+          document.publish! :plugins => [plugin]
 
           File.exist?(document.destination_file).should be_false
           File.exist?('first-half.html').should be_true
@@ -291,7 +291,7 @@ describe Mint do
             end
           end
 
-          document.publish!(true, :plugins => [plugin])
+          document.publish! :plugins => [plugin]
 
           File.read(document.style.source_file).should =~ /\#container/
         end
@@ -309,7 +309,7 @@ describe Mint do
               end
 
               lambda do
-                document.publish!(true, :plugins => [plugin])
+                document.publish! :plugins => [plugin]
               end.should raise_error(InvalidPluginAction)
             end
           end
@@ -327,7 +327,7 @@ describe Mint do
               end
             end
 
-            document.publish!(true, :plugins => [plugin])
+            document.publish! :plugins => [plugin]
 
             File.exist?('destination').should be_false
             File.exist?('book').should be_true
@@ -352,7 +352,7 @@ describe Mint do
               end
             end
 
-            document.publish!(true, :plugins => [plugin])
+            document.publish! :plugins => [plugin]
 
             File.exist?('destination').should be_true
             File.exist?('book.zip').should be_false
@@ -380,7 +380,7 @@ describe Mint do
               end
             end
 
-            document.publish!(true, :plugins => [plugin])
+            document.publish! :plugins => [plugin]
 
             File.exist?('styles').should be_false
             File.exist?('looks').should be_true

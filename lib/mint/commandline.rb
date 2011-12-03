@@ -194,7 +194,7 @@ module Mint
       # change detection
       render_style = true
       files.each do |file|
-        Document.new(file, options).publish!(render_style)
+        Document.new(file, options).publish! :render_style => render_style
         render_style = false
       end
     end
