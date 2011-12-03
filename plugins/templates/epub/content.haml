@@ -24,24 +24,23 @@
   %manifest
     %item{ :id => 'ncx',
            :href => ncx_file,
-           'media-type' => 'application/x-dtbncx+xml' }
+           'media-type' => 'application/x-dtbncx+xml' }/
 
-    - style_files.each do |file|
-      %item{ :id => 'style',
-             :href => file,
-             'media-type' => 'text/css' }
+    %item{ :id => 'style',
+           :href => style_file,
+           'media-type' => 'text/css' }/
 
     %item{ :id => 'title',
            :href => title_file,
-           'media-type' => 'application/xhtml+xml' }
+           'media-type' => 'application/xhtml+xml' }/
   
     - chapters.each do |chapter|
-      %item{ :id => chapter[:name],
+      %item{ :id => chapter[:id],
         :href => chapter[:file],
-        'media-type' =>  'application/xhtml+xml' }
+        'media-type' =>  'application/xhtml+xml' }/
   
   %spine(toc='ncx')
-    %itemref(idref='title')
+    %itemref(idref='title')/
 
     - chapters.each do |chapter|
-      %itemref{ :idref => chapter[:name], :href => chapter[:file] }
+      %itemref{ :idref => chapter[:id] }/

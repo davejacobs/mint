@@ -5,9 +5,23 @@ require 'spec_helper'
 require 'mint/plugins/epub'
 
 module Mint
+  describe Document do
+    describe "#chapters" do
+      it "splits a document's final text into chapters and maps onto IDs" do
+        # TODO: Clean up these long lines
+        chapters = Document.new('content.md').chapters
+        chapters[1].should =~ /This is just a test.*Paragraph number two/m 
+        chapters[2].should =~ /Third sentence.*Fourth sentence/m
+      end
+    end
+  end
+
   describe EPub do
     describe "#after_publish" do
-      let(:document) { Document.new 'content.md', :destination => 'directory' }
+      let(:document) do
+        Document.new 'content.md', :destination => 'directory'
+      end
+
       before do
         document.publish!
         document_length = File.read('directory/content.html').length
@@ -20,12 +34,25 @@ module Mint
         FileUtils.rm_r 'directory.epub'
       end
 
+      it "does nothing if no destination is specified" do
+        invalid_document = Document.new 'content.md'
+        lambda do
+          EPub.after_publish(invalid_document)
+        end.should raise_error(InvalidDocumentError)
+      end
+
       it "replaces the monolithic published file with a packaged ePub file" do
         File.exist?('directory/content.html').should be_false
         File.exist?('directory.epub').should be_true
       end
 
-      it "ensures all files were compressed using PKZIP"
+      it "produces a valid ePub file" do
+        pending "need to integrate epubcheck script if found on system"
+      end
+
+      it "ensures all files were compressed using PKZIP" do
+        File.read('directory.epub')[0..1].should == 'PK'
+      end
 
       context "when the ePub file is unzipped" do
         before do
@@ -68,22 +95,6 @@ module Mint
 
         it "contains an NCX file with book spine and TOC" do
           File.exist?('directory/OPS/toc.ncx').should be_true
-        end
-
-        it "contains that the OPF refers to the NCX" do
-          pending
-
-          opf_text = File.read 'directory/OPS/content.opf'
-          opf_xml = Nokogiri::XML::Document.parse opf_text
-
-          # <manifest>
-          #   <item id="ncx" href="toc.ncx" 
-          #         media-type="application/x-dtbncx+xml" />
-          # </manifest>
-        end
-
-        it "ensures that OPF and NCX info match" do
-          # For docTitle, docAuthor, and meta name="dtb:uid"
         end
 
         it "splits the document into chapters" do
@@ -168,6 +179,54 @@ module Mint
       it "creates a mimetype entry if specified" do
         pending "a more robust Zip testing strategy"
         EPub.zip! 'directory', :mimetype => 'text/epub'
+      end
+    end
+
+    describe "#create!" do
+      before do
+        EPub.should_receive(:create_from_template!).and_return
+      end
+
+      it "accepts a block for configuration options" do
+        lambda do
+          EPub.create! do |file|
+            file.type = 'container'
+          end
+        end.should_not raise_error
+      end
+
+      it "render a container file" do
+        EPub.should_receive(:container_defaults).once.and_return({})
+        EPub.create! do |file|
+          file.type = 'container'
+        end
+      end
+
+      it "render a content file" do
+        EPub.should_receive(:content_defaults).once.and_return({})
+        EPub.create! do |file|
+          file.type = 'content'
+        end
+      end
+
+      it "render a table of contents file" do
+        EPub.should_receive(:toc_defaults).once.and_return({})
+        EPub.create! do |file|
+          file.type = 'toc'
+        end
+      end
+
+      it "defaults to a type of 'container'" do
+        EPub.should_receive(:container_defaults).once.and_return({})
+        EPub.create!
+      end
+    end
+
+    describe "#create_chapters!" do
+      it "calls #create_chapter! for each chapter" do
+        EPub.should_receive(:create_chapter!).once.ordered.with(1, 'text1')
+        EPub.should_receive(:create_chapter!).once.ordered.with(2, 'text2')
+        EPub.create_chapters!(1 => 'text1', 2 => 'text2')
       end
     end
 

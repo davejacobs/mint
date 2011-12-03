@@ -1,4 +1,5 @@
 require 'nokogiri'
+require 'hashie'
 require 'zip/zip'
 require 'zip/zipfilesystem'
 
@@ -7,31 +8,49 @@ require 'zip/zipfilesystem'
 # to follow.
 
 module Mint
+  META_DIR = 'META-INF'
+  CONTENT_DIR = 'OPS'
+
+  # Add chapters to document -- this is probably not a sustainable pattern
+  # for all plugins, but it's useful here.
+  class Document
+    def chapters
+      html_document = Nokogiri::HTML::Document.parse render
+      chapter_contents = EPub.split_on(html_document, 'h2').map &:to_s
+      chapter_ids = (1..chapter_contents.length).to_a
+      chapters = Hash[chapter_ids.zip chapter_contents]
+    end
+  end
+
   class InvalidDocumentError < StandardError; end
 
   class EPub < Plugin
     def self.after_publish(document)
-      # Doesn't currently follow simlinks
-      return if document.destination_directory == Dir.getwd
+      # This check doesn't currently follow simlinks
+      if document.destination_directory == Dir.getwd
+        raise InvalidDocumentError 
+      end
 
       Dir.chdir document.destination_directory do
-        html_text = File.read document.destination_file
-        html_document = Nokogiri::HTML::Document.parse html_text
-        *chapters = self.split_on(html_document, 'h2')
-        
+        metadata = document.metadata
+        chapters = document.chapters
 
-        FileUtils.mkdir 'META-INF'
-        FileUtils.mkdir 'OPS'
+        prepare_directory!
+        create_chapters! chapters
 
-        render :container, :to => 'META-INF/container.xml'
-        render :opf, :to => 'OPS/content.opf'
-        render :ncx, :to => 'OPS/toc.ncx'
-        render :chapters, :to => 'chapter-X.html'
+        create! do |container|
+          container.type = 'container'
+          container.locals = { chapters: chapters }
+        end
 
-        chapters.each_with_index do |chapter, i|
-          File.open "OPS/chapter-#{i + 1}.html", 'w' do |file|
-            file << chapter.to_s
-          end
+        create! do |content|
+          content.type = 'content'
+          content.locals = { chapters: chapters }
+        end
+
+        create! do |toc|
+          toc.type = 'toc'
+          toc.locals = { chapters: chapters }
         end
       end
 
@@ -39,7 +58,7 @@ module Mint
                 :mimetype => 'application/epub+zip',
                 :extension => 'epub'
 
-      # TODO: I'm not sure what I should actually be doing here
+      # TODO: I'm not if this is the right thing to do here
       FileUtils.rm_r document.destination_directory
     end
     
@@ -105,58 +124,118 @@ module Mint
       end
     end
 
-    def self.render(type, locals={})
-      case type
-      when :container
-        defaults = {
-          opf_file: 'opf-file'
+    def self.create!
+      options = Hashie::Mash.new
+      yield options if block_given?
+
+      type = options[:type] || 'container'
+
+      default_options = 
+        case type.to_sym
+        when :container
+          container_defaults
+        when :content
+          content_defaults
+        when :toc
+          toc_defaults
+        else
+          {}
+        end
+
+      render_options = default_options.merge options
+      create_from_template! render_options
+    end
+
+    def self.create_chapters!(chapters)
+      chapters.each do |id, text| 
+        create_chapter!(id, text)
+      end
+    end
+    
+    private
+
+    def self.create_from_template!(opts={})
+      template_file = "#{EPub.template_directory}/#{opts[:from]}"
+      renderer = Tilt.new template_file, :ugly => false
+      content = renderer.render Object.new, opts[:locals]
+
+      File.open(opts[:to], 'w') do |f|
+        f << content
+      end
+    end
+
+    def self.prepare_directory!
+      FileUtils.mkdir META_DIR
+      FileUtils.mkdir CONTENT_DIR
+    end
+
+    def self.chapter_filename(id)
+      "OPS/chapter-#{id}.html"
+    end
+
+    # def self.metadata_from(document)
+      # document.metadata
+    # end
+
+    # def self.chapters_from(document)
+      # html_text = File.read document.destination_file
+      # html_document = Nokogiri::HTML::Document.parse html_text
+      # chapter_contents = self.split_on(html_document, 'h2')
+      # chapter_ids = (1..chapters.length).map {|x| "chapter-#{x}" }
+      # chapters = Hash[chapter_ids.zip chapter_contents]
+    # end
+
+    def self.create_chapter!(id, text)
+      File.open chapter_filename(id), 'w' do |file|
+        file << text
+      end
+    end
+
+    def self.container_defaults
+      defaults = {
+        from: 'container.haml',
+        to: "#{META_DIR}/container.xml",
+        locals: {
+          opf_file: 'OPS/content.opf'
         }
-        locals = defaults.merge locals
-        render_template('container.haml', 'META-INF/container.xml', locals)
-      when :opf
-        defaults = {
-          title: 'Title',
+      }
+    end
+
+    def self.content_defaults
+      defaults = {
+        from: 'content.haml',
+        to: "#{CONTENT_DIR}/content.opf",
+        locals: {
+          title: 'Untitled',
           language: 'English',
-          short_title: 'T',
-          uuid: '1234',
-          description: 'description',
-          date: '12/31/09',
+          short_title: 'Untitled',
+          uuid: '1',
+          description: 'No description',
+          date: Date.today,
           creators: [{file_as: '', role: ''}],
           contributors: [{file_as: '', role: ''}],
-          publisher: 'O\'reilly',
-          genre: 'Fiction',
-          rights: 'Rights',
-          ncx_file: 'file',
-          style_files: [1, 2, 3, 4],
-          title_file: 'title.title',
-          chapters: [{ name: '', file: '' }]
+          publisher: '',
+          genre: 'Non-fiction',
+          rights: 'All Rights Reserved',
+          ncx_file: 'toc.ncx',
+          style_file: 'style.css',
+          title_file: 'title.html',
+          chapters: [{ id: '', file: '' }]
         }
-        locals = defaults.merge locals
-        render_template('opf.haml', 'OPS/content.opf', locals)
-      when :ncx
-        defaults = {
+      }
+    end
+
+    def self.toc_defaults
+      defaults = {
+        from: 'toc.haml',
+        to: "#{CONTENT_DIR}/toc.ncx",
+        locals: {
           uuid: '',
           title: 'Title',
           title_file: 'title.title',
           chapters: [{ name: '', file: '' }]
         }
-        locals = defaults.merge locals
-        render_template('ncx.haml', 'OPS/toc.ncx', locals)
-      when :chapter
-        render_template('container.haml', 'OPS/container.xml')
-      end
-    end
-
-    private
-
-    def self.render_template(file, destination_file, locals={})
-      template_file = "#{EPub.template_directory}/#{file}"
-      renderer = Tilt.new template_file, :ugly => false
-      content = renderer.render Object.new, locals
-
-      File.open(destination_file, 'w') do |f|
-        f << content
-      end
+      }
     end
   end
 end
