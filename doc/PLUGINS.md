@@ -17,6 +17,10 @@ I have two competing goals to balance:
 
 Ideas
 =====
+=======
+With those goals in mind, my plugin system is going to work like this:
+
+  mint PLUGIN several named files --option1 param --option2 param
 
 1. **The lightweight option: Bash interpolation.** `mint epub publish 
    file --option1 --option2` calls `mint-epub publish file --option2`
@@ -144,4 +148,3 @@ The configuration:
           directory: /home/david/example.com/documents
       - my-blog:
         # ... etc., etc.
-

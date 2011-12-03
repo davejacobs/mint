@@ -7,29 +7,47 @@ module Mint
     @@plugins.to_a
   end
 
+  def self.activated_plugins
+    @@activated_plugins ||= Set.new
+    @@activated_plugins.to_a
+  end
+
   def self.register_plugin!(plugin)
     @@plugins ||= Set.new
     @@plugins << plugin
   end
 
-  def self.clear_plugins!
-    @@plugins.clear
+  def self.activate_plugin!(plugin)
+    @@activated_plugins ||= Set.new
+    @@activated_plugins << plugin
   end
 
-  def self.before_render(plain_text)
-    plugins.reduce(plain_text) do |intermediate, plugin|
+  def self.clear_plugins!
+    defined?(@@plugins) && @@plugins.clear
+    defined?(@@activated_plugins) && @@activated_plugins.clear
+  end
+
+  def self.template_directory(plugin)
+    Mint.root + '/plugins/templates/' + plugin.underscore
+  end
+
+  def self.before_render(plain_text, opts={})
+    active_plugins = opts[:plugins] || Mint.activated_plugins
+    active_plugins.reduce(plain_text) do |intermediate, plugin|
       plugin.before_render(intermediate)
     end
   end
 
-  def self.after_render(html_text)
-    plugins.reduce(html_text) do |intermediate, plugin|
+  def self.after_render(html_text, opts={})
+    active_plugins = opts[:plugins] || Mint.activated_plugins
+    active_plugins.reduce(html_text) do |intermediate, plugin|
       plugin.after_render(intermediate)
     end
   end
 
-  def self.after_publish(document)
-    plugins.each do |plugin|
+  def self.after_publish(document, opts={})
+    active_plugins = opts[:plugins] || Mint.activated_plugins
+    active_plugins.each do |plugin|
       plugin.after_publish(document)
     end
   end
@@ -39,7 +57,16 @@ module Mint
       Mint.register_plugin! plugin
     end
 
-    def commandline_options
+    def self.underscore(opts={})
+      opts[:ignore_prefix] ||= true
+      Helpers.underscore self.name, :ignore_prefix => opts[:ignore_prefix]
+    end
+
+    def self.template_directory
+      Mint.template_directory(self)
+    end
+
+    def self.commandline_options
     end
 
     # Supports:

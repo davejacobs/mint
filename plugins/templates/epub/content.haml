@@ -1,0 +1,46 @@
+!!! XML
+%package(version='2.0' xmlns='http://www.idpf.org/2007/opf' unique-identifier='Prototype')
+  %metadata{ 'xmlns:dc' => 'http://purl.org/dc/elements/1.1/',
+             'xmlns:dcterms' => 'http://purl.org/dc/terms/',
+             'xmlns:opf' => 'http://www.idpf.org/2007/opf',
+             'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance' }
+  
+    %dc:title= title
+    %dc:language{ 'xsi:type' => 'dcterms:RFC3066' }= language
+    %dc:identifier{ :id => short_title }= uuid
+    %dc:description= description
+    %dc:date{ 'xsi:type' => 'dcterms:W3CDTF' }= date
+    
+    - creators.each do |creator|
+      %dc:creator{ 'opf:file-as' => creator[:file_as], 'opf:role' => creator[:role] }
+    - contributors.each do |contributor|
+      %dc:contributor{ 'opf:file-as' => contributor[:file_as],
+        'opf:role' => contributor[:role] }
+    
+    %dc:publisher= publisher
+    %dc:type= genre
+    %dc:rights= rights
+  
+  %manifest
+    %item{ :id => 'ncx',
+           :href => ncx_file,
+           'media-type' => 'application/x-dtbncx+xml' }/
+
+    %item{ :id => 'style',
+           :href => style_file,
+           'media-type' => 'text/css' }/
+
+    %item{ :id => 'title',
+           :href => title_file,
+           'media-type' => 'application/xhtml+xml' }/
+  
+    - chapters.each do |chapter|
+      %item{ :id => chapter[:id],
+        :href => chapter[:file],
+        'media-type' =>  'application/xhtml+xml' }/
+  
+  %spine(toc='ncx')
+    %itemref(idref='title')/
+
+    - chapters.each do |chapter|
+      %itemref{ :idref => chapter[:id] }/

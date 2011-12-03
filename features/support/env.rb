@@ -4,7 +4,7 @@ $LOAD_PATH.unshift File.expand_path('../../../lib', __FILE__)
 
 module ArubaOverrides
   def detect_ruby(cmd)
-    if cmd =~ /^mint /
+    if cmd =~ /^mint/
       "ruby -I ../../lib -S ../../bin/#{cmd}"
     else
       super(cmd)

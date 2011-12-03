@@ -1,9 +1,23 @@
 require 'pathname'
 require 'tempfile'
 require 'yaml'
+require 'active_support/core_ext/string/inflections'
 
 module Mint
   module Helpers    
+    def self.underscore(obj, opts={})
+      namespaces = obj.to_s.split('::').map do |namespace|
+        if opts[:ignore_prefix]
+          namespace[0..1].downcase + namespace[2..-1]
+        else
+          namespace
+        end
+      end
+
+      string = opts[:namespaces] ? namespaces.join('::') : namespaces.last
+      string.underscore
+    end
+
     # Transforms a String into a URL-ready slug. Properly handles
     # ampersands, non-alphanumeric characters, extra hyphens and spaces.
     #

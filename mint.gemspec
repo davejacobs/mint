@@ -62,6 +62,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'less'
   s.add_dependency 'radius'
   s.add_dependency 'markaby'
+  s.add_dependency 'active_support'
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'cucumber'
   s.add_development_dependency 'aruba'

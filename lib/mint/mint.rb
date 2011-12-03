@@ -141,11 +141,10 @@ module Mint
     find_files = lambda {|x| Pathname.glob "#{x.to_s}.*" }
     acceptable = lambda {|x| x.to_s =~ /#{Mint.formats.join '|'}/ }
 
-    template = Mint.path(true).map(&file_name).map(&find_files).flatten.
-      select(&acceptable).select(&:exist?).first.to_s
-    raise TemplateNotFoundException unless template
-
-    template
+    Mint.path(true).map(&file_name).map(&find_files).flatten.
+      select(&acceptable).select(&:exist?).first.tap do |template|
+      raise TemplateNotFoundException unless template
+    end.to_s
   end
 
   # Checks (non-rigorously) to see if the file is somewhere on the
@@ -185,7 +184,7 @@ module Mint
   #
   # @param [Document] document a Mint document
   # @return [void]
-  def self.publish!(document)
-    document.publish!
+  def self.publish!(document, opts={})
+    document.publish! opts
   end
 end

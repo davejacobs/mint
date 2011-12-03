@@ -85,7 +85,7 @@ describe Mint do
   # to this non-OO style of publishing, and this is the transition
   context "when it publishes a document" do
     let(:document) { Mint::Document.new @content_file }
-    before { Mint.publish!(document) }
+    before { Mint.publish! document }
     subject { document }
 
     its(:destination_file_path) { should exist }
