@@ -1,11 +1,3 @@
-# This is a test of the mint binary. It only covers named templates 
-# (layouts and styles) that are included with Mint or that are passed 
-# in via relative path on document creation. Further testing might include:
-#
-# - MINT_PATH & scope selection
-# - File configuration
-# - Header parsing
-
 Feature: Mint document with varying options at the command line
   As a writer
   I want to create a document at the command line from plain text
@@ -26,10 +18,6 @@ Feature: Mint document with varying options at the command line
     And a file named "content.html" should exist
 
   Scenario Outline: Mint document with named template, layout & style
-    # Note: For all rendering, we're assuming Tilt is doing its own testing.
-    # Therefore, we're not testing anything except that our content made it
-    # into our destination file.
-    
     When I run `mint publish <template> <layout> <style> content.md`
     Then a file named "content.html" should exist
     And the file "content.html" should contain "This is a test"
