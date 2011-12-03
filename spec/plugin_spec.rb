@@ -87,34 +87,34 @@ describe Mint do
       let(:second_plugin) { Class.new(Mint::Plugin) }
       let(:third_plugin) { Class.new(Mint::Plugin) }
 
-      context "when active plugins are specified" do
+      context "when plugins are specified" do
         before do
           first_plugin.should_receive(callback).ordered.and_return('first')
           second_plugin.should_receive(callback).ordered.and_return('second')
           third_plugin.should_receive(callback).never
         end
 
-        it "reduces .#{callback} across all active plugins in order" do
-          active_plugins = [first_plugin, second_plugin]
-          Mint.send(callback, 'text', 
-                    :plugins => active_plugins).should == 'second'
+        it "reduces .#{callback} across all specified plugins in order" do
+          plugins = [first_plugin, second_plugin]
+          Mint.send(callback, 'text', :plugins => plugins).should == 'second'
         end
       end
 
-      context "when plugins are activated, but no active plugins are specified" do
+      context "when plugins are activated, but no plugins are specified" do
         before do
-          first_plugin.should_receive(callback).and_return('first')
-          second_plugin.should_receive(callback).never
+          first_plugin.should_receive(callback).ordered.and_return('first')
+          second_plugin.should_receive(callback).ordered.and_return('second')
           third_plugin.should_receive(callback).never
         end
         
-        it "returns the parameter text" do
+        it "reduces .#{callback} across all activated plugins in order" do
           Mint.activate_plugin! first_plugin
-          Mint.send(callback, 'text').should == 'first'
+          Mint.activate_plugin! second_plugin
+          Mint.send(callback, 'text').should == 'second'
         end
       end
 
-      context "when active plugins are not specified" do
+      context "when plugins are not specified" do
         before do
           first_plugin.should_receive(callback).never
           second_plugin.should_receive(callback).never
@@ -133,33 +133,34 @@ describe Mint do
     let(:second_plugin) { Class.new(Mint::Plugin) }
     let(:third_plugin) { Class.new(Mint::Plugin) }
 
-    context "when active plugins are specified" do
+    context "when plugins are specified" do
       before do
         first_plugin.should_receive(:after_publish).ordered
         second_plugin.should_receive(:after_publish).ordered
         third_plugin.should_receive(:after_publish).never
       end
 
-      it "iterates across all active plugins in order" do
-        active_plugins = [first_plugin, second_plugin]
-        Mint.after_publish('fake document', :plugins => active_plugins)
+      it "iterates across all specified plugins in order" do
+        plugins = [first_plugin, second_plugin]
+        Mint.after_publish('fake document', :plugins => plugins)
       end
     end
 
-    context "when plugins are activated, but no active plugins are specified" do
+    context "when plugins are activated, but no plugins are specified" do
       before do
-        first_plugin.should_receive(:after_publish).once
-        second_plugin.should_receive(:after_publish).never
+        first_plugin.should_receive(:after_publish).ordered
+        second_plugin.should_receive(:after_publish).ordered
         third_plugin.should_receive(:after_publish).never
       end
       
-      it "iterates across all active plugins in order" do
+      it "iterates across all activated plugins in order" do
         Mint.activate_plugin! first_plugin
+        Mint.activate_plugin! second_plugin
         Mint.after_publish('fake document')
       end
     end
 
-    context "when active plugins are not specified" do
+    context "when plugins are not specified" do
       before do
         first_plugin.should_receive(:after_publish).never
         second_plugin.should_receive(:after_publish).never
