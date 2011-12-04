@@ -15,6 +15,9 @@ I have two competing goals to balance:
 - It would be nice if plugins could be written in any language, if they didn't want to
   have control over pre-rendered doc and other features only available to a Ruby script.
 
+Ideas
+=====
+
 1. **The lightweight option: Bash interpolation.** `mint epub publish 
    file --option1 --option2` calls `mint-epub publish file --option2`
    and consumes `option1`.
@@ -141,35 +144,3 @@ The configuration:
           directory: /home/david/example.com/documents
       - my-blog:
         # ... etc., etc.
-
-<<<<<<< HEAD
-### Bringing it together ###
-
-This document is inconsistent because I have a lot of competing goals
-desgining this plugin system.
-
-How do I want to build a plugin?
-
-- Build a full-fledged gem with its own bin, lib, 
-  templates directories. Install via `gem install`
-
-- Put a mint-prefixed executable file on my PATH. Expect templates, etc.,
-  to be generated into a directory -- global or user level. This puts
-  undue burden on plugin designer to generate templates from a code file.
-  Probably not good.
-
-- Some plugins are prepackaged and come with Mint. I have the option
-  of including more plugins in the default install, if they're good
-  plugins. Mint should provide an infrastructure for deciding whether
-  a plugin is a default plugin or not and delegating directories
-  appropriately.
-
-### Intellectual property plugins ###
-
-Or you could connect to a service to protect your intellectual property rights:
-
-    mint copyright
-
-I don't know if this is even possible, but wouldn't it be cool to generate a unique number based on the date, time, and contents of any article published and assign it to the article as a hash of all its metadata. The number would be so complex that you could not generate it without all the appropriate data. And using all the appropriate metadata (including date) would give the same number every time. But somehow, the algorithm would have to never run after the current date, so that potential plagiarists could not figure out what the hash should be for a date previous to the date you published it. That idea needs work, but I feel like maybe it could work out, probably as a separate service.
-=======
->>>>>>> ac10f29d8987b9cc7efb8902a73778f8f644d3d4
