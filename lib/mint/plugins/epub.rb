@@ -2,6 +2,8 @@ require 'nokogiri'
 require 'hashie'
 require 'zip/zip'
 require 'zip/zipfilesystem'
+require 'active_support/core_ext/hash/deep_merge'
+require 'active_support/core_ext/hash/keys'
 
 # Note: This code is not as clean as I want it to be. It is an example
 # plugin with which I'm developing the Mint plugin system. Code cleanup
@@ -51,6 +53,10 @@ module Mint
         create! do |toc|
           toc.type = 'toc'
           toc.locals = { chapters: chapters }
+        end
+
+        create! do |title|
+          title.type = 'title'
         end
       end
 
@@ -127,6 +133,7 @@ module Mint
     def self.create!
       options = Hashie::Mash.new
       yield options if block_given?
+      options = options.to_hash.symbolize_keys
 
       type = options[:type] || 'container'
 
@@ -142,8 +149,7 @@ module Mint
           {}
         end
 
-      render_options = default_options.merge options
-      create_from_template! render_options
+      create_from_template! default_options.deep_merge(options)
     end
 
     def self.create_chapters!(chapters)
