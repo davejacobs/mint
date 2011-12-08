@@ -1,5 +1,5 @@
 !!! XML
-%package(version='2.0' xmlns='http://www.idpf.org/2007/opf' unique-identifier='Prototype')
+%package(version='2.0' xmlns='http://www.idpf.org/2007/opf' unique-identifier=uuid)
   %metadata{ 'xmlns:dc' => 'http://purl.org/dc/elements/1.1/',
              'xmlns:dcterms' => 'http://purl.org/dc/terms/',
              'xmlns:opf' => 'http://www.idpf.org/2007/opf',
@@ -7,7 +7,7 @@
   
     %dc:title= title
     %dc:language{ 'xsi:type' => 'dcterms:RFC3066' }= language
-    %dc:identifier{ :id => short_title }= uuid
+    %dc:identifier{ :id => uuid }= short_title
     %dc:description= description
     %dc:date{ 'xsi:type' => 'dcterms:W3CDTF' }= date
     
