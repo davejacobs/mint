@@ -41,8 +41,9 @@ else
   # been passed a set of documents, so parse the commandline options, 
   # merge them with the config options, and start minting the 
   # document list.
+  
   begin
-    system "mint-#{ARGV.first}"
+    system "mint-#{ARGV.first} #{ARGV[1..-1].join ' '}"
   rescue
     Mint::CommandLine.help(parser.help)
   end
