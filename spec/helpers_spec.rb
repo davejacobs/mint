@@ -106,6 +106,21 @@ module Mint
       end
     end
 
+    describe "#listify" do
+      it "joins a list of three or more with an ampersand, without the Oxford comma" do
+        Helpers.listify(['Alex', 'Chris', 'John']).should ==
+          'Alex, Chris & John'
+      end
+
+      it "joins a list of two with an ampersand" do
+        Helpers.listify(['Alex', 'Chris']).should == 'Alex & Chris'
+      end
+
+      it "does not do anything to a list of one" do
+        Helpers.listify(['Alex']).should == 'Alex'
+      end
+    end
+
     describe "#normalize_path" do
       it "handles two files in the same directory" do
         path1 = '~/file1'

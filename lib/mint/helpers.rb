@@ -69,6 +69,14 @@ module Mint
       end
     end
 
+    def self.listify(list)
+      if list.length > 2
+        list[0..-2].join(', ') + ' & ' + list.last
+      else
+        list.join(' & ')
+      end
+    end
+
     # Returns the relative path to to_directory from from_directory. 
     # If to_directory and from_directory have no parents in common besides 
     # /, returns the absolute directory of to_directory. Assumes no symlinks.
