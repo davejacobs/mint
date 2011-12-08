@@ -145,6 +145,8 @@ module Mint
           content_defaults
         when :toc
           toc_defaults
+        when :title
+          title_defaults
         else
           {}
         end
@@ -240,6 +242,17 @@ module Mint
           title: 'Title',
           title_file: 'title.title',
           chapters: [{ name: '', file: '' }]
+        }
+      }
+    end
+
+    def self.title_defaults
+      defaults = {
+        from: 'title.haml',
+        to: "#{CONTENT_DIR}/title.html",
+        locals: {
+          title: 'Untitled',
+          creators: ['Anonymous']
         }
       }
     end
