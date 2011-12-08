@@ -17,6 +17,7 @@ module Mint
       # This test doesn't cover any plugin transformations. Those
       # transformations are covered in the Plugin spec.
       its(:content) { should =~ /<p>This is just a test.<\/p>/ }
+      its(:metadata) { should == { 'metadata' =>  true } }
 
       # Render output
 
@@ -189,6 +190,37 @@ module Mint
       its(:stylesheet) { should == 'styles/style.css' }
 
       it_should_behave_like "all documents"
+    end
+
+    context "when dealing with metadata" do
+      let(:text) { "metadata: true\n\nReal text" }
+      describe ".metadata_chunk" do
+        it "extracts, but does not parse, metadata from text" do
+          Document.metadata_chunk(text).should == 'metadata: true'
+        end
+      end
+
+      describe ".metadata_from" do
+        it "parses a documents metadata if present" do
+          Document.metadata_from(text).should == { 'metadata' => true }
+        end
+
+        it "returns the empty string if a document has bad/no metadata" do
+          Document.metadata_from('No metadata here').should == {}
+        end
+      end
+
+      describe ".parse_metadata_from" do
+        it "separates text from its metadata if present" do
+          Document.parse_metadata_from(text).should ==
+            [{ 'metadata' => true }, 'Real text']
+        end
+
+        it "returns the entire text if no metadata is found" do
+          Document.parse_metadata_from('No metadata here').should ==
+            [{}, 'No metadata here']
+        end
+      end
     end
   end
 end

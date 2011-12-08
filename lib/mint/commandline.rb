@@ -184,7 +184,7 @@ module Mint
     # @param [Hash, #[]] commandline_options a structured set of configuration options
     #   that will guide Mint.publish!
     # @return [void]
-    def self.mint(files, commandline_options)
+    def self.publish!(files, commandline_options)
       documents = []
       options = configuration_with commandline_options
       
@@ -194,7 +194,7 @@ module Mint
       # change detection
       render_style = true
       files.each do |file|
-        Document.new(file, options).publish!(render_style)
+        Document.new(file, options).publish! :render_style => render_style
         render_style = false
       end
     end

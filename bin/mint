@@ -20,6 +20,11 @@ parser.parse!
 # Mint::CommandLine.send(command, commandline_options)
 
 case ARGV.first.downcase.to_sym
+when :publish
+  commandline_options.delete :verbose
+  commandline_options.delete :simulation
+  ARGV.shift
+  Mint::CommandLine.publish!(ARGV, commandline_options)
 when :help
   Mint::CommandLine.help(parser.help)
 when :install
@@ -37,14 +42,9 @@ else
   # merge them with the config options, and start minting the 
   # document list.
   
-  # begin
-  #   system "mint-#{ARGV.first}"
-
-  # rescue
-    # The Mint library can't parse these options
-    commandline_options.delete :verbose
-    commandline_options.delete :simulation
-
-    Mint::CommandLine.mint(ARGV, commandline_options)
-  # end
+  begin
+    system "mint-#{ARGV.first} #{ARGV[1..-1].join ' '}"
+  rescue
+    Mint::CommandLine.help(parser.help)
+  end
 end

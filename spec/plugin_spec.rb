@@ -1,9 +1,12 @@
 require 'spec_helper'
 
 describe Mint do
-  describe ".plugins" do
-    after { Mint.clear_plugins! }
+  # Remove unintended side effects of creating
+  # new plugins in other files.
+  before { Mint.clear_plugins! }
+  after { Mint.clear_plugins! }
 
+  describe ".plugins" do
     it "returns all registered plugins" do
       plugin = Class.new(Mint::Plugin)
       Mint.plugins.should == [plugin]
@@ -14,9 +17,14 @@ describe Mint do
     end
   end
 
+  describe ".activated_plugins" do
+    it "returns a list of plugins activated for a document"
+    it "returns a list of plugins activated for a set of documents"
+    it "returns a list of plugins activated for all documents"
+  end
+
   describe ".register_plugin!" do
     let(:plugin) { Class.new }
-    after { Mint.clear_plugins! }
 
     it "registers a plugin once" do
       Mint.register_plugin! plugin
@@ -27,6 +35,21 @@ describe Mint do
       Mint.register_plugin! plugin
       lambda { Mint.register_plugin! plugin }.should_not change { Mint.plugins }
       Mint.plugins.should == [plugin]
+    end
+  end
+
+  describe ".activate_plugin!" do
+    let(:plugin) { Class.new }
+
+    it "activates a plugin once" do
+      Mint.activate_plugin! plugin
+      Mint.activated_plugins.should == [plugin]
+    end
+
+    it "does not register a plugin more than once" do
+      Mint.activate_plugin! plugin
+      lambda { Mint.activate_plugin! plugin }.should_not change { Mint.activated_plugins }
+      Mint.activated_plugins.should == [plugin]
     end
   end
 
@@ -41,12 +64,15 @@ describe Mint do
       Mint.register_plugin! plugin
       lambda { Mint.clear_plugins! }.should change { Mint.plugins.length }.by(-1)
     end
+
+    it "removes all activated plugins" do
+      Mint.activate_plugin! plugin
+      lambda { Mint.clear_plugins! }.should change { Mint.activated_plugins.length }.by(-1)
+    end
   end
 
   describe ".template_directory" do
     let(:plugin) { Class.new(Mint::Plugin) }
-
-    after { Mint.clear_plugins! }
 
     it "gives access to a directory where template files can be stored" do
       plugin.should_receive(:name).and_return('DocBook')
@@ -55,20 +81,69 @@ describe Mint do
     end
   end
 
+  describe ".config_directory" do
+    let(:plugin) { Class.new(Mint::Plugin) }
+
+    it "gives access to a directory where template files can be stored" do
+      plugin.should_receive(:name).and_return('DocBook')
+      Mint.config_directory(plugin).should == 
+        Mint.root + '/plugins/config/doc_book'
+    end
+  end
+
+  describe ".commandline_options_file" do
+    let(:plugin) { Class.new(Mint::Plugin) }
+
+    it "gives access to a directory where template files can be stored" do
+      plugin.should_receive(:name).and_return('DocBook')
+      Mint.commandline_options_file(plugin).should == 
+        Mint.root + '/plugins/config/doc_book/syntax.yml'
+    end
+  end
+
   [:before_render, :after_render].each do |callback|
     describe ".#{callback}" do
       let(:first_plugin) { Class.new(Mint::Plugin) }
       let(:second_plugin) { Class.new(Mint::Plugin) }
+      let(:third_plugin) { Class.new(Mint::Plugin) }
 
-      before do
-        first_plugin.should_receive(callback).ordered.and_return('first')
-        second_plugin.should_receive(callback).ordered.and_return('second')
+      context "when plugins are specified" do
+        before do
+          first_plugin.should_receive(callback).ordered.and_return('first')
+          second_plugin.should_receive(callback).ordered.and_return('second')
+          third_plugin.should_receive(callback).never
+        end
+
+        it "reduces .#{callback} across all specified plugins in order" do
+          plugins = [first_plugin, second_plugin]
+          Mint.send(callback, 'text', :plugins => plugins).should == 'second'
+        end
       end
 
-      after { Mint.clear_plugins! }
+      context "when plugins are activated, but no plugins are specified" do
+        before do
+          first_plugin.should_receive(callback).ordered.and_return('first')
+          second_plugin.should_receive(callback).ordered.and_return('second')
+          third_plugin.should_receive(callback).never
+        end
+        
+        it "reduces .#{callback} across all activated plugins in order" do
+          Mint.activate_plugin! first_plugin
+          Mint.activate_plugin! second_plugin
+          Mint.send(callback, 'text').should == 'second'
+        end
+      end
 
-      it "reduces .#{callback} across all registered plugins in order" do
-        Mint.send(callback, 'text').should == 'second'
+      context "when plugins are not specified" do
+        before do
+          first_plugin.should_receive(callback).never
+          second_plugin.should_receive(callback).never
+          third_plugin.should_receive(callback).never
+        end
+        
+        it "returns the parameter text" do
+          Mint.send(callback, 'text').should == 'text'
+        end
       end
     end
   end
@@ -76,14 +151,45 @@ describe Mint do
   describe ".after_publish" do
     let(:first_plugin) { Class.new(Mint::Plugin) }
     let(:second_plugin) { Class.new(Mint::Plugin) }
+    let(:third_plugin) { Class.new(Mint::Plugin) }
 
-    after { Mint.clear_plugins! }
+    context "when plugins are specified" do
+      before do
+        first_plugin.should_receive(:after_publish).ordered
+        second_plugin.should_receive(:after_publish).ordered
+        third_plugin.should_receive(:after_publish).never
+      end
 
-    it "calls each registered plugin in order, passing it a document" do
-      first_plugin.should_receive(:after_publish).ordered.and_return(nil)
-      second_plugin.should_receive(:after_publish).ordered.and_return(nil)
+      it "iterates across all specified plugins in order" do
+        plugins = [first_plugin, second_plugin]
+        Mint.after_publish('fake document', :plugins => plugins)
+      end
+    end
 
-      Mint.after_publish('fake document')
+    context "when plugins are activated, but no plugins are specified" do
+      before do
+        first_plugin.should_receive(:after_publish).ordered
+        second_plugin.should_receive(:after_publish).ordered
+        third_plugin.should_receive(:after_publish).never
+      end
+      
+      it "iterates across all activated plugins in order" do
+        Mint.activate_plugin! first_plugin
+        Mint.activate_plugin! second_plugin
+        Mint.after_publish('fake document')
+      end
+    end
+
+    context "when plugins are not specified" do
+      before do
+        first_plugin.should_receive(:after_publish).never
+        second_plugin.should_receive(:after_publish).never
+        third_plugin.should_receive(:after_publish).never
+      end
+      
+      it "does not iterate over any plugins" do
+        Mint.after_publish('fake document')
+      end
     end
   end
 
@@ -113,8 +219,6 @@ describe Mint do
       @first_plugin = Class.new(Mint::Plugin)
       @second_plugin = Class.new(Mint::Plugin)
     end
-
-    after { Mint.clear_plugins! }
 
     describe ".underscore" do
       let(:plugin) { Class.new(Mint::Plugin) }
@@ -157,9 +261,7 @@ describe Mint do
         end
       end
 
-      it "returns a hash of options the plugin can take, including constraints" do
-
-      end
+      it "returns a hash of options the plugin can take, including constraints"
     end
 
     context "plugin callbacks" do
@@ -204,10 +306,6 @@ describe Mint do
           end.should change { document.name.length }.by(-1)
         end
 
-        it "allows changes to the document type" do
-          pending "figuring out what I actually meant by this"
-        end
-
         it "allows splitting up the document into two, without garbage" do
           plugin.instance_eval do
             def after_publish(document)
@@ -229,7 +327,7 @@ describe Mint do
             end
           end
 
-          document.publish!
+          document.publish! :plugins => [plugin]
 
           File.exist?(document.destination_file).should be_false
           File.exist?('first-half.html').should be_true
@@ -254,7 +352,8 @@ describe Mint do
             end
           end
 
-          document.publish!
+          document.publish! :plugins => [plugin]
+
           File.read(document.style.source_file).should =~ /\#container/
         end
 
@@ -271,7 +370,7 @@ describe Mint do
               end
 
               lambda do
-                document.publish!
+                document.publish! :plugins => [plugin]
               end.should raise_error(InvalidPluginAction)
             end
           end
@@ -283,14 +382,13 @@ describe Mint do
             plugin.instance_eval do
               def after_publish(document)
                 original = document.destination_directory
-                new = File.expand_path('book')
+                new = File.expand_path 'book'
                 FileUtils.mv original, new
                 document.destination = 'book'
               end
             end
 
-            document.publish!
-
+            document.publish! :plugins => [plugin]
             File.exist?('destination').should be_false
             File.exist?('book').should be_true
             document.destination_directory.should == File.expand_path('book')
@@ -314,7 +412,7 @@ describe Mint do
               end
             end
 
-            document.publish!
+            document.publish! :plugins => [plugin]
 
             File.exist?('destination').should be_true
             File.exist?('book.zip').should be_false
@@ -342,7 +440,7 @@ describe Mint do
               end
             end
 
-            document.publish!
+            document.publish! :plugins => [plugin]
 
             File.exist?('styles').should be_false
             File.exist?('looks').should be_true

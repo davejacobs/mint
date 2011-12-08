@@ -1,21 +1,20 @@
 require 'pathname'
 require 'tempfile'
 require 'yaml'
+require 'active_support/core_ext/string/inflections'
 
 module Mint
   module Helpers    
     def self.underscore(obj, opts={})
-      require 'active_support/core_ext/string/inflections'
-      temp_str = obj.to_s
-      string = 
-        # :ignore_first_letter option prevents snake-casing of words
-        # like ePub and iMac
+      namespaces = obj.to_s.split('::').map do |namespace|
         if opts[:ignore_prefix]
-          temp_str[0..1].downcase + temp_str[2..-1]
+          namespace[0..1].downcase + namespace[2..-1]
         else
-          temp_str
+          namespace
         end
+      end
 
+      string = opts[:namespaces] ? namespaces.join('::') : namespaces.last
       string.underscore
     end
 
@@ -67,6 +66,14 @@ module Mint
             v
           end
         syms
+      end
+    end
+
+    def self.listify(list)
+      if list.length > 2
+        list[0..-2].join(', ') + ' & ' + list.last
+      else
+        list.join(' & ')
       end
     end
 

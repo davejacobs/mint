@@ -7,33 +7,59 @@ module Mint
     @@plugins.to_a
   end
 
+  def self.activated_plugins
+    @@activated_plugins ||= Set.new
+    @@activated_plugins.to_a
+  end
+
   def self.register_plugin!(plugin)
     @@plugins ||= Set.new
     @@plugins << plugin
   end
 
+  def self.activate_plugin!(plugin)
+    @@activated_plugins ||= Set.new
+    @@activated_plugins << plugin
+  end
+
   def self.clear_plugins!
-    @@plugins.clear
+    defined?(@@plugins) && @@plugins.clear
+    defined?(@@activated_plugins) && @@activated_plugins.clear
   end
 
   def self.template_directory(plugin)
     Mint.root + '/plugins/templates/' + plugin.underscore
   end
 
-  def self.before_render(plain_text)
-    plugins.reduce(plain_text) do |intermediate, plugin|
+  def self.config_directory(plugin)
+    Mint.root + '/plugins/config/' + plugin.underscore
+  end
+
+  def self.commandline_options_file(plugin)
+    plugin.config_directory + '/syntax.yml'
+  end
+
+  def self.commandline_name(plugin)
+    plugin.underscore
+  end
+
+  def self.before_render(plain_text, opts={})
+    active_plugins = opts[:plugins] || Mint.activated_plugins
+    active_plugins.reduce(plain_text) do |intermediate, plugin|
       plugin.before_render(intermediate)
     end
   end
 
-  def self.after_render(html_text)
-    plugins.reduce(html_text) do |intermediate, plugin|
+  def self.after_render(html_text, opts={})
+    active_plugins = opts[:plugins] || Mint.activated_plugins
+    active_plugins.reduce(html_text) do |intermediate, plugin|
       plugin.after_render(intermediate)
     end
   end
 
-  def self.after_publish(document)
-    plugins.each do |plugin|
+  def self.after_publish(document, opts={})
+    active_plugins = opts[:plugins] || Mint.activated_plugins
+    active_plugins.each do |plugin|
       plugin.after_publish(document)
     end
   end
@@ -48,7 +74,20 @@ module Mint
       Helpers.underscore self.name, :ignore_prefix => opts[:ignore_prefix]
     end
 
-    def commandline_options
+    def self.template_directory
+      Mint.template_directory(self)
+    end
+
+    def self.config_directory
+      Mint.config_directory(self)
+    end
+
+    def self.commandline_options_file
+      Mint.commandline_options_file(self)
+    end
+
+    def self.commandline_name
+      Mint.commandline_name(self)
     end
 
     # Supports:

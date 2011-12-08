@@ -1,0 +1,26 @@
+!!! XML
+<!DOCTYPE ncx PUBLIC '-//NISO//DTD ncx 2005-1//EN' 'http://www.daisy.org/z3986/2005/ncx-2005-1.dtd'>
+
+%ncx(xmlns='http://www.daisy.org/z3986/2005/ncx/' version='2005-1')
+  %head
+    %meta(name='dtb:uid' content=uuid)
+    %meta(name='dtb:depth' content='1')
+    %meta(name='dtb:totalPageCount' content='0')
+    %meta(name='dtb:maxPageNumber' content='0')
+  
+  %docTitle
+    %text= title
+
+  %navMap
+    %navPoint(id='navpoint-1' playOrder=1)
+      %navLabel
+        %text= title
+      %content(src=title_file)
+    
+    - chapters.each_with_index do |content, id|
+      - idx = Integer(id) + 1
+      - order = idx + 1
+      %navPoint(id="navpoint-#{order}" playOrder=order)
+        %navLabel
+          %text= "Chapter #{idx}"
+        %content(src="chapter-#{idx}.html")

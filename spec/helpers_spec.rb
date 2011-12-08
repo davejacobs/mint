@@ -11,6 +11,16 @@ module Mint
         Helpers.underscore('EPub').should == 'e_pub'
         Helpers.underscore('EPub', :ignore_prefix => true).should == 'epub'
       end
+
+      it "allows for namespace removal" do
+        Helpers.underscore('Mint::EPub', 
+                           :namespaces => true).should == 'mint/e_pub'
+        Helpers.underscore('Mint::EPub', 
+                           :namespaces => false).should == 'e_pub'
+        Helpers.underscore('Mint::EPub', 
+                           :namespaces => true, 
+                           :ignore_prefix => true).should == 'mint/epub'
+      end
     end
     
     describe "#slugize" do
@@ -93,6 +103,21 @@ module Mint
         }
 
         Helpers.symbolize_keys(nested_map).should == expected_map
+      end
+    end
+
+    describe "#listify" do
+      it "joins a list of three or more with an ampersand, without the Oxford comma" do
+        Helpers.listify(['Alex', 'Chris', 'John']).should ==
+          'Alex, Chris & John'
+      end
+
+      it "joins a list of two with an ampersand" do
+        Helpers.listify(['Alex', 'Chris']).should == 'Alex & Chris'
+      end
+
+      it "does not do anything to a list of one" do
+        Helpers.listify(['Alex']).should == 'Alex'
       end
     end
 
