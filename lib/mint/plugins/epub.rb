@@ -18,9 +18,7 @@ module Mint
   class Document
     def chapters
       html_document = Nokogiri::HTML::Document.parse render
-      chapter_contents = EPub.split_on(html_document, 'h2').map &:to_s
-      chapter_ids = (1..chapter_contents.length).to_a
-      chapters = Hash[chapter_ids.zip chapter_contents]
+      EPub.split_on(html_document, 'h2').map &:to_s
     end
   end
 
@@ -38,6 +36,15 @@ module Mint
         chapters = document.chapters
 
         prepare_directory!
+
+        layout = Tilt.new(Mint.template_directory(self) + '/layout.haml')
+
+        chapters = chapters.map do |content|
+          layout.render Object.new, 
+                        :content => content,
+                        :title => 'Untitled'
+        end
+
         create_chapters! chapters
 
         create! do |container|
@@ -60,12 +67,12 @@ module Mint
         end
       end
 
+      FileUtils.rm document.destination_file
+      FileUtils.rm_r document.destination_directory
+
       self.zip! document.destination_directory, 
                 :mimetype => 'application/epub+zip',
                 :extension => 'epub'
-
-      # TODO: I'm not if this is the right thing to do here
-      FileUtils.rm_r document.destination_directory
     end
     
     protected
@@ -136,7 +143,6 @@ module Mint
       options = options.to_hash.symbolize_keys
 
       type = options[:type] || 'container'
-
       default_options = 
         case type.to_sym
         when :container
@@ -155,8 +161,8 @@ module Mint
     end
 
     def self.create_chapters!(chapters)
-      chapters.each do |id, text| 
-        create_chapter!(id, text)
+      chapters.each_with_index do |text, id| 
+        create_chapter!(id + 1, text)
       end
     end
     
@@ -173,8 +179,9 @@ module Mint
     end
 
     def self.prepare_directory!
-      FileUtils.mkdir META_DIR
-      FileUtils.mkdir CONTENT_DIR
+      [META_DIR, CONTENT_DIR].each do |dir|
+        FileUtils.mkdir dir unless File.exist?(dir)
+      end
     end
 
     def self.chapter_filename(id)
@@ -217,18 +224,17 @@ module Mint
           title: 'Untitled',
           language: 'English',
           short_title: 'Untitled',
-          uuid: '1',
+          uuid: 'Unspecified',
           description: 'No description',
           date: Date.today,
-          creators: [{file_as: '', role: ''}],
-          contributors: [{file_as: '', role: ''}],
-          publisher: '',
+          creators: [{ file_as: 'Anonymous', role: 'aut' }],
+          contributors: [],
+          publisher: 'Self published',
           genre: 'Non-fiction',
           rights: 'All Rights Reserved',
           ncx_file: 'toc.ncx',
           style_file: 'style.css',
           title_file: 'title.html',
-          chapters: [{ id: '', file: '' }]
         }
       }
     end
@@ -238,10 +244,9 @@ module Mint
         from: 'toc.haml',
         to: "#{CONTENT_DIR}/toc.ncx",
         locals: {
-          uuid: '',
-          title: 'Title',
-          title_file: 'title.title',
-          chapters: [{ name: '', file: '' }]
+          uuid: 'Unspecified',
+          title: 'Untitled',
+          title_file: 'title.html',
         }
       }
     end

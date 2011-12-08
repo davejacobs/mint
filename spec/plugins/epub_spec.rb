@@ -10,8 +10,8 @@ module Mint
       it "splits a document's final text into chapters and maps onto IDs" do
         # TODO: Clean up these long lines
         chapters = Document.new('content.md').chapters
-        chapters[1].should =~ /This is just a test.*Paragraph number two/m 
-        chapters[2].should =~ /Third sentence.*Fourth sentence/m
+        chapters[0].should =~ /This is just a test.*Paragraph number two/m 
+        chapters[1].should =~ /Third sentence.*Fourth sentence/m
       end
     end
   end
@@ -27,7 +27,11 @@ module Mint
         document_length = File.read('directory/content.html').length
         EPub.after_publish(document)
 
-        @target_length = document_length / 2
+        # We're going to consider a document successfully split
+        # if its two chapters are less than half of it's length,
+        # not including the DOCTYPE/HTML chrome that we introduce 
+        # into each split document (~150 characters)
+        @target_length = document_length / 2 + 200
       end
 
       after do
@@ -100,6 +104,7 @@ module Mint
         it "splits the document into chapters" do
           chapter1 = File.read 'directory/OPS/chapter-1.html'
           chapter2 = File.read 'directory/OPS/chapter-2.html'
+
           chapter1.length.should < @target_length
           chapter2.length.should < @target_length
         end
@@ -226,7 +231,7 @@ module Mint
       it "calls #create_chapter! for each chapter" do
         EPub.should_receive(:create_chapter!).once.ordered.with(1, 'text1')
         EPub.should_receive(:create_chapter!).once.ordered.with(2, 'text2')
-        EPub.create_chapters!(1 => 'text1', 2 => 'text2')
+        EPub.create_chapters! ['text1', 'text2']
       end
     end
 

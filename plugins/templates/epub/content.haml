@@ -22,25 +22,15 @@
     %dc:rights= rights
   
   %manifest
-    %item{ :id => 'ncx',
-           :href => ncx_file,
-           'media-type' => 'application/x-dtbncx+xml' }/
-
-    %item{ :id => 'style',
-           :href => style_file,
-           'media-type' => 'text/css' }/
-
-    %item{ :id => 'title',
-           :href => title_file,
-           'media-type' => 'application/xhtml+xml' }/
-  
-    - chapters.each do |chapter|
-      %item{ :id => chapter[:id],
-        :href => chapter[:file],
-        'media-type' =>  'application/xhtml+xml' }/
+    %item(id='ncx' href=ncx_file media-type='application/x-dtbncx+xml')/
+    %item(id='style' href=style_file media-type='text/css')/
+    %item(id='title' href=title_file media-type='application/xhtml+xml')/
+    - chapters.each_with_index do |content, id|
+      - idx = id + 1
+      %item(id="chapter-#{idx}" href="chapter-#{idx}.html" media-type='application/xhtml+xml')/
   
   %spine(toc='ncx')
     %itemref(idref='title')/
-
-    - chapters.each do |chapter|
-      %itemref{ :idref => chapter[:id] }/
+    - chapters.each_with_index do |content, id|
+      - idx = id + 1
+      %itemref(idref="chapter-#{idx}")/

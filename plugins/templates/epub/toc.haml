@@ -12,15 +12,15 @@
     %text= title
 
   %navMap
-    %navPoint{ :id => "navpoint-1", :playOrder => 1 }
+    %navPoint(id='navpoint-1' playOrder=1)
       %navLabel
         %text= title
-      %content{ :src => title_file }
+      %content(src=title_file)
     
-    - chapters.each_with_index do |chapter,i|
-      / First navPoint is 1. Continue from there.
-      - idx = i + 2
-      %navPoint{ :id => "navpoint-#{idx}", :playOrder => idx }
+    - chapters.each_with_index do |content, id|
+      - idx = Integer(id) + 1
+      - order = idx + 1
+      %navPoint(id="navpoint-#{order}" playOrder=order)
         %navLabel
-          %text= "Chapter #{i + 1}: #{chapter[:name]}"
-        %content{ :src => chapter[:file] }
+          %text= "Chapter #{idx}"
+        %content(src="chapter-#{idx}.html")
