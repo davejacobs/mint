@@ -56,12 +56,14 @@ module Mint
     #
     # @param [Hash, #[]] map a potentially nested Hash containing symbolizable keys
     # @return [Hash] a version of map where all keys are symbols
-    def self.symbolize_keys(map)
+    def self.symbolize_keys(map, opts={})
+      transform = lambda {|x| opts[:downcase] ? x.downcase : x }
+
       map.reduce(Hash.new) do |syms,(k,v)| 
-        syms[k.to_sym] = 
+        syms[transform[k].to_sym] = 
           case v
           when Hash
-            self.symbolize_keys(v)
+            self.symbolize_keys(v, opts)
           else
             v
           end

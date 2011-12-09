@@ -104,6 +104,30 @@ module Mint
 
         Helpers.symbolize_keys(nested_map).should == expected_map
       end
+
+      it "recursively downcases all keys if specified" do
+        capitalized_map = {
+          'Key1' => 'value1',
+          'Key2' => 'value2',
+          'Key3' => 'value3',
+          'Key4' => {
+            'Nested_key1' => 'nested_value1',
+            'Nested_key2' => 'nested_value2'
+          }
+        }
+
+        expected_map = {
+          key1: 'value1',
+          key2: 'value2',
+          key3: 'value3',
+          key4: {
+            nested_key1: 'nested_value1',
+            nested_key2: 'nested_value2'
+          }
+        }
+
+        Helpers.symbolize_keys(capitalized_map, :downcase => true).should == expected_map
+      end
     end
 
     describe "#listify" do
