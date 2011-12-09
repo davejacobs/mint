@@ -34,6 +34,7 @@ module Mint
       Dir.chdir document.destination_directory do
         metadata = document.metadata
         chapters = document.chapters
+        locals = { chapters: chapters }.merge metadata
 
         prepare_directory!
 
@@ -49,21 +50,22 @@ module Mint
 
         create! do |container|
           container.type = 'container'
-          container.locals = { chapters: chapters }
+          container.locals = locals
         end
 
         create! do |content|
           content.type = 'content'
-          content.locals = { chapters: chapters }
+          content.locals = locals
         end
 
         create! do |toc|
           toc.type = 'toc'
-          toc.locals = { chapters: chapters }
+          toc.locals = locals
         end
 
         create! do |title|
           title.type = 'title'
+          title.locals = locals
         end
       end
 
