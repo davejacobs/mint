@@ -68,11 +68,12 @@ module Mint
       end
 
       FileUtils.rm document.destination_file
-      FileUtils.rm_r document.destination_directory
 
       self.zip! document.destination_directory, 
                 :mimetype => 'application/epub+zip',
                 :extension => 'epub'
+
+      FileUtils.rm_r document.destination_directory
     end
     
     protected
