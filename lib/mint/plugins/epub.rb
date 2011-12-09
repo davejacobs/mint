@@ -34,7 +34,9 @@ module Mint
       Dir.chdir document.destination_directory do
         metadata = document.metadata
         chapters = document.chapters
-        locals = { chapters: chapters }.merge metadata
+        sanitized_metadata = 
+          Helpers.symbolize_keys(metadata, :downcase => true)
+        locals = { chapters: chapters }.merge sanitized_metadata
 
         prepare_directory!
 
