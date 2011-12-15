@@ -34,7 +34,7 @@ Use cases
 4. Santosh stores his blog entries in Markdown and wants to see how they look using his blog engine's stylesheet. He doesn't want to upload his entry until he's finished with it, but he wants to preview it with that stylesheet along the way.
 
 The Mint library
---------------------
+----------------
 
 This section discusses the Mint library API. This library encapsulates the idea of a styled document, which is composed of a stylesheet, a layout and content. Mint makes combining those seemless. See **The `mint` command** for more information on an easy-to-use binary.
 
@@ -224,11 +224,11 @@ The mint command
 
 The easiest Mint command doesn't require configuration. It will transform the specified document into HTML and link it to the default stylesheet.
 
-    mint Minimalism.md                    # creates Minimalism.html
+    mint publish Minimalism.md
 
 You can throw as many files as you'd like in. Any commandline argument *not* preceded by an option (e.g., `--template`) or in the `mint` command vocabulary (more on that in a minute) will be interpreted as a file name:
 
-    mint Minimalism.md Proposal.md Protocol.md
+    mint publish Minimalism.md Proposal.md Protocol.md
 
 This command can be tweaked with options and arguments to be more flexible:
 
@@ -329,7 +329,7 @@ Mint will open the appropriate file in the editor specified by EDITOR. The same 
     mint edit -s normal
 
 The future of Mint
-----------------------
+------------------
 
 This section documents features that do not yet exist, but that I would like to have in future versions of Mint.
 

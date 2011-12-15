@@ -56,16 +56,50 @@ module Mint
     #
     # @param [Hash, #[]] map a potentially nested Hash containing symbolizable keys
     # @return [Hash] a version of map where all keys are symbols
-    def self.symbolize_keys(map)
+    def self.symbolize_keys(map, opts={})
+      transform = lambda {|x| opts[:downcase] ? x.downcase : x }
+
       map.reduce(Hash.new) do |syms,(k,v)| 
-        syms[k.to_sym] = 
+        syms[transform[k].to_sym] = 
           case v
           when Hash
-            self.symbolize_keys(v)
+            self.symbolize_keys(v, opts)
           else
             v
           end
         syms
+      end
+    end
+
+    def self.listify(list)
+      if list.length > 2
+        list[0..-2].join(', ') + ' & ' + list.last
+      else
+        list.join(' & ')
+      end
+    end
+
+    def self.standardize(metadata, opts={})
+      table = opts[:table] || {}
+      metadata.reduce({}) do |hash, (key,value)|
+        if table[key] && table[key].length == 2
+          standard_key, standard_type = table[key]
+          standard_value =
+            case standard_type
+            when :array
+              [*value]
+            when :string
+              value
+            else
+              # If key/type were not in table
+              value
+            end
+
+          hash[standard_key] = standard_value
+        else
+          hash[key] = value
+        end
+        hash
       end
     end
 

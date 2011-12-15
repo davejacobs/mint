@@ -2,6 +2,8 @@ require 'nokogiri'
 require 'hashie'
 require 'zip/zip'
 require 'zip/zipfilesystem'
+require 'active_support/core_ext/hash/deep_merge'
+require 'active_support/core_ext/hash/keys'
 
 # Note: This code is not as clean as I want it to be. It is an example
 # plugin with which I'm developing the Mint plugin system. Code cleanup
@@ -16,9 +18,7 @@ module Mint
   class Document
     def chapters
       html_document = Nokogiri::HTML::Document.parse render
-      chapter_contents = EPub.split_on(html_document, 'h2').map &:to_s
-      chapter_ids = (1..chapter_contents.length).to_a
-      chapters = Hash[chapter_ids.zip chapter_contents]
+      EPub.split_on(html_document, 'h2').map &:to_s
     end
   end
 
@@ -32,33 +32,40 @@ module Mint
       end
 
       Dir.chdir document.destination_directory do
-        metadata = document.metadata
+        metadata = standardize document.metadata
         chapters = document.chapters
+        locals = { chapters: chapters }.merge metadata
 
         prepare_directory!
-        create_chapters! chapters
+        create_chapters! chapters, :locals => metadata
 
         create! do |container|
           container.type = 'container'
-          container.locals = { chapters: chapters }
+          container.locals = locals
         end
 
         create! do |content|
           content.type = 'content'
-          content.locals = { chapters: chapters }
+          content.locals = locals
         end
 
         create! do |toc|
           toc.type = 'toc'
-          toc.locals = { chapters: chapters }
+          toc.locals = locals
+        end
+
+        create! do |title|
+          title.type = 'title'
+          title.locals = locals
         end
       end
+
+      FileUtils.rm document.destination_file
 
       self.zip! document.destination_directory, 
                 :mimetype => 'application/epub+zip',
                 :extension => 'epub'
 
-      # TODO: I'm not if this is the right thing to do here
       FileUtils.rm_r document.destination_directory
     end
     
@@ -127,9 +134,9 @@ module Mint
     def self.create!
       options = Hashie::Mash.new
       yield options if block_given?
+      options = options.to_hash.symbolize_keys
 
       type = options[:type] || 'container'
-
       default_options = 
         case type.to_sym
         when :container
@@ -138,24 +145,30 @@ module Mint
           content_defaults
         when :toc
           toc_defaults
+        when :title
+          title_defaults
         else
           {}
         end
 
-      render_options = default_options.merge options
-      create_from_template! render_options
+      create_from_template! default_options.deep_merge(options)
     end
 
-    def self.create_chapters!(chapters)
-      chapters.each do |id, text| 
-        create_chapter!(id, text)
+    def self.create_chapters!(chapters, opts={})
+      opts = chapter_defaults.deep_merge(opts)
+      template_file = EPub.template_directory + '/layout.haml'
+      renderer = Tilt.new template_file, :ugly => false
+      chapters.map do |chapter|
+        renderer.render Object.new, opts[:locals].merge(:content => chapter)
+      end.each_with_index do |text, id| 
+        create_chapter!(id + 1, text)
       end
     end
     
     private
 
     def self.create_from_template!(opts={})
-      template_file = "#{EPub.template_directory}/#{opts[:from]}"
+      template_file = EPub.template_directory + "/#{opts[:from]}"
       renderer = Tilt.new template_file, :ugly => false
       content = renderer.render Object.new, opts[:locals]
 
@@ -165,8 +178,29 @@ module Mint
     end
 
     def self.prepare_directory!
-      FileUtils.mkdir META_DIR
-      FileUtils.mkdir CONTENT_DIR
+      [META_DIR, CONTENT_DIR].each do |dir|
+        FileUtils.mkdir dir unless File.exist?(dir)
+      end
+    end
+
+    def self.locals_lookup_table
+      {
+        author:     [:creators, :array],
+        authors:    [:creators, :array],
+        editor:     [:contributors, :array],
+        editors:    [:contributors, :array],
+        barcode:    [:uuid, :string],
+        upc:        [:uuid, :string],
+        copyright:  [:rights, :string]
+      }
+    end
+
+    def self.standardize(metadata)
+      sanitized_metadata = 
+        Helpers.symbolize_keys(metadata, :downcase => true)
+      standardized_metadata = 
+        Helpers.standardize(sanitized_metadata, 
+                            :table => locals_lookup_table)
     end
 
     def self.chapter_filename(id)
@@ -191,6 +225,14 @@ module Mint
       end
     end
 
+    def self.chapter_defaults
+      {
+        locals: {
+          title: 'Untitled'
+        }
+      }
+    end
+
     def self.container_defaults
       defaults = {
         from: 'container.haml',
@@ -208,19 +250,18 @@ module Mint
         locals: {
           title: 'Untitled',
           language: 'English',
-          short_title: 'Untitled',
-          uuid: '1',
+          short_title: '',
+          uuid: 'Unspecified',
           description: 'No description',
           date: Date.today,
-          creators: [{file_as: '', role: ''}],
-          contributors: [{file_as: '', role: ''}],
-          publisher: '',
+          creators: ['Anonymous'],
+          contributors: [],
+          publisher: 'Self published',
           genre: 'Non-fiction',
           rights: 'All Rights Reserved',
           ncx_file: 'toc.ncx',
           style_file: 'style.css',
           title_file: 'title.html',
-          chapters: [{ id: '', file: '' }]
         }
       }
     end
@@ -230,10 +271,20 @@ module Mint
         from: 'toc.haml',
         to: "#{CONTENT_DIR}/toc.ncx",
         locals: {
-          uuid: '',
-          title: 'Title',
-          title_file: 'title.title',
-          chapters: [{ name: '', file: '' }]
+          uuid: 'Unspecified',
+          title: 'Untitled',
+          title_file: 'title.html',
+        }
+      }
+    end
+
+    def self.title_defaults
+      defaults = {
+        from: 'title.haml',
+        to: "#{CONTENT_DIR}/title.html",
+        locals: {
+          title: 'Untitled',
+          creators: ['Anonymous']
         }
       }
     end

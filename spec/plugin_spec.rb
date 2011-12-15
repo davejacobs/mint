@@ -81,6 +81,26 @@ describe Mint do
     end
   end
 
+  describe ".config_directory" do
+    let(:plugin) { Class.new(Mint::Plugin) }
+
+    it "gives access to a directory where template files can be stored" do
+      plugin.should_receive(:name).and_return('DocBook')
+      Mint.config_directory(plugin).should == 
+        Mint.root + '/plugins/config/doc_book'
+    end
+  end
+
+  describe ".commandline_options_file" do
+    let(:plugin) { Class.new(Mint::Plugin) }
+
+    it "gives access to a directory where template files can be stored" do
+      plugin.should_receive(:name).and_return('DocBook')
+      Mint.commandline_options_file(plugin).should == 
+        Mint.root + '/plugins/config/doc_book/syntax.yml'
+    end
+  end
+
   [:before_render, :after_render].each do |callback|
     describe ".#{callback}" do
       let(:first_plugin) { Class.new(Mint::Plugin) }

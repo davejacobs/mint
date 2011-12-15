@@ -31,6 +31,18 @@ module Mint
     Mint.root + '/plugins/templates/' + plugin.underscore
   end
 
+  def self.config_directory(plugin)
+    Mint.root + '/plugins/config/' + plugin.underscore
+  end
+
+  def self.commandline_options_file(plugin)
+    plugin.config_directory + '/syntax.yml'
+  end
+
+  def self.commandline_name(plugin)
+    plugin.underscore
+  end
+
   def self.before_render(plain_text, opts={})
     active_plugins = opts[:plugins] || Mint.activated_plugins
     active_plugins.reduce(plain_text) do |intermediate, plugin|
@@ -66,7 +78,16 @@ module Mint
       Mint.template_directory(self)
     end
 
-    def self.commandline_options
+    def self.config_directory
+      Mint.config_directory(self)
+    end
+
+    def self.commandline_options_file
+      Mint.commandline_options_file(self)
+    end
+
+    def self.commandline_name
+      Mint.commandline_name(self)
     end
 
     # Supports:
