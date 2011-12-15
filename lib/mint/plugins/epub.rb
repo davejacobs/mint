@@ -32,11 +32,9 @@ module Mint
       end
 
       Dir.chdir document.destination_directory do
-        metadata = document.metadata
+        metadata = standardize document.metadata
         chapters = document.chapters
-        sanitized_metadata = 
-          Helpers.symbolize_keys(metadata, :downcase => true)
-        locals = { chapters: chapters }.merge sanitized_metadata
+        locals = { chapters: chapters }.merge metadata
 
         prepare_directory!
 
@@ -187,6 +185,26 @@ module Mint
       [META_DIR, CONTENT_DIR].each do |dir|
         FileUtils.mkdir dir unless File.exist?(dir)
       end
+    end
+
+    def self.locals_lookup_table
+      {
+        author:     [:creators, :array],
+        authors:    [:creators, :array],
+        editor:     [:contributors, :array],
+        editors:    [:contributors, :array],
+        barcode:    [:uuid, :string],
+        upc:        [:uuid, :string],
+        copyright:  [:rights, :string]
+      }
+    end
+
+    def self.standardize(metadata)
+      sanitized_metadata = 
+        Helpers.symbolize_keys(metadata, :downcase => true)
+      standardized_metadata = 
+        Helpers.standardize(sanitized_metadata, 
+                            :table => locals_lookup_table)
     end
 
     def self.chapter_filename(id)
