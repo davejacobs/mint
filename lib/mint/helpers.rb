@@ -79,6 +79,30 @@ module Mint
       end
     end
 
+    def self.standardize(metadata, opts={})
+      table = opts[:table] || {}
+      metadata.reduce({}) do |hash, (key,value)|
+        if table[key] && table[key].length == 2
+          standard_key, standard_type = table[key]
+          standard_value =
+            case standard_type
+            when :array
+              [*value]
+            when :string
+              value
+            else
+              # If key/type were not in table
+              value
+            end
+
+          hash[standard_key] = standard_value
+        else
+          hash[key] = value
+        end
+        hash
+      end
+    end
+
     # Returns the relative path to to_directory from from_directory. 
     # If to_directory and from_directory have no parents in common besides 
     # /, returns the absolute directory of to_directory. Assumes no symlinks.

@@ -145,6 +145,35 @@ module Mint
       end
     end
 
+    describe "#standardize" do
+      before do
+        @nonstandard = {
+          title: 'Title',
+          author: 'David',
+          editors: ['David', 'Jake'],
+          barcode: 'Unique ID'
+        }
+
+        @table = {
+          author: [:creators, :array],
+          editors: [:collaborators, :array],
+          barcode: [:uuid, :string]
+        }
+
+        @standard = {
+          title: 'Title',
+          creators: ['David'],
+          collaborators: ['David', 'Jake'],
+          uuid: 'Unique ID'
+        }
+      end
+
+      it "converts all nonstandard keys to standard ones" do
+        Helpers.standardize(@nonstandard, 
+                            :table => @table).should == @standard
+      end
+    end
+
     describe "#normalize_path" do
       it "handles two files in the same directory" do
         path1 = '~/file1'
