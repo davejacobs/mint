@@ -12,10 +12,10 @@
     %dc:date{ 'xsi:type' => 'dcterms:W3CDTF' }= date
     
     - creators.each do |creator|
-      %dc:creator{ 'opf:file-as' => creator[:file_as], 'opf:role' => creator[:role] }
+      %dc:creator{ 'opf:file-as' => creator, 'opf:role' => 'aut' }
     - contributors.each do |contributor|
-      %dc:contributor{ 'opf:file-as' => contributor[:file_as],
-        'opf:role' => contributor[:role] }
+      %dc:contributor{ 'opf:file-as' => contributor,
+        'opf:role' => 'edt' }
     
     %dc:publisher= publisher
     %dc:type= genre

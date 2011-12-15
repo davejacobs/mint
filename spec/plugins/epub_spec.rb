@@ -229,8 +229,8 @@ module Mint
 
     describe "#create_chapters!" do
       it "calls #create_chapter! for each chapter" do
-        EPub.should_receive(:create_chapter!).once.ordered.with(1, 'text1')
-        EPub.should_receive(:create_chapter!).once.ordered.with(2, 'text2')
+        EPub.should_receive(:create_chapter!).once.ordered
+        EPub.should_receive(:create_chapter!).once.ordered
         EPub.create_chapters! ['text1', 'text2']
       end
     end

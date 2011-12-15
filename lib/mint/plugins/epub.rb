@@ -37,16 +37,7 @@ module Mint
         locals = { chapters: chapters }.merge metadata
 
         prepare_directory!
-
-        layout = Tilt.new(Mint.template_directory(self) + '/layout.haml')
-
-        chapters = chapters.map do |content|
-          layout.render Object.new, 
-                        :content => content,
-                        :title => 'Untitled'
-        end
-
-        create_chapters! chapters
+        create_chapters! chapters, :locals => metadata
 
         create! do |container|
           container.type = 'container'
@@ -163,8 +154,13 @@ module Mint
       create_from_template! default_options.deep_merge(options)
     end
 
-    def self.create_chapters!(chapters)
-      chapters.each_with_index do |text, id| 
+    def self.create_chapters!(chapters, opts={})
+      opts = chapter_defaults.deep_merge(opts)
+      template_file = EPub.template_directory + '/layout.haml'
+      renderer = Tilt.new template_file, :ugly => false
+      chapters.map do |chapter|
+        renderer.render Object.new, opts[:locals].merge(:content => chapter)
+      end.each_with_index do |text, id| 
         create_chapter!(id + 1, text)
       end
     end
@@ -172,7 +168,7 @@ module Mint
     private
 
     def self.create_from_template!(opts={})
-      template_file = "#{EPub.template_directory}/#{opts[:from]}"
+      template_file = EPub.template_directory + "/#{opts[:from]}"
       renderer = Tilt.new template_file, :ugly => false
       content = renderer.render Object.new, opts[:locals]
 
@@ -229,6 +225,14 @@ module Mint
       end
     end
 
+    def self.chapter_defaults
+      {
+        locals: {
+          title: 'Untitled'
+        }
+      }
+    end
+
     def self.container_defaults
       defaults = {
         from: 'container.haml',
@@ -246,11 +250,11 @@ module Mint
         locals: {
           title: 'Untitled',
           language: 'English',
-          short_title: 'Untitled',
+          short_title: '',
           uuid: 'Unspecified',
           description: 'No description',
           date: Date.today,
-          creators: [{ file_as: 'Anonymous', role: 'aut' }],
+          creators: ['Anonymous'],
           contributors: [],
           publisher: 'Self published',
           genre: 'Non-fiction',
