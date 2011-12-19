@@ -32,7 +32,7 @@ module Mint
       end
 
       Dir.chdir document.destination_directory do
-        metadata = standardize document.metadata
+        metadata = standardized_metadata document
         chapters = document.chapters
         locals = { chapters: chapters }.merge metadata
 
@@ -195,7 +195,8 @@ module Mint
       }
     end
 
-    def self.standardize(metadata)
+    def self.standardized_metadata(document)
+      metadata = document.metadata.merge(:stylesheet => document.stylesheet)
       sanitized_metadata = 
         Helpers.symbolize_keys(metadata, :downcase => true)
       standardized_metadata = 
@@ -260,7 +261,7 @@ module Mint
           genre: 'Non-fiction',
           rights: 'All Rights Reserved',
           ncx_file: 'toc.ncx',
-          style_file: 'style.css',
+          stylesheet: 'style.css',
           title_file: 'title.html',
         }
       }
@@ -284,7 +285,8 @@ module Mint
         to: "#{CONTENT_DIR}/title.html",
         locals: {
           title: 'Untitled',
-          creators: ['Anonymous']
+          creators: ['Anonymous'],
+          stylesheet: 'style.css'
         }
       }
     end
