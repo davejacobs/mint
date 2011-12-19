@@ -1,8 +1,10 @@
 Plugins
--------
+=======
+
+*The following is a scratchpad for plugin system ideas. It's inconsistent and not final.*
 
 Overview
-========
+--------
 
 Mint is small, in the spirit of Unix. I want it to be extensible via a plugin architecture. This is an exploration of how I want that architecture to work.
 
@@ -16,7 +18,7 @@ I have two competing goals to balance:
   have control over pre-rendered doc and other features only available to a Ruby script.
 
 Ideas
-=====
+-----
 
 1. **The lightweight option: Bash interpolation.** `mint epub publish 
    file --option1 --option2` calls `mint-epub publish file --option2`
@@ -36,17 +38,17 @@ Ideas
 It seems like option 2 is the best one. However, it defeats my goal of wanting a lightweight plugin system.
 
 Questions
-=========
+---------
 
 1. What if the plugin defines a parameter that's named the same as a mint one?
 
 Thoughts
-========
+--------
 
 1. I need to figure out how to give wrapped read/write access to the config file, in a standard "config namespace".
 
 Plugin ideas
-============
+------------
 
 The following are some ideas I have for Mint plugins. I want plugins to be related to Mint's functionality, but not limited to desktop publishing.
 

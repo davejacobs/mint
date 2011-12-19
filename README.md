@@ -23,7 +23,7 @@ The easiest Mint command doesn't require configuration. It transforms a document
 
 Simply type:
 
-    mint Minimalism.md                    # creates Minimalism.html
+    mint publish Minimalism.md
 
 And voil&agrave;, Minimalism.html will show up next to Minimalism.md.
 
@@ -33,12 +33,12 @@ Sending that page to a printer is as easy as clicking "Print" from your browser.
 
 You can throw as many files as you'd like in. Any commandline argument *not* preceded by an option (e.g., `--template`) or in the `mint` command vocabulary (more on that in a minute) will be interpreted as a file name:
 
-    mint Minimalism.md Proposal.md Protocol.md
+    mint publish Minimalism.md Proposal.md Protocol.md
 
 This command can be tweaked with options and arguments to be more flexible:
 
-    mint Minimalism.md --template resume  # specifies a style template
-    mint Minimalism.md --destination final --style-destination=styles
+    mint publish Minimalism.md --template resume  # specifies a style template
+    mint publish Minimalism.md --destination final --style-destination=styles
 
 For a listing of mint options, take [a look at the API][API].
 
@@ -56,8 +56,8 @@ To understand Mint's flexibility, you'll want to [take a look at the API][API].
 
 [Firefox typography]: http://opentype.info/blog/2008/06/14/kerning-and-opentype-features-in-firefox-3/ "Firefox 3 supports kerning and automatic ligatures"
 
-Designing a template
---------------------
+Templates
+---------
 
 Templates can be written in any format accepted by the Tilt template interface library. (See [the Tilt TEMPLATES file][Tilt templates] for more information.)
 
@@ -96,10 +96,12 @@ Mint comes preloaded with several styles and layouts.
 
 I've included a base stylesheet that is useful for setting sensible typographic defaults.
 
-Plugins coming soon
--------------------
+Plugins: A work in progress
+---------------------------
 
-I have the beginnings of a plugin system planned. Essentially, I want to be able to create and modify a document workflow to my liking without modifying the Mint core. This is going to be useful for things like creating actual office documents or e-books or even bound novels. More on this soon. 
+I've designed the beginnings of a plugin system. With this system, you can implement a callback or two and have full control over document creation and sharing. I'll get documentation going soon. For now, look to lib/mint/plugins/epub.rb and bin/mint-epub for an example of how to build one. It's not complete and I'm open to API suggestions. 
+
+This is going to be useful for things like creating actual office documents or e-books or even bound novels. I'm actually thinking that half the power of this library is its plugin system.
 
 [API]: http://github.com/davejacobs/mint/tree/master/doc/API.md
 [Tilt templates]: http://github.com/rtomayko/tilt/blob/master/TEMPLATES.md "A listing of all templates supported by Tilt."
