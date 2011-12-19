@@ -17,6 +17,7 @@ Gem::Specification.new do |s|
   s.files = [
     'README.md',
     'bin/mint',
+    'bin/mint-epub',
     'lib/mint.rb',
     'lib/mint/helpers.rb',
     'lib/mint/exceptions.rb',
@@ -28,29 +29,52 @@ Gem::Specification.new do |s|
     'lib/mint/version.rb',
     'lib/mint/css.rb',
     'lib/mint/commandline.rb',
+    'lib/mint/plugin.rb',
+    'lib/mint/plugins/epub.rb',
     'config/syntax.yaml',
     'templates/base/style.sass',
     'templates/default/layout.haml',
     'templates/default/style.sass',
     'templates/pro/layout.haml',
     'templates/pro/style.sass',
-    'features/mint_document.feature',
-    'features/step_definitions/mint_steps.rb',
+    'plugins/templates/epub/container.haml',
+    'plugins/templates/epub/layout.haml',
+    'plugins/templates/epub/title.haml',
+    'plugins/templates/epub/toc.haml',
+    'plugins/templates/epub/content.haml',
     'features/support/env.rb',
+    'features/publish.feature',
+    'features/plugins/epub.feature',
+    'spec/spec_helper.rb',
+    'spec/helpers_spec.rb',
+    'spec/mint_spec.rb',
+    'spec/resource_spec.rb',
+    'spec/layout_spec.rb',
+    'spec/style_spec.rb',
     'spec/document_spec.rb',
-    'spec/spec_helper.rb'
+    'spec/commandline_spec.rb',
+    'spec/plugin_spec.rb',
+    'spec/plugins/epub_spec.rb'
   ]
 
   s.test_files = [
-    'features/mint_document.feature',
-    'features/step_definitions/mint_steps.rb',
     'features/support/env.rb',
+    'features/publish.feature',
+    'features/plugins/epub.feature',
+    'spec/spec_helper.rb',
+    'spec/helpers_spec.rb',
+    'spec/mint_spec.rb',
+    'spec/resource_spec.rb',
+    'spec/layout_spec.rb',
+    'spec/style_spec.rb',
     'spec/document_spec.rb',
-    'spec/spec_helper.rb'
+    'spec/commandline_spec.rb',
+    'spec/plugin_spec.rb',
+    'spec/plugins/epub_spec.rb'
   ]
 
   s.require_path = 'lib'
-  s.executables  = ['mint']
+  s.executables  = ['mint', 'mint-epub']
 
   s.add_dependency 'tilt'
   s.add_dependency 'rdiscount'
@@ -63,6 +87,9 @@ Gem::Specification.new do |s|
   s.add_dependency 'radius'
   s.add_dependency 'markaby'
   s.add_dependency 'active_support'
+  s.add_dependency 'nokogiri'
+  s.add_dependency 'hashie'
+  s.add_dependency 'rubyzip'
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'cucumber'
   s.add_development_dependency 'aruba'
