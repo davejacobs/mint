@@ -32,7 +32,7 @@ module Mint
       end
 
       Dir.chdir document.destination_directory do
-        metadata = standardize document.metadata
+        metadata = standardized_metadata document
         chapters = document.chapters
         locals = { chapters: chapters }.merge metadata
 
@@ -156,8 +156,8 @@ module Mint
 
     def self.create_chapters!(chapters, opts={})
       opts = chapter_defaults.deep_merge(opts)
-      template_file = EPub.template_directory + '/layout.haml'
-      renderer = Tilt.new template_file, :ugly => false
+      template_file = EPub.template_directory + '/layouts/layout.haml'
+      renderer = Tilt.new template_file, :ugly => true
       chapters.map do |chapter|
         renderer.render Object.new, opts[:locals].merge(:content => chapter)
       end.each_with_index do |text, id| 
@@ -168,8 +168,8 @@ module Mint
     private
 
     def self.create_from_template!(opts={})
-      template_file = EPub.template_directory + "/#{opts[:from]}"
-      renderer = Tilt.new template_file, :ugly => false
+      template_file = EPub.template_directory + "/layouts/#{opts[:from]}"
+      renderer = Tilt.new template_file, :ugly => true
       content = renderer.render Object.new, opts[:locals]
 
       File.open(opts[:to], 'w') do |f|
@@ -195,7 +195,8 @@ module Mint
       }
     end
 
-    def self.standardize(metadata)
+    def self.standardized_metadata(document)
+      metadata = document.metadata.merge(:stylesheet => document.stylesheet)
       sanitized_metadata = 
         Helpers.symbolize_keys(metadata, :downcase => true)
       standardized_metadata = 
@@ -260,7 +261,7 @@ module Mint
           genre: 'Non-fiction',
           rights: 'All Rights Reserved',
           ncx_file: 'toc.ncx',
-          style_file: 'style.css',
+          stylesheet: 'style.css',
           title_file: 'title.html',
         }
       }
@@ -284,7 +285,8 @@ module Mint
         to: "#{CONTENT_DIR}/title.html",
         locals: {
           title: 'Untitled',
-          creators: ['Anonymous']
+          creators: ['Anonymous'],
+          stylesheet: 'style.css'
         }
       }
     end
