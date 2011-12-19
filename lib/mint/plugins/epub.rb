@@ -156,8 +156,8 @@ module Mint
 
     def self.create_chapters!(chapters, opts={})
       opts = chapter_defaults.deep_merge(opts)
-      template_file = EPub.template_directory + '/layout.haml'
-      renderer = Tilt.new template_file, :ugly => false
+      template_file = EPub.template_directory + '/layouts/layout.haml'
+      renderer = Tilt.new template_file, :ugly => true
       chapters.map do |chapter|
         renderer.render Object.new, opts[:locals].merge(:content => chapter)
       end.each_with_index do |text, id| 
@@ -168,8 +168,8 @@ module Mint
     private
 
     def self.create_from_template!(opts={})
-      template_file = EPub.template_directory + "/#{opts[:from]}"
-      renderer = Tilt.new template_file, :ugly => false
+      template_file = EPub.template_directory + "/layouts/#{opts[:from]}"
+      renderer = Tilt.new template_file, :ugly => true
       content = renderer.render Object.new, opts[:locals]
 
       File.open(opts[:to], 'w') do |f|
