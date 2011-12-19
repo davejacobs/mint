@@ -1,21 +1,20 @@
 !!! XML
 %package(version='2.0' xmlns='http://www.idpf.org/2007/opf' unique-identifier=uuid)
-  %metadata{ 'xmlns:dc' => 'http://purl.org/dc/elements/1.1/',
-             'xmlns:dcterms' => 'http://purl.org/dc/terms/',
-             'xmlns:opf' => 'http://www.idpf.org/2007/opf',
-             'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance' }
+  %metadata(xmlns:dc='http://purl.org/dc/elements/1.1/'
+            xmlns:dcterms='http://purl.org/dc/terms/'
+            xmlns:opf='http://www.idpf.org/2007/opf'
+            xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance')
   
     %dc:title= title
-    %dc:language{ 'xsi:type' => 'dcterms:RFC3066' }= language
-    %dc:identifier{ :id => uuid }= short_title
+    %dc:language(xsi:type='dcterms:RFC3066')= language
+    %dc:identifier(id=uuid)= short_title
     %dc:description= description
-    %dc:date{ 'xsi:type' => 'dcterms:W3CDTF' }= date
+    %dc:date(xsi:type='dcterms:W3CDTF')= date
     
     - creators.each do |creator|
-      %dc:creator{ 'opf:file-as' => creator, 'opf:role' => 'aut' }
+      %dc:creator(opf:file-as=creator opf:role='aut')
     - contributors.each do |contributor|
-      %dc:contributor{ 'opf:file-as' => contributor,
-        'opf:role' => 'edt' }
+      %dc:contributor(opf:file-as=contributor opf:role='edt')
     
     %dc:publisher= publisher
     %dc:type= genre
