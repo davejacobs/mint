@@ -182,7 +182,7 @@ destination.
 Mint comes preloaded with several styles and layouts.
 
 1. Default
-2. Pro
+2. Zen
 3. Resume\*
 4. Protocol
 5. Protocol Flow\* - requires Javascript and jQuery
