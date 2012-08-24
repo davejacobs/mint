@@ -1,6 +1,6 @@
 module Mint
   module CSS
-    def container
+    def self.container
       'container'
     end
 
@@ -20,40 +20,47 @@ module Mint
     #   ...
     #   p { line-height: (value specified and cleaned up) }
     # }
-    def mappings
+    def self.mappings
       { 
-        font: 'font',
+        font: 'font-family',
+        font_size: 'font-size',
+        font_color: 'color',
         color: 'color',
         top_margin: 'padding-top',
-        bottom_margin: 'padding-bottom',
-        left_margin: 'padding-left',
-        right_margin: 'padding-right',
         top: 'padding-top',
+        bottom_margin: 'padding-bottom',
         bottom: 'padding-bottom',
+        left_margin: 'padding-left',
         left: 'padding-left',
+        right_margin: 'padding-right',
         right: 'padding-right',
         height: 'height',
         width: 'width',
-        line_spacing: 'p { line-height: %s }',
-        bullet: 'bullet-shape',
-        indentation: 'text-indent',
+        columns: "column-count",
+        column_gap: "column-gap",
+        orientation: "@page { size: %s }",
+        indentation: 'p+p { text-indent: %s }',
+        indent: 'p+p { text-indent: %s }',
+        bullet: 'li { list-style-type: %s }',
+        bullet_image: 'li { list-style-image: url(%s) }',
         after_paragraph: 'margin-bottom',
-        before_paragraph: 'margin-top',
-        smart_typography: 'optimizeLegibility'
+        before_paragraph: 'margin-top'
       }
     end
 
-    def format(key, value)
+    def self.stylify(key, value)
       selector = mappings[Helpers.symbolize key]
 
-      if selector.include? '%'
+      if selector.nil?
+        raise "[error] no mapping found for #{key}" 
+      elsif selector.include? '%'
         selector % value
       else
         "#{selector || key}: #{value}"
       end
     end
 
-    def parse(style)
+    def self.parse(style)
       css = style.map {|k,v| format(k, v) }.join("\n  ")
       "##{container} {\n  #{css.strip}\n}"
     end
