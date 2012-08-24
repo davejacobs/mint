@@ -1,3 +1,5 @@
+require 'sass'
+
 module Mint
   module CSS
     def self.container
@@ -52,7 +54,7 @@ module Mint
       selector = mappings[Helpers.symbolize key]
 
       if selector.nil?
-        raise "[error] no mapping found for #{key}" 
+        ""
       elsif selector.include? '%'
         selector % value
       else
@@ -61,8 +63,9 @@ module Mint
     end
 
     def self.parse(style)
-      css = style.map {|k,v| format(k, v) }.join("\n  ")
-      "##{container} {\n  #{css.strip}\n}"
+      css = style.map {|k,v| stylify(k, v) }.join("\n  ")
+      container_scope = "##{container}\n  #{css.strip}\n"
+      Sass::Engine.new(container_scope).render
     end
   end
 end

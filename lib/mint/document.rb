@@ -201,6 +201,10 @@ module Mint
                              self.destination_directory).to_s
     end
 
+    def inline_styles
+      CSS.parse(metadata)
+    end
+
     protected
 
     def self.metadata_chunk(text)
