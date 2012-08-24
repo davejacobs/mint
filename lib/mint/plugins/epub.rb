@@ -26,7 +26,7 @@ module Mint
 
   class EPub < Plugin
     def self.after_publish(document)
-      # This check doesn't currently follow simlinks
+      # This check doesn't currently follow symlinks
       if document.destination_directory == Dir.getwd
         raise InvalidDocumentError 
       end
