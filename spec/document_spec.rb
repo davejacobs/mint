@@ -157,8 +157,8 @@ module Mint
           doc.root              = "#{@tmp_dir}/alternative-root"
           doc.destination       = 'destination'
           doc.style_destination = 'styles'
-          doc.layout            = 'pro'
-          doc.style             = 'pro'
+          doc.layout            = 'zen'
+          doc.style             = 'zen'
         end
       end
 
@@ -184,8 +184,8 @@ module Mint
         should == Pathname.new(document.style_destination_directory)
       end
 
-      its(:layout) { should be_in_directory('pro') }
-      its(:style) { should be_in_directory('pro') }
+      its(:layout) { should be_in_directory('zen') }
+      its(:style) { should be_in_directory('zen') }
 
       its(:stylesheet) { should == 'styles/style.css' }
 

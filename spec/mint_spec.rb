@@ -44,16 +44,16 @@ describe Mint do
   it "looks up the correct template according to scope" do
     Mint.lookup_template(:default, :layout).should be_in_template('default')
     Mint.lookup_template(:default, :style).should be_in_template('default')
-    Mint.lookup_template(:pro, :layout).should be_in_template('pro')
-    Mint.lookup_template(:pro, :style).should be_in_template('pro')
+    Mint.lookup_template(:zen, :layout).should be_in_template('zen')
+    Mint.lookup_template(:zen, :style).should be_in_template('zen')
     Mint.lookup_template('layout.haml').should == 'layout.haml'
     Mint.lookup_template('dynamic.sass').should == 'dynamic.sass'
   end
 
   it "finds the correct template according to scope" do
     Mint.find_template('default', :layout).should be_in_template('default')
-    Mint.find_template('pro', :layout).should be_in_template('pro')
-    Mint.find_template('pro', :style).should be_in_template('pro')
+    Mint.find_template('zen', :layout).should be_in_template('zen')
+    Mint.find_template('zen', :style).should be_in_template('zen')
   end
 
   it "decides whether or not a file is a template file" do

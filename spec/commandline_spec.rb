@@ -12,11 +12,11 @@ module Mint
 
     describe "#parser" do
       it "provides a default option parser" do
-        fake_argv = ['--layout', 'pro']
+        fake_argv = ['--layout', 'zen']
 
         options = {}
         CommandLine.parser {|k, p| options[k] = p }.parse!(fake_argv)
-        options[:layout].should == 'pro'
+        options[:layout].should == 'zen'
       end
 
       it "provides an option parser based on a formatted hash" do
@@ -66,7 +66,7 @@ module Mint
         before do
           FileUtils.mkdir_p '.mint/config'
           File.open('.mint/config/config.yaml', 'w') do |file|
-            file << 'layout: pro'
+            file << 'layout: zen'
           end
         end
 
@@ -75,7 +75,7 @@ module Mint
         end
 
         it "merges all specified options with precedence according to scope" do
-          CommandLine.configuration[:layout].should == 'pro'
+          CommandLine.configuration[:layout].should == 'zen'
         end
       end
     end

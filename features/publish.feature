@@ -45,8 +45,8 @@ Feature: Publish document with varying options at the command line
     Examples:
       | template | layout | style  | style file                            |
       |          |        |        | ../../templates/default/css/style.css |
-      | -t pro   |        |        | ../../templates/pro/css/style.css     |
-      |          | -l pro | -s pro | ../../templates/pro/css/style.css     |
+      | -t zen   |        |        | ../../templates/zen/css/style.css     |
+      |          | -l zen | -s zen | ../../templates/zen/css/style.css     |
 
   Scenario: Publish document with non-existent template
     When I run `mint publish -t nonexistent content.md`

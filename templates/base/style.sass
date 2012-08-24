@@ -57,7 +57,6 @@ ul, ol
 p
   margin: ($screen_unit / 2) 0
 
-// For some reason this is necessary ...
 ul+p, ol+p, blockquote+p, pre+p
   text-indent: 0
 
@@ -69,7 +68,7 @@ a
     text-decoration: underline
 
 code
-  font-family: Menlo, Mensch, Monaco, Consolas, Monotype, mono
+  font-family: Monaco, Menlo, Mensch, Consolas, Monotype, mono
   font-style: normal
 
 pre, blockquote
@@ -96,15 +95,23 @@ img
   #container
     display: block
     border: solid 1px #999
-    width: 620px
+    width: 740px
     padding: 60px
     margin: ($screen_unit / 2) auto
     background-color: #fff
+    box-sizing: border-box
+    -moz-box-sizing: border-box
+    -webkit-box-sizing: border-box
     
   code
     font-size: $screen_font_size * 7/8
 
   pre
+    white-space: pre-wrap
+    white-space: -moz-pre-wrap
+    white-space: -o-pre-wrap
+    word-wrap: break-word
+
     code
       font-size: $screen_font_size * 3/4
 
