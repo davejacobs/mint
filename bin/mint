@@ -23,8 +23,7 @@ case ARGV.first.downcase.to_sym
 when :publish
   commandline_options.delete :verbose
   commandline_options.delete :simulation
-  ARGV.shift
-  Mint::CommandLine.publish!(ARGV, commandline_options)
+  Mint::CommandLine.publish!(ARGV[1..-1], commandline_options)
 when :help
   Mint::CommandLine.help(parser.help)
 when :install
