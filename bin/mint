@@ -19,11 +19,11 @@ parser.parse!
 
 # Mint::CommandLine.send(command, commandline_options)
 
-case ARGV.first.downcase.to_sym
+case ARGV.shift.downcase.to_sym
 when :publish
   commandline_options.delete :verbose
   commandline_options.delete :simulation
-  Mint::CommandLine.publish!(ARGV[1..-1], commandline_options)
+  Mint::CommandLine.publish!(ARGV, commandline_options)
 when :help
   Mint::CommandLine.help(parser.help)
 when :install

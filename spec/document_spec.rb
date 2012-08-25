@@ -59,11 +59,11 @@ module Mint
       its(:style_destination) { should be_nil }
 
       its(:style_destination_file) do
-        should == Mint.root + '/templates/default/css/style.css'
+        should == Mint.root + '/config/templates/default/css/style.css'
       end
 
       its(:style_destination_directory) do 
-        should == Mint.root + '/templates/default/css'
+        should == Mint.root + '/config/templates/default/css'
       end
 
       its(:style_destination_file_path) do
@@ -77,7 +77,7 @@ module Mint
       its(:layout) { should be_in_directory('default') }
       its(:style) { should be_in_directory('default') }
 
-      its(:stylesheet) { should == Mint.root + '/templates/default/css/style.css' }
+      its(:stylesheet) { should == Mint.root + '/config/templates/default/css/style.css' }
 
       it_should_behave_like "all documents"
     end
@@ -128,11 +128,11 @@ module Mint
       its(:style_destination) { should be_nil }
 
       its(:style_destination_file) do
-        should == Mint.root + '/templates/default/css/style.css'
+        should == Mint.root + '/config/templates/default/css/style.css'
       end
 
       its(:style_destination_directory) do
-        should == Mint.root + '/templates/default/css'
+        should == Mint.root + '/config/templates/default/css'
       end
 
       its(:style_destination_file_path) do
@@ -146,7 +146,7 @@ module Mint
       its(:layout) { should be_in_directory('default') }
       its(:style) { should be_in_directory('default') }
 
-      its(:stylesheet) { should == Mint.root + '/templates/default/css/style.css' }
+      its(:stylesheet) { should == Mint.root + '/config/templates/default/css/style.css' }
 
       it_should_behave_like "all documents"
     end

@@ -1,6 +1,7 @@
 require 'pathname'
 require 'yaml'
 require 'optparse'
+require 'fileutils'
 
 module Mint
   module CommandLine
@@ -14,7 +15,7 @@ module Mint
     # @return [Hash] a structured set of options that the commandline
     #   executable accepts
     def self.options
-      options_file = "../../../#{Mint.files[:syntax]}"
+      options_file = "../../../config/#{Mint.files[:syntax]}"
       YAML.load_file File.expand_path(options_file, __FILE__)
     end
 
@@ -50,13 +51,13 @@ module Mint
     end
 
     # Returns a hash of all active options specified by file (for all scopes).
-    # That is, if you specify file as 'config.yaml', this will return the aggregate
-    # of all config.yaml-specified options in the Mint path, where more local
+    # That is, if you specify file as 'defaults.yaml', this will return the aggregate
+    # of all defaults.yaml-specified options in the Mint path, where more local
     # members of the path take precedence over more global ones.
     #
     # @param [String] file a filename pointing to a Mint configuration file
     # @return [Hash] a structured set of configuration options
-    def self.configuration(file=Mint.files[:config])
+    def self.configuration(file=Mint.files[:defaults])
       return nil unless file
       config_file = Pathname.new file
 
@@ -119,13 +120,17 @@ module Mint
       layout = commandline_options[:layout]
       style = commandline_options[:style]
 
-      if layout and not style
-        layout_or_style = :layout
-      elsif style
-        layout_or_style = :style
+      # Allow for convenient editing (edit 'default' works just as well
+      # as edit :style => 'default')
+      if style
+        name, layout_or_style = style, :style
+      elsif layout
+        name, layout_or_style = layout, :layout
       else
-        puts optparse.help
+        layout_or_style = :style
       end
+
+      abort "[error] no template specified" if name.nil? || name.empty?
 
       file = Mint.lookup_template name, layout_or_style
       
@@ -142,8 +147,8 @@ module Mint
     # @return [void]
     def self.configure(opts, scope=:local)
       config_directory = Mint.path_for_scope(scope, true)
-      config_file = config_directory + Mint.files[:config]
-      Helpers.ensure_directory config_directory
+      config_file = config_directory + Mint.files[:defaults]
+      FileUtils.mkdir_p config_directory
       Helpers.update_yaml! opts, config_file
     end
 

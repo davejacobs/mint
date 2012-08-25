@@ -62,7 +62,7 @@ module Mint
 
       its(:destination) { should == 'css' }
       its(:destination_file) do
-        should == "#{Mint.root}/templates/default/css/style.css"
+        should == "#{Mint.root}/config/templates/default/css/style.css"
       end
     end
   end

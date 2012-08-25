@@ -64,14 +64,14 @@ module Mint
 
       context "when a config syntax file is loaded and there is a .config file" do
         before do
-          FileUtils.mkdir_p '.mint/config'
-          File.open('.mint/config/config.yaml', 'w') do |file|
+          FileUtils.mkdir_p '.mint'
+          File.open('.mint/defaults.yaml', 'w') do |file|
             file << 'layout: zen'
           end
         end
 
         after do
-          File.delete '.mint/config/config.yaml'
+          File.delete '.mint/defaults.yaml'
         end
 
         it "merges all specified options with precedence according to scope" do
