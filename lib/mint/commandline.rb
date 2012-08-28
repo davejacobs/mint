@@ -93,6 +93,8 @@ module Mint
       puts message
     end
 
+    # Install the named file as a template
+    #
     # @param [File] file the file to install to the appropriate Mint directory
     # @param [Hash] commandline_options a structured set of options, including 
     #   a scope label that the method will use to choose the appropriate 
@@ -117,6 +119,30 @@ module Mint
         FileUtils.cp file, destination
       else
         raise '[error] no such file'
+      end
+    end
+
+    # Uninstall the named template
+    #
+    # @param [String] name the name of the template to be uninstalled
+    # @param [Hash] commandline_options a structured set of options, including 
+    #   a scope label that the method will use to choose the appropriate 
+    #   installation directory
+    # @return [void]
+    def self.uninstall(name, commandline_options={})
+      scope = [:global, :user].
+        select {|e| commandline_options[e] }.
+        first || :local
+
+      FileUtils.rm_r Mint.template_path(name, :all, :scope => scope)
+    end
+
+    # List the installed templates
+    #
+    # @return [void]
+    def self.templates
+      Mint.templates.each do |template|
+        puts "#{File.basename template} [#{template}]"
       end
     end
 

@@ -154,7 +154,12 @@ module Mint
     opts = defaults.merge(opts)
     path = Mint.path_for_scope(opts[:scope])
 
-    "#{path}/templates/#{name}/#{type}.#{opts[:ext]}"
+    case type
+    when :layout, :style
+      "#{path}/templates/#{name}/#{type}.#{opts[:ext]}"
+    when :all
+      "#{path}/templates/#{name}"
+    end
   end
 
   # Checks (non-rigorously) to see if the file is somewhere on the

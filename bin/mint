@@ -28,6 +28,12 @@ when :help
   Mint::CommandLine.help(parser.help)
 when :install
   Mint::CommandLine.install(ARGV.shift, commandline_options)
+when :uninstall
+  # TODO: Clean up syntax for this to match install syntax
+  # Right now it's `mint install file.scss -t pro` vs. `mint uninstall pro`
+  Mint::CommandLine.uninstall(ARGV.shift, commandline_options)
+when :templates
+  Mint::CommandLine.templates
 when :edit
   Mint::CommandLine.edit(ARGV.shift, commandline_options)
 when :set
