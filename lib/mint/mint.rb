@@ -24,7 +24,7 @@ module Mint
   # @return [String] the Mint path as a String or Pathname
   def self.path(as_path=false)
     mint_path = ENV['MINT_PATH'] || 
-      "#{Dir.getwd}/.mint:~/.mint:#{Mint.root}"
+      "#{Dir.getwd}/.mint:~/.mint:#{Mint.root}/config"
     paths = mint_path.split(':')
     as_path ? paths.map {|p| Pathname.new(p).expand_path } : paths
   end
@@ -54,16 +54,15 @@ module Mint
   # @return [Hash] key Mint directories
   def self.directories
     { 
-      templates: 'templates',
-      config: 'config'
+      templates: 'templates'
     }
   end
 
   # @return [Hash] key Mint files
   def self.files
     { 
-      syntax: directories[:config] + '/syntax.yaml',
-      config: directories[:config] + '/config.yaml'
+      syntax: 'syntax.yaml',
+      defaults: 'defaults.yaml'
     }
   end
 
@@ -145,6 +144,17 @@ module Mint
       select(&acceptable).select(&:exist?).first.tap do |template|
       raise TemplateNotFoundException unless template
     end.to_s
+  end
+
+  def self.template_path(name, type, opts={})
+    defaults = { 
+      scope: :local,
+      ext: { layout: 'haml', style: 'sass' }[type]
+    }
+    opts = defaults.merge(opts)
+    path = Mint.path_for_scope(opts[:scope])
+
+    "#{path}/templates/#{name}/#{type}.#{opts[:ext]}"
   end
 
   # Checks (non-rigorously) to see if the file is somewhere on the

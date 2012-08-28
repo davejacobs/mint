@@ -2,8 +2,6 @@ require 'spec_helper'
 
 module Mint
   describe Document do
-    before { @tmp_dir = Dir.getwd }
-
     # We're not going to re-test derivative methods like source_file_path
     # or root_directory. resource_spec.rb tells us that if the master
     # values hold true, then their derivatives will be what we expect, as well.
@@ -59,11 +57,11 @@ module Mint
       its(:style_destination) { should be_nil }
 
       its(:style_destination_file) do
-        should == Mint.root + '/templates/default/css/style.css'
+        should == Mint.root + '/config/templates/default/css/style.css'
       end
 
       its(:style_destination_directory) do 
-        should == Mint.root + '/templates/default/css'
+        should == Mint.root + '/config/templates/default/css'
       end
 
       its(:style_destination_file_path) do
@@ -77,7 +75,7 @@ module Mint
       its(:layout) { should be_in_directory('default') }
       its(:style) { should be_in_directory('default') }
 
-      its(:stylesheet) { should == Mint.root + '/templates/default/css/style.css' }
+      its(:stylesheet) { should == Mint.root + '/config/templates/default/css/style.css' }
 
       it_should_behave_like "all documents"
     end
@@ -128,11 +126,11 @@ module Mint
       its(:style_destination) { should be_nil }
 
       its(:style_destination_file) do
-        should == Mint.root + '/templates/default/css/style.css'
+        should == Mint.root + '/config/templates/default/css/style.css'
       end
 
       its(:style_destination_directory) do
-        should == Mint.root + '/templates/default/css'
+        should == Mint.root + '/config/templates/default/css'
       end
 
       its(:style_destination_file_path) do
@@ -146,7 +144,7 @@ module Mint
       its(:layout) { should be_in_directory('default') }
       its(:style) { should be_in_directory('default') }
 
-      its(:stylesheet) { should == Mint.root + '/templates/default/css/style.css' }
+      its(:stylesheet) { should == Mint.root + '/config/templates/default/css/style.css' }
 
       it_should_behave_like "all documents"
     end

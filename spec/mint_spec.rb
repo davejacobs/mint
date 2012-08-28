@@ -3,10 +3,10 @@ require 'spec_helper'
 describe Mint do
   subject { Mint }
   its(:root) { should == File.expand_path('../../../mint', __FILE__) }
-  its(:path) { should == ["#{Dir.getwd}/.mint", "~/.mint", Mint.root] }
+  its(:path) { should == ["#{Dir.getwd}/.mint", "~/.mint", Mint.root + "/config"] }
   its(:formats) { should include('md') }
   its(:css_formats) { should include('sass') }
-  its(:templates) { should include(Mint.root + '/templates/default') }
+  its(:templates) { should include(Mint.root + '/config/templates/default') }
 
   its(:default_options) do
     should == {
@@ -19,15 +19,14 @@ describe Mint do
 
   its(:directories) do 
     should == { 
-      templates: 'templates',
-      config: 'config'
+      templates: 'templates'
     }
   end
 
   its(:files) do 
     should == { 
-      syntax: Mint.directories[:config] + '/syntax.yaml',
-      config: Mint.directories[:config] + '/config.yaml' 
+      syntax: 'syntax.yaml',
+      defaults: 'defaults.yaml' 
     }
   end
 
@@ -38,7 +37,7 @@ describe Mint do
   it "chooses the appropriate path for scope" do
     Mint.path_for_scope(:local).should == "#{Dir.getwd}/.mint"
     Mint.path_for_scope(:user).should == '~/.mint'
-    Mint.path_for_scope(:global).should == Mint.root
+    Mint.path_for_scope(:global).should == Mint.root + "/config"
   end
 
   it "looks up the correct template according to scope" do
@@ -58,7 +57,7 @@ describe Mint do
 
   it "decides whether or not a file is a template file" do
     actual_template = Mint.lookup_template(:default, :layout)
-    fake_template = "#{Mint.root}/templates/default.css"
+    fake_template = "#{Mint.root}/config/templates/default.css"
     obvious_nontemplate = @dynamic_style_file
 
     actual_template.should be_a_template
@@ -90,5 +89,22 @@ describe Mint do
 
     its(:destination_file_path) { should exist }
     its(:style_destination_file_path) { should exist }
+  end
+
+  describe ".template_path" do
+    it "creates a template in the local directory" do
+      Mint.template_path('pro', :layout).should == 
+        File.expand_path('.mint/templates/pro/layout.haml') 
+    end
+
+    it "allows an extension to be specified" do
+      Mint.template_path('pro', :layout, :ext => 'erb').should == 
+        File.expand_path('.mint/templates/pro/layout.erb') 
+    end
+
+    it "allows a scope to be specified" do
+      Mint.template_path('pro', :layout, :scope => :user).should == 
+        '~/.mint/templates/pro/layout.haml' 
+    end
   end
 end
