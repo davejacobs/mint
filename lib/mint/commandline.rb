@@ -110,8 +110,11 @@ module Mint
       destination = Mint.template_path(name, type, :scope => scope, :ext => ext) 
       FileUtils.mkdir_p File.expand_path("#{destination}/..")
 
+      puts "reading file"
+      puts File.read file
+
       if File.exist? file
-        FileUtils.copy file, destination
+        FileUtils.cp file, destination
       else
         raise '[error] no such file'
       end
