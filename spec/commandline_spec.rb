@@ -82,10 +82,18 @@ module Mint
 
     it "displays the sum of all configuration files with other options added"
     it "prints a help message"
-    it "installs a template file to the correct scope"
     it "pulls up a named template file in the user's editor"
     it "writes options to the correct file for the scope specified"
     it "sets and stores a scoped configuration variable"
     it "publishes a set of files"
+
+    describe "#install" do
+      describe "when there is no template by the specified name" do
+        it "installs the specified file as a new template" do
+          CommandLine.install("dynamic.sass", :template => "pro")
+          Mint.find_template("pro", :style).should == Mint.template_path("pro", :style, :scope => :local, :ext => "sass")
+        end
+      end
+    end
   end
 end

@@ -146,6 +146,17 @@ module Mint
     end.to_s
   end
 
+  def self.template_path(name, type, opts={})
+    defaults = { 
+      scope: :local,
+      ext: { layout: 'haml', style: 'sass' }[type]
+    }
+    opts = defaults.merge(opts)
+    path = Mint.path_for_scope(opts[:scope])
+
+    "#{path}/templates/#{name}/#{type}.#{opts[:ext]}"
+  end
+
   # Checks (non-rigorously) to see if the file is somewhere on the
   # MINT_PATH
   #

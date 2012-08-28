@@ -90,4 +90,21 @@ describe Mint do
     its(:destination_file_path) { should exist }
     its(:style_destination_file_path) { should exist }
   end
+
+  describe ".template_path" do
+    it "creates a template in the local directory" do
+      Mint.template_path('pro', :layout).should == 
+        File.expand_path('.mint/templates/pro/layout.haml') 
+    end
+
+    it "allows an extension to be specified" do
+      Mint.template_path('pro', :layout, :ext => 'erb').should == 
+        File.expand_path('.mint/templates/pro/layout.erb') 
+    end
+
+    it "allows a scope to be specified" do
+      Mint.template_path('pro', :layout, :scope => :user).should == 
+        '~/.mint/templates/pro/layout.haml' 
+    end
+  end
 end

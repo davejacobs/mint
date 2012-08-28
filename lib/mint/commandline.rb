@@ -99,13 +99,22 @@ module Mint
     #   installation directory
     # @return [void]
     def self.install(file, commandline_options={})
-      commandline_options[:local] = true
-      scope = [:global, :user, :local].
+      scope = [:global, :user].
         select {|e| commandline_options[e] }.
-        first
+        first || :local
 
-      directory = Mint.path_for_scope(scope)
-      FileUtils.copy file, directory
+      filename, ext = file.split '.'
+
+      name = commandline_options[:template] || filename
+      type = Mint.css_formats.include?(ext) ? :style : :layout
+      destination = Mint.template_path(name, type, :scope => scope, :ext => ext) 
+      FileUtils.mkdir_p File.expand_path("#{destination}/..")
+
+      if File.exist? file
+        FileUtils.copy file, destination
+      else
+        raise '[error] no such file'
+      end
     end
 
     # Retrieve named template file (probably a built-in or installed 

@@ -65,7 +65,8 @@ module Mint
     def self.parse(style)
       css = style.map {|k,v| stylify(k, v) }.join("\n  ")
       container_scope = "##{container}\n  #{css.strip}\n"
-      Sass::Engine.new(container_scope).render
+      engine = Sass::Engine.new(container_scope)
+      engine.silence_sass_warnings { engine.render }
     end
   end
 end

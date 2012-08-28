@@ -2,8 +2,6 @@ require 'spec_helper'
 
 module Mint
   describe Style do
-    before { @tmp_dir = Dir.getwd }
-
     context "when it's created from a static file" do
       let(:style) { Style.new @static_style_file }
       subject { style }

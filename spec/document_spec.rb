@@ -2,8 +2,6 @@ require 'spec_helper'
 
 module Mint
   describe Document do
-    before { @tmp_dir = Dir.getwd }
-
     # We're not going to re-test derivative methods like source_file_path
     # or root_directory. resource_spec.rb tells us that if the master
     # values hold true, then their derivatives will be what we expect, as well.
