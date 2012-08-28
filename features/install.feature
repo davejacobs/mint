@@ -60,5 +60,7 @@ Feature: Publish document with varying options at the command line
   Scenario: Uninstall an installed file
     When I run `mint install -t pro file.sass`
     Then a directory named ".mint/templates/pro" should exist
+    When I run `mint templates`
+    Then the output should contain "pro"
     When I run `mint uninstall pro`
     Then a directory named ".mint/templates/pro" should not exist
