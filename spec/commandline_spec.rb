@@ -87,12 +87,22 @@ module Mint
     it "sets and stores a scoped configuration variable"
     it "publishes a set of files"
 
-    describe "#install" do
+    describe ".install" do
       describe "when there is no template by the specified name" do
         it "installs the specified file as a new template" do
           CommandLine.install("dynamic.sass", :template => "pro")
           Mint.find_template("pro", :style).should == Mint.template_path("pro", :style, :scope => :local, :ext => "sass")
         end
+      end
+    end
+
+    describe ".uninstall" do
+      it "uninstalls the specified template" do
+        CommandLine.install("dynamic.sass", :template => "pro")
+        CommandLine.uninstall("pro")
+        lambda do
+          Mint.find_template("pro", :style)
+        end.should raise_error
       end
     end
   end

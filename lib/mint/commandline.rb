@@ -117,6 +117,14 @@ module Mint
       end
     end
 
+    def self.uninstall(name, commandline_options={})
+      scope = [:global, :user].
+        select {|e| commandline_options[e] }.
+        first || :local
+
+      FileUtils.rm_r Mint.template_path(name, :all, :scope => scope)
+    end
+
     # Retrieve named template file (probably a built-in or installed 
     # template) and shell out that file to the user's favorite editor.
     #
