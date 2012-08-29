@@ -101,6 +101,7 @@ module Mint
     #   installation directory
     # @return [void]
     def self.install(file, commandline_options={})
+      opts = { scope: :local }.merge(commandline_options)
       scope = [:global, :user].
         select {|e| commandline_options[e] }.
         first || :local
@@ -109,7 +110,7 @@ module Mint
 
       name = commandline_options[:template] || filename
       type = Mint.css_formats.include?(ext) ? :style : :layout
-      destination = Mint.template_path(name, type, :scope => scope, :ext => ext) 
+      destination = Mint.template_path(name, type, :scope => opts[:scope], :ext => ext) 
       FileUtils.mkdir_p File.expand_path("#{destination}/..")
 
       if File.exist? file
@@ -127,21 +128,24 @@ module Mint
     #   installation directory
     # @return [void]
     def self.uninstall(name, commandline_options={})
-      scope = [:global, :user].
-        select {|e| commandline_options[e] }.
-        first || :local
-
-      FileUtils.rm_r Mint.template_path(name, :all, :scope => scope)
+      opts = { scope: :local }.merge(commandline_options)
+      FileUtils.rm_r Mint.template_path(name, :all, :scope => opts[:scope])
     end
 
     # List the installed templates
     #
     # @return [void]
-    def self.templates
-      Mint.templates.each do |template|
-        puts "#{File.basename template} [#{template}]"
+    def self.templates(filter=nil, commandline_options={})
+      opts = { scope: :local }.merge(commandline_options)
+
+      Mint.templates(opts[:scope]).
+        grep(Regexp.new(filter || "")).
+        sort.each do |template|
+          print File.basename template
+          print " [#{template}]" if opts[:verbose]
+          puts
+        end
       end
-    end
 
     # Retrieve named template file (probably a built-in or installed 
     # template) and shell out that file to the user's favorite editor.
@@ -151,7 +155,7 @@ module Mint
     #   a layout or style flag that the method will use to choose the appropriate 
     #   file to edit
     # @return [void]
-    def self.edit(name, commandline_options)
+    def self.edit(name, commandline_options={})
       layout = commandline_options[:layout]
       style = commandline_options[:style]
 
