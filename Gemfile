@@ -1,10 +1,16 @@
-source :gemcutter
+source :rubygems
 
 gem 'tilt'
 gem 'rdiscount'
-gem 'erubis'
 gem 'haml'
 gem 'sass'
 gem 'less'
 gem 'activesupport'
+
+gem 'rubyzip'
+gem 'hashie'
+gem 'nokogiri'
+
 gem 'rspec'
+gem 'cucumber'
+gem 'aruba'
