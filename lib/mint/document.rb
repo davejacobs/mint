@@ -6,10 +6,64 @@ module Mint
   class Document < Resource
     METADATA_DELIM = "\n\n"
 
+    # Creates a new Mint Document object. Can be block initialized.
+    # Accepts source and options. Block initialization occurs after
+    # all defaults are set, so not all options must be specified.
+    def initialize(source, opts={})
+      options = Mint.default_options.merge opts
+
+      # Loads source and destination, which will be used for
+      # all source_* and destination_* virtual attributes.
+      super(source, options)
+      self.type     = :document
+
+      # Each of these should invoke explicitly defined method
+      self.content  = source
+      self.layout   = options[:layout]
+      self.style    = options[:style]
+      self.style_destination = options[:style_destination]
+
+      # The template option will override layout and style choices
+      self.template = options[:template]
+
+      # Yield self to block after all other parameters are loaded,
+      # so we only have to tweak. (We don't have to give up our
+      # defaults or re-test blocks beyond them being tweaked.)
+      yield self if block_given?
+    end
+
+    # Renders content in the context of layout and returns as a String.
+    def render(args={})
+      intermediate_content = layout.render self, args
+      Mint.after_render(intermediate_content)
+    end
+
+    # Writes all rendered content where a) possible, b) required,
+    # and c) specified. Outputs to specified file.
+    def publish!(opts={})      
+      options = { :render_style => true }.merge(opts)
+      FileUtils.mkdir_p self.destination_directory
+      File.open(self.destination_file, 'w+') do |f|
+        f << self.render
+      end
+
+      # Only renders style if a) it's specified by the options path and
+      # b) it actually needs rendering (i.e., it's in template form and
+      # not raw, browser-parseable CSS) or it if it doesn't need
+      # rendering but there is an explicit style_destination.
+      if options[:render_style]
+        FileUtils.mkdir_p style_destination_directory
+        File.open(self.style_destination_file, 'w+') do |f|
+          f << self.style.render
+        end
+      end
+
+      Mint.after_publish(self, opts)
+    end
+
     # Implicit readers are paired with explicit accessors. This
     # allows for processing variables before storing them.
-    attr_reader :content, :layout, :style
-    attr_accessor :metadata
+    attr_reader :content, :metadata, :layout, :style
 
     # Passes content through a renderer before assigning it to be
     # the Document's content
@@ -21,11 +75,12 @@ module Mint
       tempfile = Helpers.generate_temp_file! content
       original_content = File.read content
 
-      metadata, text = Document.parse_metadata_from original_content
-      self.metadata = metadata
+      @metadata, text = Document.parse_metadata_from original_content
       intermediate_content = Mint.before_render text
 
-      File.open(tempfile, 'w') {|file| file << intermediate_content }
+      File.open(tempfile, 'w') do |file|
+        file << intermediate_content
+      end
 
       @renderer = Mint.renderer tempfile
       @content = @renderer.render
@@ -63,6 +118,17 @@ module Mint
         end
     rescue TemplateNotFoundException
       abort "Template '#{style}' does not exist."
+    end
+
+    # Overrides layout and style settings with named template.
+    #
+    # @param [String] template the name of the template to set as
+    #   layout and string
+    def template=(template)
+      if template
+        self.layout = template
+        self.style = template
+      end
     end
 
     # Explanation of style_destination:
@@ -126,72 +192,6 @@ module Mint
       style_destination_directory_path.to_s
     end
 
-    # Overrides layout and style settings with named template.
-    #
-    # @param [String] template the name of the template to set as
-    #   layout and string
-    def template=(template)
-      if template
-        self.layout = template
-        self.style = template
-      end
-    end
-    
-    # Creates a new Mint Document object. Can be block initialized.
-    # Accepts source and options. Block initialization occurs after
-    # all defaults are set, so not all options must be specified.
-    def initialize(source, opts={})
-      options = Mint.default_options.merge opts
-
-      # Loads source and destination, which will be used for
-      # all source_* and destination_* virtual attributes.
-      super(source, options)
-      self.type     = :document
-
-      # Each of these should invoke explicitly defined method
-      self.content  = source
-      self.layout   = options[:layout]
-      self.style    = options[:style]
-      self.style_destination = options[:style_destination]
-
-      # The template option will override layout and style choices
-      self.template = options[:template]
-
-      # Yield self to block after all other parameters are loaded,
-      # so we only have to tweak. (We don't have to give up our
-      # defaults or re-test blocks beyond them being tweaked.)
-      yield self if block_given?
-    end
-
-    # Renders content in the context of layout and returns as a String.
-    def render(args={})
-      intermediate_content = layout.render self, args
-      Mint.after_render(intermediate_content)
-    end
-
-    # Writes all rendered content where a) possible, b) required,
-    # and c) specified. Outputs to specified file.
-    def publish!(opts={})      
-      options = { :render_style => true }.merge(opts)
-      FileUtils.mkdir_p self.destination_directory
-      File.open(self.destination_file, 'w+') do |f|
-        f << self.render
-      end
-
-      # Only renders style if a) it's specified by the options path and
-      # b) it actually needs rendering (i.e., it's in template form and
-      # not raw, browser-parseable CSS) or it if it doesn't need
-      # rendering but there is an explicit style_destination.
-      if options[:render_style]
-        FileUtils.mkdir_p style_destination_directory
-        File.open(self.style_destination_file, 'w+') do |f|
-          f << self.style.render
-        end
-      end
-
-      Mint.after_publish(self, opts)
-    end
-
     # Convenience methods for views
 
     # Returns a relative path from the document to its stylesheet. Can
@@ -205,29 +205,31 @@ module Mint
       CSS.parse(metadata)
     end
 
-    protected
+    # Functions
 
-    def self.metadata_chunk(text)
-      text.split(METADATA_DELIM).first
-    end
+    class << self
+      def metadata_chunk(text)
+        text.split(METADATA_DELIM).first
+      end
 
-    def self.metadata_from(text)
-      raw_metadata = YAML.load metadata_chunk(text)
-      raw_metadata.is_a?(String) ? {} : raw_metadata
-    rescue
-      {}
-    end
+      def metadata_from(text)
+        raw_metadata = YAML.load metadata_chunk(text)
+        raw_metadata.is_a?(String) ? {} : raw_metadata
+      rescue
+        {}
+      end
 
-    def self.parse_metadata_from(text)
-      metadata = metadata_from text
-      new_text =
-        if !metadata.empty?
-          text.sub metadata_chunk(text) + METADATA_DELIM, ''
-        else
-          text
-        end
+      def parse_metadata_from(text)
+        metadata = metadata_from text
+        new_text =
+          if !metadata.empty?
+            text.sub metadata_chunk(text) + METADATA_DELIM, ''
+          else
+            text
+          end
 
-      [metadata, new_text]
+        [metadata, new_text]
+      end
     end
   end
 end
