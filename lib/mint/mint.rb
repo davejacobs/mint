@@ -90,9 +90,7 @@ module Mint
   end
 
   # @return [Array] the full path for each known template in the Mint path
-  def self.templates
-    templates_dir = Mint.directories[:templates]
-
+  def self.templates(opts={})
     Mint.path(true).
       map {|p| p + directories[:templates] }.
       select(&:exist?).

@@ -52,8 +52,6 @@ Feature: Publish document with varying options at the command line
       | erb  | -t pro        | --local | .mint   | pro      | layout.erb  |
       | sass | -t pro        | --local | .mint   | pro      | style.sass  |
       | scss | -t pro        | --local | .mint   | pro      | style.scss  |
-
-      # Not yet confirmed to be valid expectations
       | haml | -t pro        |         | .mint   | pro      | layout.haml |
       | haml |               |         | .mint   | file     | layout.haml |
 
@@ -64,3 +62,21 @@ Feature: Publish document with varying options at the command line
     Then the output should contain "pro"
     When I run `mint uninstall pro`
     Then a directory named ".mint/templates/pro" should not exist
+
+  Scenario: List all templates in scope
+    When I run `mint install -t pro file.sass`
+    And I run `mint templates --local`
+    Then the output should contain:
+      """
+      base
+      default
+      pro
+      protocol
+      zen
+      """
+    When I run `mint templates pro --local`
+    Then the output should contain:
+      """
+      pro
+      protocol
+      """

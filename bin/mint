@@ -33,7 +33,7 @@ when :uninstall
   # Right now it's `mint install file.scss -t pro` vs. `mint uninstall pro`
   Mint::CommandLine.uninstall(ARGV.shift, commandline_options)
 when :templates
-  Mint::CommandLine.templates
+  Mint::CommandLine.templates(ARGV.shift, commandline_options)
 when :edit
   Mint::CommandLine.edit(ARGV.shift, commandline_options)
 when :set

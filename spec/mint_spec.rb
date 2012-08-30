@@ -39,6 +39,17 @@ describe Mint do
     end
   end
 
+  describe ".templates" do
+    it "returns all templates if no scopes are passed in" do
+      Mint.templates.should include(Mint.root + '/config/templates/default') 
+    end
+
+    it "returns all local templates if the scope is local" do
+      pending "a rearchitecture and unification of scopes"
+      Mint.templates(:scope => :local).should_not include(Mint.root + '/config/templates/default')
+    end
+  end
+
   describe ".formats" do
     it "includes Markdown" do
       Mint.formats.should include("md")
@@ -52,12 +63,6 @@ describe Mint do
   describe ".css_formats" do
     it "includes Sass" do
       Mint.formats.should include("sass")
-    end
-  end
-
-  describe ".templates" do
-    it "returns all templates if no scopes are passed in" do
-      Mint.templates.should include(Mint.root + '/config/templates/default') 
     end
   end
 
