@@ -2,7 +2,7 @@ require 'spec_helper'
 
 module Mint
   describe CommandLine do
-    describe "#options" do
+    describe ".options" do
       it "provides default options" do
         CommandLine.options['template']['long'].should == 'template'
         CommandLine.options['layout']['long'].should == 'layout'
@@ -10,7 +10,7 @@ module Mint
       end
     end
 
-    describe "#parser" do
+    describe ".parser" do
       it "provides a default option parser" do
         fake_argv = ['--layout', 'zen']
 
@@ -42,7 +42,7 @@ module Mint
       end
     end
 
-    describe "#configuration" do
+    describe ".configuration" do
       context "when no config syntax file is loaded" do
         it "returns nil" do
           CommandLine.configuration(nil).should be_nil
@@ -80,12 +80,24 @@ module Mint
       end
     end
 
-    it "displays the sum of all configuration files with other options added"
-    it "prints a help message"
-    it "pulls up a named template file in the user's editor"
-    it "writes options to the correct file for the scope specified"
-    it "sets and stores a scoped configuration variable"
-    it "publishes a set of files"
+    describe ".configuration_with" do
+      it "displays the sum of all configuration files with other options added" do
+        CommandLine.configuration_with(:local => true).should == {
+          layout: 'default',
+          style: 'default',
+          destination: nil,
+          style_destination: nil,
+          local: true
+        }
+      end
+    end
+
+    describe ".help" do
+      it "prints a help message" do
+        STDOUT.should_receive(:puts).with('message')
+        CommandLine.help('message')
+      end
+    end
 
     describe ".install" do
       describe "when there is no template by the specified name" do
@@ -103,6 +115,36 @@ module Mint
         lambda do
           Mint.find_template("pro", :style)
         end.should raise_error
+      end
+    end
+
+    describe ".edit" do
+      it "pulls up a named template file in the user's editor" do
+        ENV['EDITOR'] = 'vim'
+        CommandLine.should_receive(:system).with("vim #{@dynamic_style_file}")
+        CommandLine.edit(@dynamic_style_file)
+      end
+    end
+
+    describe ".configure" do
+      it "writes options to the correct file for the scope specified" do
+        CommandLine.configuration[:layout].should == "default"
+        CommandLine.configure({ layout: "pro" }, :local)
+        CommandLine.configuration[:layout].should == "pro"
+      end
+    end
+
+    describe ".set" do
+      it "sets and stores a scoped configuration variable" do
+        CommandLine.should_receive(:configure).with({ layout: "pro" }, :local)
+        CommandLine.set(:layout, "pro", :scope => :local)
+      end
+    end
+
+    describe ".publish!" do
+      it "publishes a set of files" do
+        CommandLine.publish!([@content_file])
+        File.exist?("content.html").should be_true
       end
     end
   end

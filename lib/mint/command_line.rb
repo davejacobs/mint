@@ -200,7 +200,7 @@ module Mint
     #   a scope label that the method will use to choose the appropriate 
     #   scope
     # @return [void]
-    def self.set(key, value, commandline_options)
+    def self.set(key, value, commandline_options={})
       commandline_options[:local] = true
       scope = [:global, :user, :local].
         select {|e| commandline_options[e] }.
@@ -228,18 +228,10 @@ module Mint
     # @param [Hash, #[]] commandline_options a structured set of configuration options
     #   that will guide Mint.publish!
     # @return [void]
-    def self.publish!(files, commandline_options)
-      documents = []
-      options = configuration_with commandline_options
-      
-      options[:root] ||= Dir.getwd
-
-      # Eventually render_style should be replaced with file 
-      # change detection
-      render_style = true
-      files.each do |file|
-        Document.new(file, options).publish! :render_style => render_style
-        render_style = false
+    def self.publish!(files, commandline_options={})
+      options = { root: Dir.getwd }.merge(configuration_with commandline_options)
+      files.each_with_index do |file, idx|
+        Document.new(file, options).publish!(:render_style => (idx == 0))
       end
     end
   end
