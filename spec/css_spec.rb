@@ -2,7 +2,7 @@ require 'spec_helper'
 
 module Mint
   describe CSS do
-    describe "#stylify" do
+    describe ".stylify" do
       it "translates from human-readable configuration to CSS" do
         table = {
           "Font: Helvetica"         => "font-family: Helvetica",
