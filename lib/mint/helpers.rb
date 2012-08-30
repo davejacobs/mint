@@ -103,6 +103,10 @@ module Mint
       end
     end
 
+    def self.hashify(list1, list2)
+      Hash[*list1.zip(list2).flatten]
+    end
+
     # Returns the relative path to to_directory from from_directory. 
     # If to_directory and from_directory have no parents in common besides 
     # /, returns the absolute directory of to_directory. Assumes no symlinks.

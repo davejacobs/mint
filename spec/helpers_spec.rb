@@ -174,6 +174,16 @@ module Mint
       end
     end
 
+    describe "#hashify" do
+      it "zips two lists of the same size into a Hash" do
+        Helpers.hashify([:one, :two, :three], [1, 2, 3]).should == {
+          one: 1,
+          two: 2,
+          three: 3
+        }
+      end
+    end
+
     describe "#normalize_path" do
       it "handles two files in the same directory" do
         path1 = '~/file1'
