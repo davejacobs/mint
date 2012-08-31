@@ -23,21 +23,73 @@ describe Mint do
 
   describe ".path" do
     def as_pathname(files)
-      files.map {|file| Pathname.new(file).expand_path }
+      files.map {|file| Pathname.new(file) }
     end
 
     it "it returns the paths corresponding to all scopes as an array" do
-      files_in_scope = ["#{Dir.getwd}/.mint", "~/.mint", Mint.root + "/config"] 
-      Mint.path.should == as_pathname(files_in_scope)
-    end
-
-    it "can filter paths by many scopes" do
-      files_in_scope = ["#{Dir.getwd}/.mint", "~/.mint"] 
-      Mint.path(:scopes => [:local, :user]).should == as_pathname(files_in_scope)
+      Mint.path.should == [Pathname.new(".mint"),
+                           Pathname.new("~/.mint").expand_path,
+                           Pathname.new(Mint.root + "/config").expand_path]
     end
 
     it "can filter paths by one scope" do
-      Mint.path(:scopes => [:user]).should == as_pathname(["~/.mint"])
+      Mint.path(:scopes => [:user]).should == [Pathname.new("~/.mint").expand_path]
+    end
+
+    it "can filter paths by many scopes" do
+      Mint.path(:scopes => [:local, :user]).should == [Pathname.new(".mint"),
+                                                       Pathname.new("~/.mint").expand_path]
+    end
+  end
+
+
+  describe ".configuration" do
+    let(:defaults) do
+      {
+        layout: 'default',
+        style: 'default',
+        destination: nil,
+        style_destination: nil
+      }
+    end
+
+    context "when there is no defaults.yaml file on the Mint path" do
+      it "returns a default set of options" do
+        Mint.configuration.should == defaults 
+      end
+    end
+
+    context "when there is a defaults.yaml file on the Mint path" do
+      before do
+        FileUtils.mkdir_p '.mint'
+        File.open('.mint/defaults.yaml', 'w') do |file|
+          file << 'layout: zen'
+        end
+      end
+
+      after do
+        FileUtils.rm_rf '.mint'
+      end
+
+      it "merges all specified options with precedence according to scope" do
+        Mint.configuration[:layout].should == 'zen'
+      end
+
+      it "can filter by scope (but always includes defaults)" do
+        Mint.configuration(:scopes => [:user]).should == defaults
+      end
+    end
+  end
+
+  describe ".configuration_with" do
+    it "displays the sum of all configuration files with other options added" do
+      Mint.configuration_with(:local => true).should == {
+        layout: 'default',
+        style: 'default',
+        destination: nil,
+        style_destination: nil,
+        local: true
+      }
     end
   end
 
@@ -77,7 +129,7 @@ describe Mint do
   describe ".path_for_scope" do
     it "chooses the appropriate path for scope" do
       expectations = {
-        local: Pathname.new("#{Dir.getwd}/.mint").expand_path,
+        local: Pathname.new(".mint"),
         user: Pathname.new("~/.mint").expand_path,
         global: Pathname.new(Mint.root + "/config").expand_path
       }
@@ -150,12 +202,12 @@ describe Mint do
   describe ".template_path" do
     it "creates a template in the local directory" do
       Mint.template_path('pro', :layout).should == 
-        File.expand_path('.mint/templates/pro/layout.haml') 
+        '.mint/templates/pro/layout.haml' 
     end
 
     it "allows an extension to be specified" do
       Mint.template_path('pro', :layout, :ext => 'erb').should == 
-        File.expand_path('.mint/templates/pro/layout.erb') 
+        '.mint/templates/pro/layout.erb' 
     end
 
     it "allows a scope to be specified" do

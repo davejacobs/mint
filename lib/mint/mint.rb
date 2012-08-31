@@ -9,7 +9,7 @@ module Mint
   ROOT = (Pathname.new(__FILE__).realpath.dirname + '../..').to_s 
 
   SCOPES = {
-    local:  Pathname.new("#{Dir.getwd}/.mint").expand_path,
+    local:  Pathname.new(".mint"),
     user:   Pathname.new("~/.mint").expand_path,
     global: Pathname.new("#{ROOT}/config").expand_path
   }
@@ -95,6 +95,39 @@ module Mint
   #   name guessing/conversion only.
   def self.css_formats
     ['css', 'sass', 'scss', 'less']
+  end
+
+  # Returns a hash of all active options specified by file (for all scopes).
+  # That is, if you specify file as 'defaults.yaml', this will return the aggregate
+  # of all defaults.yaml-specified options in the Mint path, where more local
+  # members of the path take precedence over more global ones.
+  #
+  # @param [String] file a filename pointing to a Mint configuration file
+  # @return [Hash] a structured set of configuration options
+  def self.configuration(opts={})
+    opts = { scopes: SCOPE_NAMES }.merge(opts)
+
+    # Merge config options from all config files on the Mint path,
+    # where more local options take precedence over more global
+    # options
+    configuration = Mint.path(:scopes => opts[:scopes]).
+      map {|p| p + Mint.files[:defaults] }.
+      select(&:exist?).
+      map {|p| YAML.load_file p }.
+      reverse.
+      reduce(Mint.default_options) {|r,p| r.merge p }
+
+    Helpers.symbolize_keys configuration
+  end
+
+  # Returns all configuration options (as specified by the aggregate
+  # of all config files), along with opts, where opts take precedence.
+  #
+  # @param [Hash] additional options to add to the current configuration
+  # @return [Hash] a structured set of configuration options with opts
+  #   overriding any options from config files
+  def self.configuration_with(opts)
+    configuration.merge opts
   end
 
   # @return [Array] the full path for each known template in the Mint path

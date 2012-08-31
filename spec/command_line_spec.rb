@@ -42,56 +42,6 @@ module Mint
       end
     end
 
-    describe ".configuration" do
-      context "when no config syntax file is loaded" do
-        it "returns nil" do
-          CommandLine.configuration(nil).should be_nil
-        end
-      end
-
-      context "when a config syntax file is loaded but there is no .config file" do
-        it "returns a default set of options" do
-          expected_map = {
-            layout: 'default',
-            style: 'default',
-            destination: nil,
-            style_destination: nil
-          }
-
-          CommandLine.configuration.should == expected_map 
-        end
-      end
-
-      context "when a config syntax file is loaded and there is a .config file" do
-        before do
-          FileUtils.mkdir_p '.mint'
-          File.open('.mint/defaults.yaml', 'w') do |file|
-            file << 'layout: zen'
-          end
-        end
-
-        after do
-          File.delete '.mint/defaults.yaml'
-        end
-
-        it "merges all specified options with precedence according to scope" do
-          CommandLine.configuration[:layout].should == 'zen'
-        end
-      end
-    end
-
-    describe ".configuration_with" do
-      it "displays the sum of all configuration files with other options added" do
-        CommandLine.configuration_with(:local => true).should == {
-          layout: 'default',
-          style: 'default',
-          destination: nil,
-          style_destination: nil,
-          local: true
-        }
-      end
-    end
-
     describe ".help" do
       it "prints a help message" do
         STDOUT.should_receive(:puts).with('message')
@@ -128,9 +78,9 @@ module Mint
 
     describe ".configure" do
       it "writes options to the correct file for the scope specified" do
-        CommandLine.configuration[:layout].should == "default"
+        Mint.configuration[:layout].should == "default"
         CommandLine.configure({ layout: "pro" }, :local)
-        CommandLine.configuration[:layout].should == "pro"
+        Mint.configuration[:layout].should == "pro"
       end
     end
 

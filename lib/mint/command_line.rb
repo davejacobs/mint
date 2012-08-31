@@ -3,6 +3,8 @@ require 'yaml'
 require 'optparse'
 require 'fileutils'
 
+require 'active_support/core_ext/object/blank'
+
 module Mint
   module CommandLine
     # Commandline-related helper methods
@@ -48,39 +50,6 @@ module Mint
           end
         end
       end
-    end
-
-    # Returns a hash of all active options specified by file (for all scopes).
-    # That is, if you specify file as 'defaults.yaml', this will return the aggregate
-    # of all defaults.yaml-specified options in the Mint path, where more local
-    # members of the path take precedence over more global ones.
-    #
-    # @param [String] file a filename pointing to a Mint configuration file
-    # @return [Hash] a structured set of configuration options
-    def self.configuration(file=Mint.files[:defaults])
-      return nil unless file
-      config_file = Pathname.new file
-
-      # Merge config options from all config files on the Mint path,
-      # where more local options take precedence over more global
-      # options
-      configuration = Mint.path.map {|p| p + config_file }.
-        select(&:exist?).
-        map {|p| YAML.load_file p }.
-        reverse.
-        reduce(Mint.default_options) {|r,p| r.merge p }
-
-      Helpers.symbolize_keys configuration
-    end
-
-    # Returns all configuration options (as specified by the aggregate
-    # of all config files), along with opts, where opts take precedence.
-    #
-    # @param [Hash] additional options to add to the current configuration
-    # @return [Hash] a structured set of configuration options with opts
-    #   overriding any options from config files
-    def self.configuration_with(opts)
-      configuration.merge opts
     end
 
     # Mint built-in commands
@@ -136,7 +105,9 @@ module Mint
     #
     # @return [void]
     def self.templates(filter=nil, commandline_options={})
-      scopes = Mint::SCOPE_NAMES.select {|sn| commandline_options[sn] }
+      scopes = Mint::SCOPE_NAMES.select do |s|
+        commandline_options[s] 
+      end.presence || Mint::SCOPE_NAMES
 
       Mint.templates(:scopes => scopes).
         grep(Regexp.new(filter || "")).
@@ -215,7 +186,7 @@ module Mint
     #
     # @return [void]
     def self.config
-      puts YAML.dump(configuration)
+      puts YAML.dump(Mint.configuration)
     end
     
     # Renders and writes to file all resources described by a document.
@@ -230,7 +201,7 @@ module Mint
     #   that will guide Mint.publish!
     # @return [void]
     def self.publish!(files, commandline_options={})
-      options = { root: Dir.getwd }.merge(configuration_with commandline_options)
+      options = { root: Dir.getwd }.merge(Mint.configuration_with commandline_options)
       files.each_with_index do |file, idx|
         Document.new(file, options).publish!(:render_style => (idx == 0))
       end
