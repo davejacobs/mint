@@ -214,8 +214,16 @@ module Mint
     end
 
     describe ".update_yaml!" do
-      it "loads existing YAML data from file"
-      it "combines existing YAML data with new data and writes to file"
+      before do
+        File.open "example.yaml", "w" do |file|
+          file << "conflicting: foo\nnon-conflicting: bar"
+        end
+      end
+
+      it "combines specified data with data in YAML file and updates file" do
+        Helpers.update_yaml! 'example.yaml', 'conflicting' => 'baz'
+        YAML.load_file('example.yaml')['conflicting'].should == 'baz'
+      end
     end
 
     describe ".generate_temp_file!" do

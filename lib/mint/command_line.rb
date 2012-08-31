@@ -158,9 +158,8 @@ module Mint
     # @return [void]
     def self.configure(opts, scope=:local)
       config_directory = Mint.path_for_scope(scope, true)
-      config_file = config_directory + Mint.files[:defaults]
       FileUtils.mkdir_p config_directory
-      Helpers.update_yaml! opts, config_file
+      Helpers.update_yaml! "#{config_directory}/#{Mint.files[:defaults]}", opts
     end
 
     # Tries to set a config option (at the specified scope) per 
