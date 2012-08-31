@@ -1,7 +1,7 @@
-Feature: Publish document with varying options at the command line
+Feature: Install, uninstall, and list templates
   As a writer
-  I want to create a document at the command line from plain text
-  So that I can view a typeset version in a web browser
+  I want to use existing stylesheets and install my own
+  So that I do not have to clutter up my workspace with styles
 
   Background:
     Given a file named "file.sass" with:
