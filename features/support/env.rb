@@ -19,15 +19,12 @@ Before do
   @old_path = ENV['PATH']
   @bin_path = File.expand_path('../../../bin', __FILE__)
 
-  # puts "path is #{@old_path}"
   unless @old_path.include? @bin_path
-    puts "changing path to #{@bin_path}"
     system "export PATH=#{@bin_path}:$PATH"
   end
-  # puts "now mint command should alias to #{`which mint`}"
 end
 
 After do
-  # puts "reverting path to #{@old_path}"
+  FileUtils.rm_rf "tmp/aruba/.mint"
   ENV['PATH'] = @old_path
 end
