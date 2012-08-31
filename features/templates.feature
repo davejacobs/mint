@@ -58,25 +58,22 @@ Feature: Publish document with varying options at the command line
   Scenario: Uninstall an installed file
     When I run `mint install -t pro file.sass`
     Then a directory named ".mint/templates/pro" should exist
-    When I run `mint templates`
+    When I run `mint templates --local`
     Then the output should contain "pro"
     When I run `mint uninstall pro`
     Then a directory named ".mint/templates/pro" should not exist
 
   Scenario: List all templates in scope
-    When I run `mint install -t pro file.sass`
+    When I run `mint install -t one file.sass --local`
+    When I run `mint install -t two file.sass --local`
     And I run `mint templates --local`
     Then the output should contain:
       """
-      base
-      default
-      pro
-      protocol
-      zen
+      one
+      two
       """
-    When I run `mint templates pro --local`
+    When I run `mint templates one --local`
     Then the output should contain:
       """
-      pro
-      protocol
+      one
       """

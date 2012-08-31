@@ -64,7 +64,7 @@ module Mint
       # Merge config options from all config files on the Mint path,
       # where more local options take precedence over more global
       # options
-      configuration = Mint.path(true).map {|p| p + config_file }.
+      configuration = Mint.path.map {|p| p + config_file }.
         select(&:exist?).
         map {|p| YAML.load_file p }.
         reverse.
@@ -136,16 +136,17 @@ module Mint
     #
     # @return [void]
     def self.templates(filter=nil, commandline_options={})
-      opts = { scope: :local }.merge(commandline_options)
+      scopes = Mint::SCOPE_NAMES.select {|sn| commandline_options[sn] }
 
-      Mint.templates(opts[:scope]).
+      Mint.templates(:scopes => scopes).
         grep(Regexp.new(filter || "")).
-        sort.each do |template|
+        sort.
+        each do |template|
           print File.basename template
-          print " [#{template}]" if opts[:verbose]
+          print " [#{template}]" if commandline_options[:verbose]
           puts
         end
-      end
+    end
 
     # Retrieve named template file (probably a built-in or installed 
     # template) and shell out that file to the user's favorite editor.

@@ -22,20 +22,22 @@ describe Mint do
   end
 
   describe ".path" do
-    it "returns the Mint lookup path as a string if as_path is false" do
-      Mint.path(true).should == [
-        Pathname.new("#{Dir.getwd}/.mint"),
-        Pathname.new("~/.mint").expand_path,
-        Pathname.new(Mint.root + "/config")
-      ]
+    def as_pathname(files)
+      files.map {|file| Pathname.new(file).expand_path }
     end
 
-    it "returns the Mint lookup path as a string if as_path is false" do
-      Mint.path.should == [
-        "#{Dir.getwd}/.mint",
-        "~/.mint",
-        Mint.root + "/config"
-      ]
+    it "it returns the paths corresponding to all scopes as an array" do
+      files_in_scope = ["#{Dir.getwd}/.mint", "~/.mint", Mint.root + "/config"] 
+      Mint.path.should == as_pathname(files_in_scope)
+    end
+
+    it "can filter paths by many scopes" do
+      files_in_scope = ["#{Dir.getwd}/.mint", "~/.mint"] 
+      Mint.path(:scopes => [:local, :user]).should == as_pathname(files_in_scope)
+    end
+
+    it "can filter paths by one scope" do
+      Mint.path(:scopes => [:user]).should == as_pathname(["~/.mint"])
     end
   end
 
@@ -74,9 +76,15 @@ describe Mint do
 
   describe ".path_for_scope" do
     it "chooses the appropriate path for scope" do
-      Mint.path_for_scope(:local).should == "#{Dir.getwd}/.mint"
-      Mint.path_for_scope(:user).should == '~/.mint'
-      Mint.path_for_scope(:global).should == Mint.root + "/config"
+      expectations = {
+        local: Pathname.new("#{Dir.getwd}/.mint").expand_path,
+        user: Pathname.new("~/.mint").expand_path,
+        global: Pathname.new(Mint.root + "/config").expand_path
+      }
+
+      expectations.each do |scope, path|
+        Mint.path_for_scope(scope).should == path
+      end
     end
   end
 
@@ -152,7 +160,7 @@ describe Mint do
 
     it "allows a scope to be specified" do
       Mint.template_path('pro', :layout, :scope => :user).should == 
-        '~/.mint/templates/pro/layout.haml' 
+        File.expand_path('~/.mint/templates/pro/layout.haml')
     end
   end
 end

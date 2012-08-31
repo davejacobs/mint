@@ -3,7 +3,19 @@ require 'fileutils'
 require 'yaml'
 require 'tilt'
 
+require 'active_support/core_ext/hash/slice'
+
 module Mint
+  ROOT = (Pathname.new(__FILE__).realpath.dirname + '../..').to_s 
+
+  SCOPES = {
+    local:  Pathname.new("#{Dir.getwd}/.mint").expand_path,
+    user:   Pathname.new("~/.mint").expand_path,
+    global: Pathname.new("#{ROOT}/config").expand_path
+  }
+
+  SCOPE_NAMES = SCOPES.keys
+
   # Assume that someone using an Html template has formatted it
   # in Erb and that a Css stylesheet will pass untouched through
   # a Scss parser.
@@ -12,21 +24,17 @@ module Mint
 
   # @return [String] the Mint root path name
   def self.root
-    (Pathname.new(__FILE__).realpath.dirname + '../..').to_s
+    ROOT
   end
 
-  # Returns an array with the Mint template path. Will first look
-  # for MINT_PATH environment variable. Otherwise will use smart defaults.
-  # Either way, earlier/higher paths take precedence. And is considered to
-  # be the directory for "local" config options, templates, etc.
+  # Returns an array with the Mint template path for the named scope
+  # or scopes. This path is used to lookup templates and configuration options.
   #
-  # @param [Boolean] as_path if as_path is true, will return Pathname objects
-  # @return [String] the Mint path as a String or Pathname
-  def self.path(as_path=false)
-    mint_path = ENV['MINT_PATH'] || 
-      "#{Dir.getwd}/.mint:~/.mint:#{Mint.root}/config"
-    paths = mint_path.split(':')
-    as_path ? paths.map {|p| Pathname.new(p).expand_path } : paths
+  # @param [Hash] opts a list of options, including :scopes
+  # @return [Array] the Mint path as an Array of Pathnames
+  def self.path(opts={})
+    opts = { scopes: SCOPE_NAMES }.merge(opts)
+    SCOPES.slice(*opts[:scopes]).values
   end
 
   # Returns the part of Mint.path relevant to scope.
@@ -43,9 +51,9 @@ module Mint
     case Mint.path
     when Array
       index = { local: 0, user: 1, global: 2 }[scope]
-      Mint.path(as_path)[index]
+      Mint.path[index]
     when Hash
-      Mint.path(as_path)[scope]
+      Mint.path[scope]
     else
       nil
     end
@@ -91,11 +99,13 @@ module Mint
 
   # @return [Array] the full path for each known template in the Mint path
   def self.templates(opts={})
-    Mint.path(true).
+    opts = { scopes: SCOPE_NAMES }.merge(opts)
+    Mint.path(:scopes => opts[:scopes]).
       map {|p| p + directories[:templates] }.
       select(&:exist?).
       map {|p| p.children.select(&:directory?).map(&:to_s) }.
-      flatten
+      flatten.
+      sort
   end
 
   # Decides whether the template specified by `name_or_file` is a real
@@ -138,7 +148,7 @@ module Mint
     find_files = lambda {|x| Pathname.glob "#{x.to_s}.*" }
     acceptable = lambda {|x| x.to_s =~ /#{Mint.formats.join '|'}/ }
 
-    Mint.path(true).map(&file_name).map(&find_files).flatten.
+    Mint.path.map(&file_name).map(&find_files).flatten.
       select(&acceptable).select(&:exist?).first.tap do |template|
       raise TemplateNotFoundException unless template
     end.to_s
@@ -169,7 +179,7 @@ module Mint
     paths = Mint.path.map {|f| File.expand_path f }
     file_path = Pathname.new(file)
     file_path.exist? and 
-      file_path.dirname.expand_path.to_s =~ /#{paths.join('|')}/
+      file_path.dirname.expand_path.to_s =~ /#{paths.map(&:to_s).join('|')}/
   end
 
   # Guesses an appropriate name for the resource output file based on
