@@ -14,3 +14,5 @@ gem 'nokogiri'
 gem 'rspec'
 gem 'cucumber'
 gem 'aruba'
+
+gem 'debugger'
