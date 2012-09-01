@@ -16,7 +16,7 @@ World(ArubaOverrides)
 
 Before do
   ENV["MINT_NO_PIPE"] = "true"
-  @aruba_timeout_seconds = 3
+  @aruba_timeout_seconds = 5
   @old_path = ENV["PATH"]
   @bin_path = File.expand_path("../../../bin", __FILE__)
 
