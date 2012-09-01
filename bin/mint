@@ -3,6 +3,7 @@
 # Usage: mint [options] files
 
 require 'mint'
+require 'shellwords'
 
 # Parse options from the commandline
 commandline_options = {}
@@ -21,9 +22,17 @@ parser.parse!
 
 case ARGV.shift.downcase.to_sym
 when :publish
-  commandline_options.delete :verbose
-  commandline_options.delete :simulation
-  Mint::CommandLine.publish!(ARGV, commandline_options)
+  # Aruba chokes here, so we use this hack to convince Mint we're
+  # not in a pipeline
+  files = 
+    if $stdin.tty? || ENV["MINT_NO_PIPE"]
+      ARGV
+    else
+      $stdin.each_line.reduce [] do |list, line|
+        list.concat(Shellwords.split(line))
+      end
+    end
+  Mint::CommandLine.publish!(files, commandline_options)
 when :help
   Mint::CommandLine.help(parser.help)
 when :install
