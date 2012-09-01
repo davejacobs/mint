@@ -340,8 +340,8 @@ describe Mint do
               # stylesheet in our current directory
               style_source = document.style.source_file
               style = File.read style_source
-              File.open style_source, 'w' do |file|
-                file << style.gsub(/#/, '.')
+              File.open style_source, "w" do |file|
+                file << style.gsub(/#/, ".")
               end
             end
           end
