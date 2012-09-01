@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 # A script for publishing Mint in the ePub format
-# Usage: mint epub [options] files
+# Usage: mint epub [command] [options] [files]
 
 require 'mint'
 require 'mint/plugins/epub'
