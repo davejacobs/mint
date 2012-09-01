@@ -5,28 +5,27 @@
 require 'mint'
 require 'shellwords'
 
-# Parse options from the commandline
-commandline_options = {}
-process_opts = lambda {|k,v| commandline_options[k] = v }
-parser = Mint::CommandLine.parser(&process_opts)
-parser.parse!
+# Parse commandline arguments
+
+argv, commandline_options, help = 
+  Mint::CommandLine.parse(ARGV).values_at(:argv, :options, :help)
 
 # Minimalist implementation that I want to move to, but
 # will have to refactor commandline.rb code and tests
 #
-# first = ARGV.first.downcase.to_sym
+# first = argv.first.downcase.to_sym
 # commands = [ :install, :edit, :set, :config ]
 # command = commands.include?(first) ? command : :mint
 
 # Mint::CommandLine.send(command, commandline_options)
 
-case ARGV.shift.downcase.to_sym
+case argv.shift.downcase.to_sym
 when :publish
   # Aruba chokes here, so we use this hack to convince Mint we're
   # not in a pipeline
   files = 
     if $stdin.tty? || ENV["MINT_NO_PIPE"]
-      ARGV
+      argv
     else
       $stdin.each_line.reduce [] do |list, line|
         list.concat(Shellwords.split(line))
@@ -34,19 +33,19 @@ when :publish
     end
   Mint::CommandLine.publish!(files, commandline_options)
 when :help
-  Mint::CommandLine.help(parser.help)
+  Mint::CommandLine.help(help)
 when :install
-  Mint::CommandLine.install(ARGV.shift, commandline_options)
+  Mint::CommandLine.install(argv.shift, commandline_options)
 when :uninstall
   # TODO: Clean up syntax for this to match install syntax
   # Right now it's `mint install file.scss -t pro` vs. `mint uninstall pro`
-  Mint::CommandLine.uninstall(ARGV.shift, commandline_options)
+  Mint::CommandLine.uninstall(argv.shift, commandline_options)
 when :templates
-  Mint::CommandLine.templates(ARGV.shift, commandline_options)
+  Mint::CommandLine.templates(argv.shift, commandline_options)
 when :edit
-  Mint::CommandLine.edit(ARGV.shift, commandline_options)
+  Mint::CommandLine.edit(argv.shift, commandline_options)
 when :set
-  Mint::CommandLine.set(ARGV.shift, ARGV.shift, commandline_options)
+  Mint::CommandLine.set(argv.shift, argv.shift, commandline_options)
 when :config
   Mint::CommandLine.config
 else
@@ -57,8 +56,8 @@ else
   # document list.
   
   begin
-    system "mint-#{ARGV.first} #{ARGV[1..-1].join ' '}"
+    system "mint-#{argv.first} #{argv[1..-1].join ' '}"
   rescue
-    Mint::CommandLine.help(parser.help)
+    Mint::CommandLine.help(help)
   end
 end

@@ -10,35 +10,21 @@ module Mint
       end
     end
 
-    describe ".parser" do
-      it "provides a default option parser" do
-        fake_argv = ['--layout', 'zen']
-
-        options = {}
-        CommandLine.parser {|k, p| options[k] = p }.parse!(fake_argv)
-        options[:layout].should == 'zen'
+    describe ".parse" do
+      it "does not mutate passed in ARGV" do
+        argv = ['--layout', 'zen']
+        lambda { CommandLine.parse(argv) }.should_not change { argv }
       end
 
-      it "provides an option parser based on a formatted hash" do
-        fake_argv = ['--novel', 'novel']
-        formatted_options = {
-          # Option keys must be formatted as strings, so we
-          # use hash-bang syntax
-          novel: {
-            'short' => 'n',
-            'long' => 'novel',
-            'parameter' => true,
-            'description' => ''
+      it "returns a hash of commandline options, unconsumed options, and the help message" do
+        OptionParser.any_instance.stub(:help => 'Help message')
+        CommandLine.parse(['command', '--layout', 'zen']).should == {
+          help: 'Help message',
+          argv: ['command'],
+          options: {
+            layout: 'zen' 
           }
         }
-
-        options = {}
-
-        CommandLine.parser(formatted_options) do |k, p| 
-          options[k] = p
-        end.parse!(fake_argv)
-
-        options[:novel].should == 'novel'
       end
     end
 

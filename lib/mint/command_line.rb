@@ -21,18 +21,20 @@ module Mint
       YAML.load_file File.expand_path(options_file, __FILE__)
     end
 
-    # Yields each commandline option specified by options_metadata as
-    # a key/value pair to a block. If the option does not take a param, the value
-    # will be specified as true.
+    # Parses ARGV according to the specified or default commandline syntax
     #
-    # @param [Hash, #[]] options_metadata a structured set of options that the executable 
-    #   can use to parse commandline configuration options
-    # @return [OptionParser] an object that will parse ARGV when called
-    def self.parser(options_metadata=Mint::CommandLine.options)
-      optparse = OptionParser.new do |opts|
-        opts.banner = 'Usage: mint [command] files [options]'
+    # @param [Array] argv a list of arguments to parse
+    # @param [Hash] opts default parsing options (to specify syntax file)
+    # @return [Hash] an object that contains parsed options, remaining arguments,
+    #   and a help message
+    def self.parse(argv, opts={})
+      opts = { syntax: options }.merge(opts)
+      parsed_options = {}
 
-        Helpers.symbolize_keys(options_metadata).each do |k,v|
+      parser = OptionParser.new do |cli|
+        cli.banner = 'Usage: mint [command] files [options]'
+
+        Helpers.symbolize_keys(opts[:syntax]).each do |k,v|
           has_param = v[:parameter]
 
           v[:short] = "-#{v[:short]}"
@@ -40,16 +42,20 @@ module Mint
 
           if has_param
             v[:long] << " PARAM"
-            opts.on v[:short], v[:long], v[:description] do |p|
-              yield k.to_sym, p
+            cli.on v[:short], v[:long], v[:description] do |p|
+              parsed_options[k.to_sym] = p
             end
           else
-            opts.on v[:short], v[:long], v[:description] do
-              yield k, true
+            cli.on v[:short], v[:long], v[:description] do
+              parsed_options[k.to_sym] = true
             end
           end
         end
       end
+
+      transient_argv = argv.dup 
+      parser.parse! transient_argv
+      { argv: transient_argv, options: parsed_options, help: parser.help }
     end
 
     # Mint built-in commands
