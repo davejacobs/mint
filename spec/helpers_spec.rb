@@ -2,7 +2,7 @@ require 'spec_helper'
 
 module Mint
   describe Helpers do
-    describe "#underscore" do
+    describe ".underscore" do
       it "underscores class names per ActiveSupport conventions" do
         Helpers.underscore('ClassName').should == 'class_name'
       end
@@ -23,7 +23,7 @@ module Mint
       end
     end
     
-    describe "#slugize" do
+    describe ".slugize" do
       it "downcases everything" do
         Helpers.slugize('This could use FEWER CAPITALS').should ==
           'this-could-use-fewer-capitals'
@@ -46,13 +46,13 @@ module Mint
       end
     end
 
-    describe "#symbolize" do
+    describe ".symbolize" do
       it "converts hyphens to underscores" do
         Helpers.symbolize('you-and-me').should == :you_and_me
       end
     end
 
-    describe "#pathize" do
+    describe ".pathize" do
       it "converts a String to a Pathname" do
         Helpers.pathize("filename.md").should == 
           Pathname.new("filename.md").expand_path
@@ -64,7 +64,7 @@ module Mint
       end
     end
 
-    describe "#symbolize_keys" do
+    describe ".symbolize_keys" do
       it "turns all string keys in a flat map into symbols" do
         flat_map = {
           'key1' => 'value1',
@@ -130,7 +130,7 @@ module Mint
       end
     end
 
-    describe "#listify" do
+    describe ".listify" do
       it "joins a list of three or more with an ampersand, without the Oxford comma" do
         Helpers.listify(['Alex', 'Chris', 'John']).should ==
           'Alex, Chris & John'
@@ -145,7 +145,7 @@ module Mint
       end
     end
 
-    describe "#standardize" do
+    describe ".standardize" do
       before do
         @nonstandard = {
           title: 'Title',
@@ -174,7 +174,17 @@ module Mint
       end
     end
 
-    describe "#normalize_path" do
+    describe ".hashify" do
+      it "zips two lists of the same size into a Hash" do
+        Helpers.hashify([:one, :two, :three], [1, 2, 3]).should == {
+          one: 1,
+          two: 2,
+          three: 3
+        }
+      end
+    end
+
+    describe ".normalize_path" do
       it "handles two files in the same directory" do
         path1 = '~/file1'
         path2 = '~/file2'
@@ -203,12 +213,20 @@ module Mint
       end
     end
 
-    describe "#update_yaml!" do
-      it "loads existing YAML data from file"
-      it "combines existing YAML data with new data and writes to file"
+    describe ".update_yaml!" do
+      before do
+        File.open "example.yaml", "w" do |file|
+          file << "conflicting: foo\nnon-conflicting: bar"
+        end
+      end
+
+      it "combines specified data with data in YAML file and updates file" do
+        Helpers.update_yaml! 'example.yaml', 'conflicting' => 'baz'
+        YAML.load_file('example.yaml')['conflicting'].should == 'baz'
+      end
     end
 
-    describe "#generate_temp_file!" do
+    describe ".generate_temp_file!" do
       before do
         @file = Helpers.generate_temp_file! 'content.md'
         @path = Pathname.new @file

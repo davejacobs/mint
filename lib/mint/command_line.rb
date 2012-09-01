@@ -3,6 +3,8 @@ require 'yaml'
 require 'optparse'
 require 'fileutils'
 
+require 'active_support/core_ext/object/blank'
+
 module Mint
   module CommandLine
     # Commandline-related helper methods
@@ -50,39 +52,6 @@ module Mint
       end
     end
 
-    # Returns a hash of all active options specified by file (for all scopes).
-    # That is, if you specify file as 'defaults.yaml', this will return the aggregate
-    # of all defaults.yaml-specified options in the Mint path, where more local
-    # members of the path take precedence over more global ones.
-    #
-    # @param [String] file a filename pointing to a Mint configuration file
-    # @return [Hash] a structured set of configuration options
-    def self.configuration(file=Mint.files[:defaults])
-      return nil unless file
-      config_file = Pathname.new file
-
-      # Merge config options from all config files on the Mint path,
-      # where more local options take precedence over more global
-      # options
-      configuration = Mint.path(true).map {|p| p + config_file }.
-        select(&:exist?).
-        map {|p| YAML.load_file p }.
-        reverse.
-        reduce(Mint.default_options) {|r,p| r.merge p }
-
-      Helpers.symbolize_keys configuration
-    end
-
-    # Returns all configuration options (as specified by the aggregate
-    # of all config files), along with opts, where opts take precedence.
-    #
-    # @param [Hash] additional options to add to the current configuration
-    # @return [Hash] a structured set of configuration options with opts
-    #   overriding any options from config files
-    def self.configuration_with(opts)
-      configuration.merge opts
-    end
-
     # Mint built-in commands
     
     # Prints a help banner
@@ -101,6 +70,7 @@ module Mint
     #   installation directory
     # @return [void]
     def self.install(file, commandline_options={})
+      opts = { scope: :local }.merge(commandline_options)
       scope = [:global, :user].
         select {|e| commandline_options[e] }.
         first || :local
@@ -109,7 +79,7 @@ module Mint
 
       name = commandline_options[:template] || filename
       type = Mint.css_formats.include?(ext) ? :style : :layout
-      destination = Mint.template_path(name, type, :scope => scope, :ext => ext) 
+      destination = Mint.template_path(name, type, :scope => opts[:scope], :ext => ext) 
       FileUtils.mkdir_p File.expand_path("#{destination}/..")
 
       puts "reading file"
@@ -130,20 +100,26 @@ module Mint
     #   installation directory
     # @return [void]
     def self.uninstall(name, commandline_options={})
-      scope = [:global, :user].
-        select {|e| commandline_options[e] }.
-        first || :local
-
-      FileUtils.rm_r Mint.template_path(name, :all, :scope => scope)
+      opts = { scope: :local }.merge(commandline_options)
+      FileUtils.rm_r Mint.template_path(name, :all, :scope => opts[:scope])
     end
 
     # List the installed templates
     #
     # @return [void]
-    def self.templates
-      Mint.templates.each do |template|
-        puts "#{File.basename template} [#{template}]"
-      end
+    def self.templates(filter=nil, commandline_options={})
+      scopes = Mint::SCOPE_NAMES.select do |s|
+        commandline_options[s] 
+      end.presence || Mint::SCOPE_NAMES
+
+      Mint.templates(:scopes => scopes).
+        grep(Regexp.new(filter || "")).
+        sort.
+        each do |template|
+          print File.basename template
+          print " [#{template}]" if commandline_options[:verbose]
+          puts
+        end
     end
 
     # Retrieve named template file (probably a built-in or installed 
@@ -154,7 +130,7 @@ module Mint
     #   a layout or style flag that the method will use to choose the appropriate 
     #   file to edit
     # @return [void]
-    def self.edit(name, commandline_options)
+    def self.edit(name, commandline_options={})
       layout = commandline_options[:layout]
       style = commandline_options[:style]
 
@@ -185,9 +161,8 @@ module Mint
     # @return [void]
     def self.configure(opts, scope=:local)
       config_directory = Mint.path_for_scope(scope, true)
-      config_file = config_directory + Mint.files[:defaults]
       FileUtils.mkdir_p config_directory
-      Helpers.update_yaml! opts, config_file
+      Helpers.update_yaml! "#{config_directory}/#{Mint.files[:defaults]}", opts
     end
 
     # Tries to set a config option (at the specified scope) per 
@@ -199,7 +174,7 @@ module Mint
     #   a scope label that the method will use to choose the appropriate 
     #   scope
     # @return [void]
-    def self.set(key, value, commandline_options)
+    def self.set(key, value, commandline_options={})
       commandline_options[:local] = true
       scope = [:global, :user, :local].
         select {|e| commandline_options[e] }.
@@ -213,7 +188,7 @@ module Mint
     #
     # @return [void]
     def self.config
-      puts YAML.dump(configuration)
+      puts YAML.dump(Mint.configuration)
     end
     
     # Renders and writes to file all resources described by a document.
@@ -227,18 +202,10 @@ module Mint
     # @param [Hash, #[]] commandline_options a structured set of configuration options
     #   that will guide Mint.publish!
     # @return [void]
-    def self.publish!(files, commandline_options)
-      documents = []
-      options = configuration_with commandline_options
-      
-      options[:root] ||= Dir.getwd
-
-      # Eventually render_style should be replaced with file 
-      # change detection
-      render_style = true
-      files.each do |file|
-        Document.new(file, options).publish! :render_style => render_style
-        render_style = false
+    def self.publish!(files, commandline_options={})
+      options = { root: Dir.getwd }.merge(Mint.configuration_with commandline_options)
+      files.each_with_index do |file, idx|
+        Document.new(file, options).publish!(:render_style => (idx == 0))
       end
     end
   end

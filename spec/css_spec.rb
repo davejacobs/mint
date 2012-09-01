@@ -2,7 +2,7 @@ require 'spec_helper'
 
 module Mint
   describe CSS do
-    describe "#stylify" do
+    describe ".stylify" do
       it "translates from human-readable configuration to CSS" do
         table = {
           "Font: Helvetica"         => "font-family: Helvetica",
@@ -34,6 +34,12 @@ module Mint
         table.each do |human, machine|
           CSS.stylify(*human.split(':').map(&:strip))
         end
+      end
+    end
+
+    describe ".parse" do
+      it "transforms a map of human-readable styles into a CSS string" do
+        CSS.parse({ "Font" => "Helvetica" }).should == "#container {\n  font-family: Helvetica; }\n" 
       end
     end
   end

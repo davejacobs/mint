@@ -6,21 +6,19 @@ module Mint
       'container'
     end
 
-    # Maps a "DSL" onto actual CSS. This is not yet implemented, but 
-    # the plan is to translate this ...
+    # Maps a "DSL" onto actual CSS. Translates this ...
     #
     # ---
     # Font: Helvetica
-    # Margin: 1 in
-    # Line spacing: 1.25
+    # Margin: 1in
+    # Orientation: Landscape
     #
     # ... into something like:
     #
     # #container {
-    #   font: (value specified and cleaned up)
-    #   padding-left: (value specified and cleaned up)
-    #   ...
-    #   p { line-height: (value specified and cleaned up) }
+    #   font-family: Helvetica;
+    #   padding-left: 1in;
+    #   @page { size: landscape };
     # }
     def self.mappings
       { 

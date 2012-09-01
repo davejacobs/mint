@@ -1,7 +1,7 @@
-Feature: Publish document with varying options at the command line
+Feature: Install, uninstall, and list templates
   As a writer
-  I want to create a document at the command line from plain text
-  So that I can view a typeset version in a web browser
+  I want to use existing stylesheets and install my own
+  So that I do not have to clutter up my workspace with styles
 
   Background:
     Given a file named "file.sass" with:
@@ -52,15 +52,28 @@ Feature: Publish document with varying options at the command line
       | erb  | -t pro        | --local | .mint   | pro      | layout.erb  |
       | sass | -t pro        | --local | .mint   | pro      | style.sass  |
       | scss | -t pro        | --local | .mint   | pro      | style.scss  |
-
-      # Not yet confirmed to be valid expectations
       | haml | -t pro        |         | .mint   | pro      | layout.haml |
       | haml |               |         | .mint   | file     | layout.haml |
 
   Scenario: Uninstall an installed file
     When I run `mint install -t pro file.sass`
     Then a directory named ".mint/templates/pro" should exist
-    When I run `mint templates`
+    When I run `mint templates --local`
     Then the output should contain "pro"
     When I run `mint uninstall pro`
     Then a directory named ".mint/templates/pro" should not exist
+
+  Scenario: List all templates in scope
+    When I run `mint install -t one file.sass --local`
+    When I run `mint install -t two file.sass --local`
+    And I run `mint templates --local`
+    Then the output should contain:
+      """
+      one
+      two
+      """
+    When I run `mint templates one --local`
+    Then the output should contain:
+      """
+      one
+      """

@@ -103,6 +103,10 @@ module Mint
       end
     end
 
+    def self.hashify(list1, list2)
+      Hash[*list1.zip(list2).flatten]
+    end
+
     # Returns the relative path to to_directory from from_directory. 
     # If to_directory and from_directory have no parents in common besides 
     # /, returns the absolute directory of to_directory. Assumes no symlinks.
@@ -126,11 +130,11 @@ module Mint
     # @param [Hash, #[]] new_opts a set of options to add to the Yaml file
     # @param [Pathname, #exist] file a file to read from and write to
     # @return [void] 
-    def self.update_yaml!(new_opts, file)
-      curr_opts = file.exist? ? YAML.load_file(file) : {}
+    def self.update_yaml!(file, opts={})
+      curr_opts = File.exist?(file) ? YAML.load_file(file) : {}
 
       File.open file, 'w' do |f|
-        YAML.dump(curr_opts.merge(new_opts), f)
+        YAML.dump(curr_opts.merge(opts), f)
       end
     end
 

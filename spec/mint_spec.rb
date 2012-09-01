@@ -2,11 +2,6 @@ require 'spec_helper'
 
 describe Mint do
   subject { Mint }
-  its(:root) { should == File.expand_path('../../../mint', __FILE__) }
-  its(:path) { should == ["#{Dir.getwd}/.mint", "~/.mint", Mint.root + "/config"] }
-  its(:formats) { should include('md') }
-  its(:css_formats) { should include('sass') }
-  its(:templates) { should include(Mint.root + '/config/templates/default') }
 
   its(:default_options) do
     should == {
@@ -17,94 +12,207 @@ describe Mint do
     }
   end
 
-  its(:directories) do 
-    should == { 
-      templates: 'templates'
-    }
+  its(:directories) { should == { templates: 'templates' } }
+  its(:files) { should == { syntax: 'syntax.yaml', defaults: 'defaults.yaml' } }
+
+  describe ".root" do
+    it "returns the root of the Mint gem as a string" do
+      Mint.root.should == File.expand_path('../../../mint', __FILE__)
+    end
   end
 
-  its(:files) do 
-    should == { 
-      syntax: 'syntax.yaml',
-      defaults: 'defaults.yaml' 
-    }
+  describe ".path" do
+    def as_pathname(files)
+      files.map {|file| Pathname.new(file) }
+    end
+
+    it "it returns the paths corresponding to all scopes as an array" do
+      Mint.path.should == [Pathname.new(".mint"),
+                           Pathname.new("~/.mint").expand_path,
+                           Pathname.new(Mint.root + "/config").expand_path]
+    end
+
+    it "can filter paths by one scope" do
+      Mint.path(:scopes => [:user]).should == [Pathname.new("~/.mint").expand_path]
+    end
+
+    it "can filter paths by many scopes" do
+      Mint.path(:scopes => [:local, :user]).should == [Pathname.new(".mint"),
+                                                       Pathname.new("~/.mint").expand_path]
+    end
   end
 
-  it "creates a valid renderer" do
-    Mint.renderer(@content_file).should respond_to(:render)
+
+  describe ".configuration" do
+    let(:defaults) do
+      {
+        layout: 'default',
+        style: 'default',
+        destination: nil,
+        style_destination: nil
+      }
+    end
+
+    context "when there is no defaults.yaml file on the Mint path" do
+      it "returns a default set of options" do
+        Mint.configuration.should == defaults 
+      end
+    end
+
+    context "when there is a defaults.yaml file on the Mint path" do
+      before do
+        FileUtils.mkdir_p '.mint'
+        File.open('.mint/defaults.yaml', 'w') do |file|
+          file << 'layout: zen'
+        end
+      end
+
+      after do
+        FileUtils.rm_rf '.mint'
+      end
+
+      it "merges all specified options with precedence according to scope" do
+        Mint.configuration[:layout].should == 'zen'
+      end
+
+      it "can filter by scope (but always includes defaults)" do
+        Mint.configuration(:scopes => [:user]).should == defaults
+      end
+    end
   end
 
-  it "chooses the appropriate path for scope" do
-    Mint.path_for_scope(:local).should == "#{Dir.getwd}/.mint"
-    Mint.path_for_scope(:user).should == '~/.mint'
-    Mint.path_for_scope(:global).should == Mint.root + "/config"
+  describe ".configuration_with" do
+    it "displays the sum of all configuration files with other options added" do
+      Mint.configuration_with(:local => true).should == {
+        layout: 'default',
+        style: 'default',
+        destination: nil,
+        style_destination: nil,
+        local: true
+      }
+    end
   end
 
-  it "looks up the correct template according to scope" do
-    Mint.lookup_template(:default, :layout).should be_in_template('default')
-    Mint.lookup_template(:default, :style).should be_in_template('default')
-    Mint.lookup_template(:zen, :layout).should be_in_template('zen')
-    Mint.lookup_template(:zen, :style).should be_in_template('zen')
-    Mint.lookup_template('layout.haml').should == 'layout.haml'
-    Mint.lookup_template('dynamic.sass').should == 'dynamic.sass'
+  describe ".templates" do
+    it "returns all templates if no scopes are passed in" do
+      Mint.templates.should include(Mint.root + '/config/templates/default') 
+    end
+
+    it "returns all local templates if the scope is local" do
+      pending "a rearchitecture and unification of scopes"
+      Mint.templates(:scope => :local).should_not include(Mint.root + '/config/templates/default')
+    end
   end
 
-  it "finds the correct template according to scope" do
-    Mint.find_template('default', :layout).should be_in_template('default')
-    Mint.find_template('zen', :layout).should be_in_template('zen')
-    Mint.find_template('zen', :style).should be_in_template('zen')
+  describe ".formats" do
+    it "includes Markdown" do
+      Mint.formats.should include("md")
+    end
+
+    it "includes Haml" do
+      Mint.formats.should include("haml")
+    end
   end
 
-  it "decides whether or not a file is a template file" do
-    actual_template = Mint.lookup_template(:default, :layout)
-    fake_template = "#{Mint.root}/config/templates/default.css"
-    obvious_nontemplate = @dynamic_style_file
-
-    actual_template.should be_a_template
-    fake_template.should_not be_a_template
-    obvious_nontemplate.should_not be_a_template
+  describe ".css_formats" do
+    it "includes Sass" do
+      Mint.formats.should include("sass")
+    end
   end
 
-  it "properly guesses destination file names based on source file names" do
-    Mint.guess_name_from('content.md').should == 'content.html'
-    Mint.guess_name_from('content.textile').should == 'content.html'
-    Mint.guess_name_from('layout.haml').should == 'layout.html'
-    Mint.guess_name_from('dynamic.sass').should == 'dynamic.css'
+  describe ".renderer" do
+    it "creates a valid renderer" do
+      Mint.renderer(@content_file).should respond_to(:render)
+    end
   end
 
-  context "before it publishes a document" do
-    let(:document) { Mint::Document.new @content_file }
-    subject { document }
+  describe ".path_for_scope" do
+    it "chooses the appropriate path for scope" do
+      expectations = {
+        local: Pathname.new(".mint"),
+        user: Pathname.new("~/.mint").expand_path,
+        global: Pathname.new(Mint.root + "/config").expand_path
+      }
 
-    its(:destination_file_path) { should_not exist }
-    its(:style_destination_file_path) { should_not exist }
+      expectations.each do |scope, path|
+        Mint.path_for_scope(scope).should == path
+      end
+    end
   end
 
-  # These are copied from document_spec.rb. I eventually want to move
-  # to this non-OO style of publishing, and this is the transition
-  context "when it publishes a document" do
-    let(:document) { Mint::Document.new @content_file }
-    before { Mint.publish! document }
-    subject { document }
+  describe ".lookup_template" do
+    it "looks up the correct template according to scope" do
+      Mint.lookup_template(:default, :layout).should be_in_template('default')
+      Mint.lookup_template(:default, :style).should be_in_template('default')
+      Mint.lookup_template(:zen, :layout).should be_in_template('zen')
+      Mint.lookup_template(:zen, :style).should be_in_template('zen')
+      Mint.lookup_template('layout.haml').should == 'layout.haml'
+      Mint.lookup_template('dynamic.sass').should == 'dynamic.sass'
+    end
+  end
 
-    its(:destination_file_path) { should exist }
-    its(:style_destination_file_path) { should exist }
+  describe ".find_template" do
+    it "finds the correct template according to scope" do
+      Mint.find_template('default', :layout).should be_in_template('default')
+      Mint.find_template('zen', :layout).should be_in_template('zen')
+      Mint.find_template('zen', :style).should be_in_template('zen')
+    end
+
+    it "decides whether or not a file is a template file" do
+      actual_template = Mint.lookup_template(:default, :layout)
+      fake_template = "#{Mint.root}/config/templates/default.css"
+      obvious_nontemplate = @dynamic_style_file
+
+      actual_template.should be_a_template
+      fake_template.should_not be_a_template
+      obvious_nontemplate.should_not be_a_template
+    end
+  end
+
+  describe ".guess_name_from" do
+    it "properly guesses destination file names based on source file names" do
+      Mint.guess_name_from('content.md').should == 'content.html'
+      Mint.guess_name_from('content.textile').should == 'content.html'
+      Mint.guess_name_from('layout.haml').should == 'layout.html'
+      Mint.guess_name_from('dynamic.sass').should == 'dynamic.css'
+    end
+  end
+
+  describe ".destination_file_path and .style_destination_file_path" do
+    context "before it publishes a document" do
+      let(:document) { Mint::Document.new @content_file }
+      subject { document }
+
+      its(:destination_file_path) { should_not exist }
+      its(:style_destination_file_path) { should_not exist }
+    end
+
+    # These are copied from document_spec.rb. I eventually want to move
+    # to this non-OO style of publishing, and this is the transition
+    context "when it publishes a document" do
+      let(:document) { Mint::Document.new @content_file }
+      before { Mint.publish! document }
+      subject { document }
+
+      its(:destination_file_path) { should exist }
+      its(:style_destination_file_path) { should exist }
+    end
   end
 
   describe ".template_path" do
     it "creates a template in the local directory" do
       Mint.template_path('pro', :layout).should == 
-        File.expand_path('.mint/templates/pro/layout.haml') 
+        '.mint/templates/pro/layout.haml' 
     end
 
     it "allows an extension to be specified" do
       Mint.template_path('pro', :layout, :ext => 'erb').should == 
-        File.expand_path('.mint/templates/pro/layout.erb') 
+        '.mint/templates/pro/layout.erb' 
     end
 
     it "allows a scope to be specified" do
       Mint.template_path('pro', :layout, :scope => :user).should == 
-        '~/.mint/templates/pro/layout.haml' 
+        File.expand_path('~/.mint/templates/pro/layout.haml')
     end
   end
 end

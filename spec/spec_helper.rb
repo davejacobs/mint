@@ -26,7 +26,10 @@ RSpec.configure do |config|
   end
 
   config.after(:each) do
-    FileUtils.rm 'content.html' if File.exist? 'content.html'
+    ['content.html', '.mint/defaults.yaml'].map {|file| Pathname.new file }.
+      select(&:exist?).
+      each {|file| FileUtils.rm_rf file }
+
     Mint.templates.
       map {|template| Pathname.new(template) + 'css' }.
       select(&:exist?).
