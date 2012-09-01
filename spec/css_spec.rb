@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 module Mint
   describe CSS do
@@ -32,7 +32,7 @@ module Mint
         }
 
         table.each do |human, machine|
-          CSS.stylify(*human.split(':').map(&:strip))
+          CSS.stylify(*human.split(":").map(&:strip))
         end
       end
     end

@@ -1,4 +1,4 @@
-require 'mint/resource'
+require "mint/resource"
 
 module Mint
   class Layout < Resource

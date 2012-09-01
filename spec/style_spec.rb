@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 module Mint
   describe Style do
@@ -31,10 +31,10 @@ module Mint
 
     context "when it's created with a specified destination" do
       let(:style) { Style.new @static_style_file,
-                    :destination => 'destination' }
+                    :destination => "destination" }
       subject { style }
 
-      its(:destination) { should == 'destination' }
+      its(:destination) { should == "destination" }
       its(:destination_file) do
         should == "#{@tmp_dir}/destination/static.css"
       end
@@ -50,7 +50,7 @@ module Mint
 
     #  it "#destination_file" do
     #    style.destination_file.should == 
-    #      Mint.path_for_scope(:local) + '/templates/static_test/style.css'
+    #      Mint.path_for_scope(:local) + "/templates/static_test/style.css"
     #  end
     # end
 
@@ -58,7 +58,7 @@ module Mint
       let(:style) { Style.new(Mint.lookup_template(:default, :style)) }
       subject { style }
 
-      its(:destination) { should == 'css' }
+      its(:destination) { should == "css" }
       its(:destination_file) do
         should == "#{Mint.root}/config/templates/default/css/style.css"
       end

@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 module Mint
   describe Resource do
@@ -25,7 +25,7 @@ module Mint
       let(:resource) { Resource.new @content_file }
       subject { resource }
 
-      its(:name) { should == 'content.html' }
+      its(:name) { should == "content.html" }
       its(:root) { should == @tmp_dir }
       its(:source) { should == @content_file }
       its(:source_file) { should == @full_content_file }
@@ -45,7 +45,7 @@ module Mint
       let(:resource) { Resource.new @content_file, :root => @alternative_root }
       subject { resource }
 
-      its(:name) { should == 'content.html' }
+      its(:name) { should == "content.html" }
       its(:root) { should == @alternative_root }
       its(:source) { should == @content_file }
       its(:source_file) { should == @full_alt_content_file }
@@ -62,7 +62,7 @@ module Mint
         # This is a use case we will only ever test here, so
         # I'm not going to include it in the spec_helper
         FileUtils.mkdir_p @alternative_root
-        File.open(@full_alt_content_file, 'w') do |f|
+        File.open(@full_alt_content_file, "w") do |f|
           f << @content
         end
       end
@@ -70,7 +70,7 @@ module Mint
       let(:resource) { Resource.new @full_alt_content_file }
       subject { resource }
       
-      its(:name) { should == 'content.html' }
+      its(:name) { should == "content.html" }
       its(:root) { should == @alternative_root }
       its(:source) { should == @full_alt_content_file }
       its(:source_file) { should == @full_alt_content_file}
@@ -92,7 +92,7 @@ module Mint
 
       subject { resource }
 
-      its(:name) { should == 'content.html' }
+      its(:name) { should == "content.html" }
       its(:root) { should == @alternative_root }
       its(:source) { should == @full_content_file }
       its(:source_file) { should == @full_content_file }
@@ -108,18 +108,18 @@ module Mint
       let(:resource) do
         Resource.new @content_file do |resource|
           resource.root = @alternative_root
-          resource.destination = 'destination'
+          resource.destination = "destination"
         end
       end
 
       subject { resource }
       
-      its(:name) { should == 'content.html' }
+      its(:name) { should == "content.html" }
       its(:root) { should == @alternative_root }
       its(:source) { should == @content_file }
       its(:source_file) { should == @full_alt_content_file }
       its(:source_directory) { should == @alternative_root }
-      its(:destination) { should == 'destination' }
+      its(:destination) { should == "destination" }
 
       its(:destination_file) do
         should == "#{@alternative_root}/destination/content.html"

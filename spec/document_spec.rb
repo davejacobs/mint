@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 module Mint
   describe Document do
@@ -15,7 +15,7 @@ module Mint
       # This test doesn't cover any plugin transformations. Those
       # transformations are covered in the Plugin spec.
       its(:content) { should =~ /<p>This is just a test.<\/p>/ }
-      its(:metadata) { should == { 'metadata' =>  true } }
+      its(:metadata) { should == { "metadata" =>  true } }
 
       # Render output
 
@@ -53,15 +53,15 @@ module Mint
       subject { document }
       its(:root) { should == @tmp_dir }
       its(:destination) { should be_nil }
-      its(:source) { should == 'content.md' }
+      its(:source) { should == "content.md" }
       its(:style_destination) { should be_nil }
 
       its(:style_destination_file) do
-        should == Mint.root + '/config/templates/default/css/style.css'
+        should == Mint.root + "/config/templates/default/css/style.css"
       end
 
       its(:style_destination_directory) do 
-        should == Mint.root + '/config/templates/default/css'
+        should == Mint.root + "/config/templates/default/css"
       end
 
       its(:style_destination_file_path) do
@@ -72,24 +72,24 @@ module Mint
         should == Pathname.new(document.style_destination_directory)
       end
 
-      its(:layout) { should be_in_directory('default') }
-      its(:style) { should be_in_directory('default') }
+      its(:layout) { should be_in_directory("default") }
+      its(:style) { should be_in_directory("default") }
 
-      its(:stylesheet) { should == Mint.root + '/config/templates/default/css/style.css' }
+      its(:stylesheet) { should == Mint.root + "/config/templates/default/css/style.css" }
 
       it_should_behave_like "all documents"
     end
 
     context "when it's created with explicit destination directories" do
       let(:document) { Document.new @content_file,
-                       :destination => 'destination',
-                       :style_destination => 'styles' }
+                       :destination => "destination",
+                       :style_destination => "styles" }
 
       subject { document }
       its(:root) { should == @tmp_dir }
-      its(:destination) { should == 'destination' }
-      its(:source) { should == 'content.md' }
-      its(:style_destination) { should == 'styles' }
+      its(:destination) { should == "destination" }
+      its(:source) { should == "content.md" }
+      its(:style_destination) { should == "styles" }
 
       its(:style_destination_file) do
         should == "#{@tmp_dir}/destination/styles/style.css"
@@ -107,10 +107,10 @@ module Mint
         should == Pathname.new(document.style_destination_directory)
       end
 
-      its(:layout) { should be_in_directory('default') }
-      its(:style) { should be_in_directory('default') }
+      its(:layout) { should be_in_directory("default") }
+      its(:style) { should be_in_directory("default") }
 
-      its(:stylesheet) { should == 'styles/style.css' }
+      its(:stylesheet) { should == "styles/style.css" }
 
       it_should_behave_like "all documents"
     end
@@ -122,15 +122,15 @@ module Mint
       subject { document }
       its(:root) { should == "#{@tmp_dir}/alternative-root" }
       its(:destination) { should be_nil }
-      its(:source) { should == 'content.md' }
+      its(:source) { should == "content.md" }
       its(:style_destination) { should be_nil }
 
       its(:style_destination_file) do
-        should == Mint.root + '/config/templates/default/css/style.css'
+        should == Mint.root + "/config/templates/default/css/style.css"
       end
 
       its(:style_destination_directory) do
-        should == Mint.root + '/config/templates/default/css'
+        should == Mint.root + "/config/templates/default/css"
       end
 
       its(:style_destination_file_path) do
@@ -141,10 +141,10 @@ module Mint
         should == Pathname.new(document.style_destination_directory)
       end
 
-      its(:layout) { should be_in_directory('default') }
-      its(:style) { should be_in_directory('default') }
+      its(:layout) { should be_in_directory("default") }
+      its(:style) { should be_in_directory("default") }
 
-      its(:stylesheet) { should == Mint.root + '/config/templates/default/css/style.css' }
+      its(:stylesheet) { should == Mint.root + "/config/templates/default/css/style.css" }
 
       it_should_behave_like "all documents"
     end
@@ -153,18 +153,18 @@ module Mint
       let(:document) do
         Document.new @content_file do |doc|
           doc.root              = "#{@tmp_dir}/alternative-root"
-          doc.destination       = 'destination'
-          doc.style_destination = 'styles'
-          doc.layout            = 'zen'
-          doc.style             = 'zen'
+          doc.destination       = "destination"
+          doc.style_destination = "styles"
+          doc.layout            = "zen"
+          doc.style             = "zen"
         end
       end
 
       subject { document }
       its(:root) { should == "#{@tmp_dir}/alternative-root" }
-      its(:destination) { should == 'destination' }
-      its(:source) { should == 'content.md' }
-      its(:style_destination) { should == 'styles' }
+      its(:destination) { should == "destination" }
+      its(:source) { should == "content.md" }
+      its(:style_destination) { should == "styles" }
 
       its(:style_destination_file) do
         should == "#{@tmp_dir}/alternative-root/destination/styles/style.css"
@@ -182,10 +182,10 @@ module Mint
         should == Pathname.new(document.style_destination_directory)
       end
 
-      its(:layout) { should be_in_directory('zen') }
-      its(:style) { should be_in_directory('zen') }
+      its(:layout) { should be_in_directory("zen") }
+      its(:style) { should be_in_directory("zen") }
 
-      its(:stylesheet) { should == 'styles/style.css' }
+      its(:stylesheet) { should == "styles/style.css" }
 
       it_should_behave_like "all documents"
     end
@@ -194,29 +194,29 @@ module Mint
       let(:text) { "metadata: true\n\nReal text" }
       describe ".metadata_chunk" do
         it "extracts, but does not parse, metadata from text" do
-          Document.metadata_chunk(text).should == 'metadata: true'
+          Document.metadata_chunk(text).should == "metadata: true"
         end
       end
 
       describe ".metadata_from" do
         it "parses a documents metadata if present" do
-          Document.metadata_from(text).should == { 'metadata' => true }
+          Document.metadata_from(text).should == { "metadata" => true }
         end
 
         it "returns the empty string if a document has bad/no metadata" do
-          Document.metadata_from('No metadata here').should == {}
+          Document.metadata_from("No metadata here").should == {}
         end
       end
 
       describe ".parse_metadata_from" do
         it "separates text from its metadata if present" do
           Document.parse_metadata_from(text).should ==
-            [{ 'metadata' => true }, 'Real text']
+            [{ "metadata" => true }, "Real text"]
         end
 
         it "returns the entire text if no metadata is found" do
-          Document.parse_metadata_from('No metadata here').should ==
-            [{}, 'No metadata here']
+          Document.parse_metadata_from("No metadata here").should ==
+            [{}, "No metadata here"]
         end
       end
     end

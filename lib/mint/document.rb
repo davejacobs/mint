@@ -1,6 +1,6 @@
-require 'mint/resource'
-require 'mint/layout'
-require 'mint/style'
+require "mint/resource"
+require "mint/layout"
+require "mint/style"
 
 module Mint
   class Document < Resource
@@ -43,7 +43,7 @@ module Mint
     def publish!(opts={})      
       options = { :render_style => true }.merge(opts)
       FileUtils.mkdir_p self.destination_directory
-      File.open(self.destination_file, 'w+') do |f|
+      File.open(self.destination_file, "w+") do |f|
         f << self.render
       end
 
@@ -53,7 +53,7 @@ module Mint
       # rendering but there is an explicit style_destination.
       if options[:render_style]
         FileUtils.mkdir_p style_destination_directory
-        File.open(self.style_destination_file, 'w+') do |f|
+        File.open(self.style_destination_file, "w+") do |f|
           f << self.style.render
         end
       end
@@ -78,7 +78,7 @@ module Mint
       @metadata, text = Document.parse_metadata_from original_content
       intermediate_content = Mint.before_render text
 
-      File.open(tempfile, 'w') do |file|
+      File.open(tempfile, "w") do |file|
         file << intermediate_content
       end
 
@@ -223,7 +223,7 @@ module Mint
         metadata = metadata_from text
         new_text =
           if !metadata.empty?
-            text.sub metadata_chunk(text) + METADATA_DELIM, ''
+            text.sub metadata_chunk(text) + METADATA_DELIM, ""
           else
             text
           end

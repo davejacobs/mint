@@ -1,9 +1,9 @@
-require 'pathname'
-require 'yaml'
-require 'optparse'
-require 'fileutils'
+require "pathname"
+require "yaml"
+require "optparse"
+require "fileutils"
 
-require 'active_support/core_ext/object/blank'
+require "active_support/core_ext/object/blank"
 
 module Mint
   module CommandLine
@@ -32,7 +32,7 @@ module Mint
       parsed_options = {}
 
       parser = OptionParser.new do |cli|
-        cli.banner = 'Usage: mint [command] files [options]'
+        cli.banner = "Usage: mint [command] files [options]"
 
         Helpers.symbolize_keys(opts[:syntax]).each do |k,v|
           has_param = v[:parameter]
@@ -81,7 +81,7 @@ module Mint
         select {|e| commandline_options[e] }.
         first || :local
 
-      filename, ext = file.split '.'
+      filename, ext = file.split "."
 
       name = commandline_options[:template] || filename
       type = Mint.css_formats.include?(ext) ? :style : :layout
@@ -91,7 +91,7 @@ module Mint
       if File.exist? file
         FileUtils.copy file, destination
       else
-        raise '[error] no such file'
+        raise "[error] no such file"
       end
     end
 
@@ -137,8 +137,8 @@ module Mint
       layout = commandline_options[:layout]
       style = commandline_options[:style]
 
-      # Allow for convenient editing (edit 'default' works just as well
-      # as edit :style => 'default')
+      # Allow for convenient editing (edit "default" works just as well
+      # as edit :style => "default")
       if style
         name, layout_or_style = style, :style
       elsif layout
@@ -151,7 +151,7 @@ module Mint
 
       file = Mint.lookup_template name, layout_or_style
       
-      editor = ENV['EDITOR'] || 'vi'
+      editor = ENV["EDITOR"] || "vi"
       system "#{editor} #{file}"
     end
 

@@ -1,23 +1,23 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe Mint do
   subject { Mint }
 
   its(:default_options) do
     should == {
-      layout: 'default',
-      style: 'default',
+      layout: "default",
+      style: "default",
       destination: nil,
       style_destination: nil
     }
   end
 
-  its(:directories) { should == { templates: 'templates' } }
-  its(:files) { should == { syntax: 'syntax.yaml', defaults: 'defaults.yaml' } }
+  its(:directories) { should == { templates: "templates" } }
+  its(:files) { should == { syntax: "syntax.yaml", defaults: "defaults.yaml" } }
 
   describe ".root" do
     it "returns the root of the Mint gem as a string" do
-      Mint.root.should == File.expand_path('../../../mint', __FILE__)
+      Mint.root.should == File.expand_path("../../../mint", __FILE__)
     end
   end
 
@@ -46,8 +46,8 @@ describe Mint do
   describe ".configuration" do
     let(:defaults) do
       {
-        layout: 'default',
-        style: 'default',
+        layout: "default",
+        style: "default",
         destination: nil,
         style_destination: nil
       }
@@ -61,18 +61,18 @@ describe Mint do
 
     context "when there is a defaults.yaml file on the Mint path" do
       before do
-        FileUtils.mkdir_p '.mint'
-        File.open('.mint/defaults.yaml', 'w') do |file|
-          file << 'layout: zen'
+        FileUtils.mkdir_p ".mint"
+        File.open(".mint/defaults.yaml", "w") do |file|
+          file << "layout: zen"
         end
       end
 
       after do
-        FileUtils.rm_rf '.mint'
+        FileUtils.rm_rf ".mint"
       end
 
       it "merges all specified options with precedence according to scope" do
-        Mint.configuration[:layout].should == 'zen'
+        Mint.configuration[:layout].should == "zen"
       end
 
       it "can filter by scope (but always includes defaults)" do
@@ -84,8 +84,8 @@ describe Mint do
   describe ".configuration_with" do
     it "displays the sum of all configuration files with other options added" do
       Mint.configuration_with(:local => true).should == {
-        layout: 'default',
-        style: 'default',
+        layout: "default",
+        style: "default",
         destination: nil,
         style_destination: nil,
         local: true
@@ -95,12 +95,12 @@ describe Mint do
 
   describe ".templates" do
     it "returns all templates if no scopes are passed in" do
-      Mint.templates.should include(Mint.root + '/config/templates/default') 
+      Mint.templates.should include(Mint.root + "/config/templates/default") 
     end
 
     it "returns all local templates if the scope is local" do
       pending "a rearchitecture and unification of scopes"
-      Mint.templates(:scope => :local).should_not include(Mint.root + '/config/templates/default')
+      Mint.templates(:scope => :local).should_not include(Mint.root + "/config/templates/default")
     end
   end
 
@@ -142,20 +142,20 @@ describe Mint do
 
   describe ".lookup_template" do
     it "looks up the correct template according to scope" do
-      Mint.lookup_template(:default, :layout).should be_in_template('default')
-      Mint.lookup_template(:default, :style).should be_in_template('default')
-      Mint.lookup_template(:zen, :layout).should be_in_template('zen')
-      Mint.lookup_template(:zen, :style).should be_in_template('zen')
-      Mint.lookup_template('layout.haml').should == 'layout.haml'
-      Mint.lookup_template('dynamic.sass').should == 'dynamic.sass'
+      Mint.lookup_template(:default, :layout).should be_in_template("default")
+      Mint.lookup_template(:default, :style).should be_in_template("default")
+      Mint.lookup_template(:zen, :layout).should be_in_template("zen")
+      Mint.lookup_template(:zen, :style).should be_in_template("zen")
+      Mint.lookup_template("layout.haml").should == "layout.haml"
+      Mint.lookup_template("dynamic.sass").should == "dynamic.sass"
     end
   end
 
   describe ".find_template" do
     it "finds the correct template according to scope" do
-      Mint.find_template('default', :layout).should be_in_template('default')
-      Mint.find_template('zen', :layout).should be_in_template('zen')
-      Mint.find_template('zen', :style).should be_in_template('zen')
+      Mint.find_template("default", :layout).should be_in_template("default")
+      Mint.find_template("zen", :layout).should be_in_template("zen")
+      Mint.find_template("zen", :style).should be_in_template("zen")
     end
 
     it "decides whether or not a file is a template file" do
@@ -171,10 +171,10 @@ describe Mint do
 
   describe ".guess_name_from" do
     it "properly guesses destination file names based on source file names" do
-      Mint.guess_name_from('content.md').should == 'content.html'
-      Mint.guess_name_from('content.textile').should == 'content.html'
-      Mint.guess_name_from('layout.haml').should == 'layout.html'
-      Mint.guess_name_from('dynamic.sass').should == 'dynamic.css'
+      Mint.guess_name_from("content.md").should == "content.html"
+      Mint.guess_name_from("content.textile").should == "content.html"
+      Mint.guess_name_from("layout.haml").should == "layout.html"
+      Mint.guess_name_from("dynamic.sass").should == "dynamic.css"
     end
   end
 
@@ -201,18 +201,18 @@ describe Mint do
 
   describe ".template_path" do
     it "creates a template in the local directory" do
-      Mint.template_path('pro', :layout).should == 
-        '.mint/templates/pro/layout.haml' 
+      Mint.template_path("pro", :layout).should == 
+        ".mint/templates/pro/layout.haml" 
     end
 
     it "allows an extension to be specified" do
-      Mint.template_path('pro', :layout, :ext => 'erb').should == 
-        '.mint/templates/pro/layout.erb' 
+      Mint.template_path("pro", :layout, :ext => "erb").should == 
+        ".mint/templates/pro/layout.erb" 
     end
 
     it "allows a scope to be specified" do
-      Mint.template_path('pro', :layout, :scope => :user).should == 
-        File.expand_path('~/.mint/templates/pro/layout.haml')
+      Mint.template_path("pro", :layout, :scope => :user).should == 
+        File.expand_path("~/.mint/templates/pro/layout.haml")
     end
   end
 end
