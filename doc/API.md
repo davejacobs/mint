@@ -42,7 +42,7 @@ This section discusses the Mint library API. This library encapsulates the idea 
 
 Mint is loaded with smart defaults, so if you don't want to configure something--say, the basic HTML skeleton of your document or the output directory--you don't have to. You'll probably be surprised at how easy it is to use out of the box, and how configurable it is.
 
-    document = Document.new 'Minimalism.md'
+    document = Document.new "Minimalism.md"
     document.publish!
 
 And voil&agrave;, Minimalism.html will show up next to Minimalism.md.
@@ -67,7 +67,7 @@ You can change a document by passing it one of several options.
 
 Defaults:
 
-    :template => 'default'
+    :template => "default"
 
 Notes:
 
@@ -100,26 +100,26 @@ At this point, a couple of examples may be useful.
 The following are possible:
 
     include Mint
-    content = 'Minimalism.md'
+    content = "Minimalism.md"
     
     Document.new content
-    Document.new content, :destination => 'output', 
-      :style => 'serif-pro'
+    Document.new content, :destination => "output", 
+      :style => "serif-pro"
     Document.new content, :style => Style.new(:normal)
     
-    Style.new 'normal'
+    Style.new "normal"
     Style.new :normal
-    Style.new '~/Sites/Common Styles/normal.css', 
-      :destination => 'styles'
-    Style.new '~/Sites/Common Styles/normal.css', 
-      :style_destination => 'inline'
-    Style.new 'Common Styles/normal.css'
+    Style.new "~/Sites/Common Styles/normal.css", 
+      :destination => "styles"
+    Style.new "~/Sites/Common Styles/normal.css", 
+      :style_destination => "inline"
+    Style.new "Common Styles/normal.css"
 
 If block-style initiation is your thing:
 
     Document.new content do |d|
-      d.destination = 'final'
-      d.template = 'resume'
+      d.destination = "final"
+      d.template = "resume"
     end
 
 Block-style indentation passes the block to you *after* initializing the document with default values. So you do not need to worry about specifying each argument. Anything you specify will override what is already there.
@@ -148,11 +148,11 @@ So if you're writing your layout using ERB, the template might look like this:
     <!doctype html>
     <html>
       <head>
-        <link rel='stylesheet' href='<%= stylesheet %>' />
+        <link rel="stylesheet" href="<%= stylesheet %>" />
       </head>
 
       <body>
-        <div id='container'>
+        <div id="container">
           <%= content %>
         </div>
       </body>
@@ -163,7 +163,7 @@ The same layout in Haml would be:
     !!!
     %html
       %head
-        %link(rel='stylesheet' href=stylesheet)
+        %link(rel="stylesheet" href=stylesheet)
 
       %body
         #container= content

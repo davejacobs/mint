@@ -3,21 +3,21 @@
 # A script for publishing Mint in the ePub format
 # Usage: mint epub [command] [options] [files]
 
-require 'mint'
-require 'mint/plugins/epub'
+require "mint"
+require "mint/plugins/epub"
 
 # NOTE: This is not how I want this plugin to be called.
 # However, I do want a first iteration of the plugin
 # system on master, so we'll go with this for now.
 
 def usage
-  abort 'mint epub publish file'
+  abort "mint epub publish file"
 end
 
 case ARGV.shift.downcase.to_sym
 when :publish
-  destination = ARGV.first.gsub(/\.[^.]*$/, '')
-  opts = { destination: destination, style_destination: 'OPS' }
+  destination = ARGV.first.gsub(/\.[^.]*$/, "")
+  opts = { destination: destination, style_destination: "OPS" }
   document = Mint::Document.new(ARGV.first, opts) 
   document.publish! :plugins => [Mint::EPub]
 end

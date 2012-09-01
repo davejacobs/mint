@@ -2,8 +2,8 @@
 # A script for harnessing Mint at the commandline
 # Usage: mint [command] [options] [files]
 
-require 'mint'
-require 'shellwords'
+require "mint"
+require "shellwords"
 
 argv, commandline_options, help = 
   Mint::CommandLine.parse(ARGV).values_at(:argv, :options, :help)
@@ -43,7 +43,7 @@ else
   # document list.
   
   begin
-    system "mint-#{argv.first} #{argv[1..-1].join ' '}"
+    system 'mint-#{argv.first} #{argv[1..-1].join " "}'
   rescue
     Mint::CommandLine.help(help)
   end
