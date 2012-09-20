@@ -1,51 +1,37 @@
-require 'spec_helper'
+require "spec_helper"
 
 module Mint
   describe CommandLine do
     describe ".options" do
       it "provides default options" do
-        CommandLine.options['template']['long'].should == 'template'
-        CommandLine.options['layout']['long'].should == 'layout'
-        CommandLine.options['style']['long'].should == 'style'
+        CommandLine.options["template"]["long"].should == "template"
+        CommandLine.options["layout"]["long"].should == "layout"
+        CommandLine.options["style"]["long"].should == "style"
       end
     end
 
-    describe ".parser" do
-      it "provides a default option parser" do
-        fake_argv = ['--layout', 'zen']
-
-        options = {}
-        CommandLine.parser {|k, p| options[k] = p }.parse!(fake_argv)
-        options[:layout].should == 'zen'
+    describe ".parse" do
+      it "does not mutate passed in ARGV" do
+        argv = ["--layout", "zen"]
+        lambda { CommandLine.parse(argv) }.should_not change { argv }
       end
 
-      it "provides an option parser based on a formatted hash" do
-        fake_argv = ['--novel', 'novel']
-        formatted_options = {
-          # Option keys must be formatted as strings, so we
-          # use hash-bang syntax
-          novel: {
-            'short' => 'n',
-            'long' => 'novel',
-            'parameter' => true,
-            'description' => ''
+      it "returns a hash of commandline options, unconsumed options, and the help message" do
+        OptionParser.any_instance.stub(:help => "Help message")
+        CommandLine.parse(["command", "--layout", "zen"]).should == {
+          help: "Help message",
+          argv: ["command"],
+          options: {
+            layout: "zen" 
           }
         }
-
-        options = {}
-
-        CommandLine.parser(formatted_options) do |k, p| 
-          options[k] = p
-        end.parse!(fake_argv)
-
-        options[:novel].should == 'novel'
       end
     end
 
     describe ".help" do
       it "prints a help message" do
-        STDOUT.should_receive(:puts).with('message')
-        CommandLine.help('message')
+        STDOUT.should_receive(:puts).with("message")
+        CommandLine.help("message")
       end
     end
 
@@ -70,7 +56,7 @@ module Mint
 
     describe ".edit" do
       it "pulls up a named template file in the user's editor" do
-        ENV['EDITOR'] = 'vim'
+        ENV["EDITOR"] = "vim"
         CommandLine.should_receive(:system).with("vim #{@dynamic_style_file}")
         CommandLine.edit(@dynamic_style_file)
       end

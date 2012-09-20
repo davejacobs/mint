@@ -1,5 +1,5 @@
-require 'mint/document'
-require 'set'
+require "mint/document"
+require "set"
 
 module Mint
   def self.plugins
@@ -28,15 +28,15 @@ module Mint
   end
 
   def self.template_directory(plugin)
-    Mint.root + '/plugins/templates/' + plugin.underscore
+    Mint.root + "/plugins/templates/" + plugin.underscore
   end
 
   def self.config_directory(plugin)
-    Mint.root + '/plugins/config/' + plugin.underscore
+    Mint.root + "/plugins/config/" + plugin.underscore
   end
 
   def self.commandline_options_file(plugin)
-    plugin.config_directory + '/syntax.yml'
+    plugin.config_directory + "/syntax.yml"
   end
 
   def self.commandline_name(plugin)

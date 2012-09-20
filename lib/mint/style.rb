@@ -1,4 +1,4 @@
-require 'mint/resource'
+require "mint/resource"
 
 module Mint
   class Style < Resource
@@ -19,7 +19,7 @@ module Mint
       # However, if a destination directory is already specified, we
       # leave it alone.
       if Mint.template?(self.source_directory) and rendered?
-        self.destination ||= 'css' 
+        self.destination ||= "css" 
       end
     end
 

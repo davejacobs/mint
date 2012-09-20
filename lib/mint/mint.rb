@@ -1,12 +1,12 @@
-require 'pathname'
-require 'fileutils'
-require 'yaml'
-require 'tilt'
+require "pathname"
+require "fileutils"
+require "yaml"
+require "tilt"
 
-require 'active_support/core_ext/hash/slice'
+require "active_support/core_ext/hash/slice"
 
 module Mint
-  ROOT = (Pathname.new(__FILE__).realpath.dirname + '../..').to_s 
+  ROOT = (Pathname.new(__FILE__).realpath.dirname + "../..").to_s 
 
   SCOPES = {
     local:  Pathname.new(".mint"),
@@ -62,15 +62,15 @@ module Mint
   # @return [Hash] key Mint directories
   def self.directories
     { 
-      templates: 'templates'
+      templates: "templates"
     }
   end
 
   # @return [Hash] key Mint files
   def self.files
     { 
-      syntax: 'syntax.yaml',
-      defaults: 'defaults.yaml'
+      syntax: "syntax.yaml",
+      defaults: "defaults.yaml"
     }
   end
 
@@ -79,8 +79,8 @@ module Mint
     {
       # Do not set default `template`--will override style and
       # layout when already specified -- causes tricky bugs
-      layout: 'default',     # default layout
-      style: 'default',      # default style
+      layout: "default",     # default layout
+      style: "default",      # default style
       destination: nil,      # do not create a subdirectory
       style_destination: nil # do not copy style to root
     }
@@ -94,11 +94,11 @@ module Mint
   # @return [Array] CSS formats, for source -> destination
   #   name guessing/conversion only.
   def self.css_formats
-    ['css', 'sass', 'scss', 'less']
+    ["css", "sass", "scss", "less"]
   end
 
   # Returns a hash of all active options specified by file (for all scopes).
-  # That is, if you specify file as 'defaults.yaml', this will return the aggregate
+  # That is, if you specify file as "defaults.yaml", this will return the aggregate
   # of all defaults.yaml-specified options in the Mint path, where more local
   # members of the path take precedence over more global ones.
   #
@@ -179,7 +179,7 @@ module Mint
 
     file_name  = lambda {|x| x + templates_dir + name + type.to_s }
     find_files = lambda {|x| Pathname.glob "#{x.to_s}.*" }
-    acceptable = lambda {|x| x.to_s =~ /#{Mint.formats.join '|'}/ }
+    acceptable = lambda {|x| x.to_s =~ /#{Mint.formats.join "|"}/ }
 
     Mint.path.map(&file_name).map(&find_files).flatten.
       select(&acceptable).select(&:exist?).first.tap do |template|
@@ -190,7 +190,7 @@ module Mint
   def self.template_path(name, type, opts={})
     defaults = { 
       scope: :local,
-      ext: { layout: 'haml', style: 'sass' }[type]
+      ext: { layout: "haml", style: "sass" }[type]
     }
     opts = defaults.merge(opts)
     path = Mint.path_for_scope(opts[:scope])
@@ -212,7 +212,7 @@ module Mint
     paths = Mint.path.map {|f| File.expand_path f }
     file_path = Pathname.new(file)
     file_path.exist? and 
-      file_path.dirname.expand_path.to_s =~ /#{paths.map(&:to_s).join('|')}/
+      file_path.dirname.expand_path.to_s =~ /#{paths.map(&:to_s).join("|")}/
   end
 
   # Guesses an appropriate name for the resource output file based on
@@ -222,10 +222,10 @@ module Mint
   # @return [String] probably output file name
   def self.guess_name_from(name)
     name = Pathname(name).basename if name
-    css = Mint.css_formats.join '|'
+    css = Mint.css_formats.join "|"
     name.to_s.
-      gsub(/\.(#{css})$/, '.css').
-      gsub(/(\.[^css]+)$/, '.html')
+      gsub(/\.(#{css})$/, ".css").
+      gsub(/(\.[^css]+)$/, ".html")
   end
 
   # Transforms a path into a template that will render the file specified

@@ -1,12 +1,12 @@
-require 'pathname'
-require 'tempfile'
-require 'yaml'
-require 'active_support/core_ext/string/inflections'
+require "pathname"
+require "tempfile"
+require "yaml"
+require "active_support/core_ext/string/inflections"
 
 module Mint
   module Helpers    
     def self.underscore(obj, opts={})
-      namespaces = obj.to_s.split('::').map do |namespace|
+      namespaces = obj.to_s.split("::").map do |namespace|
         if opts[:ignore_prefix]
           namespace[0..1].downcase + namespace[2..-1]
         else
@@ -14,7 +14,7 @@ module Mint
         end
       end
 
-      string = opts[:namespaces] ? namespaces.join('::') : namespaces.last
+      string = opts[:namespaces] ? namespaces.join("::") : namespaces.last
       string.underscore
     end
 
@@ -25,10 +25,10 @@ module Mint
     # @return [String] a URL-ready slug
     def self.slugize(obj)
       obj.to_s.downcase.
-        gsub(/&/, 'and').
-        gsub(/[\s-]+/, '-').
-        gsub(/[^a-z0-9-]/, '').
-        gsub(/[-]+/, '-')
+        gsub(/&/, "and").
+        gsub(/[\s-]+/, "-").
+        gsub(/[^a-z0-9-]/, "").
+        gsub(/[-]+/, "-")
     end
 
     # Transforms a potentially hyphenated String into a symbol name.
@@ -36,7 +36,7 @@ module Mint
     # @param [String, #to_s] obj an object to be turned into a symbol name
     # @return [Symbol] a symbol representation of obj
     def self.symbolize(obj)
-      slugize(obj).gsub(/-/, '_').to_sym
+      slugize(obj).gsub(/-/, "_").to_sym
     end
   
     # Transforms a String or Pathname into a fully expanded Pathname.
@@ -73,9 +73,9 @@ module Mint
 
     def self.listify(list)
       if list.length > 2
-        list[0..-2].join(', ') + ' & ' + list.last
+        list[0..-2].join(", ") + " & " + list.last
       else
-        list.join(' & ')
+        list.join(" & ")
       end
     end
 
@@ -133,7 +133,7 @@ module Mint
     def self.update_yaml!(file, opts={})
       curr_opts = File.exist?(file) ? YAML.load_file(file) : {}
 
-      File.open file, 'w' do |f|
+      File.open file, "w" do |f|
         YAML.dump(curr_opts.merge(opts), f)
       end
     end

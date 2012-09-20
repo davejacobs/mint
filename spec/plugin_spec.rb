@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe Mint do
   # Remove unintended side effects of creating
@@ -69,9 +69,9 @@ describe Mint do
     let(:plugin) { Class.new(Mint::Plugin) }
 
     it "gives access to a directory where template files can be stored" do
-      plugin.should_receive(:name).and_return('DocBook')
+      plugin.should_receive(:name).and_return("DocBook")
       Mint.template_directory(plugin).should == 
-        Mint.root + '/plugins/templates/doc_book'
+        Mint.root + "/plugins/templates/doc_book"
     end
   end
 
@@ -79,9 +79,9 @@ describe Mint do
     let(:plugin) { Class.new(Mint::Plugin) }
 
     it "gives access to a directory where template files can be stored" do
-      plugin.should_receive(:name).and_return('DocBook')
+      plugin.should_receive(:name).and_return("DocBook")
       Mint.config_directory(plugin).should == 
-        Mint.root + '/plugins/config/doc_book'
+        Mint.root + "/plugins/config/doc_book"
     end
   end
 
@@ -89,9 +89,9 @@ describe Mint do
     let(:plugin) { Class.new(Mint::Plugin) }
 
     it "gives access to a directory where template files can be stored" do
-      plugin.should_receive(:name).and_return('DocBook')
+      plugin.should_receive(:name).and_return("DocBook")
       Mint.commandline_options_file(plugin).should == 
-        Mint.root + '/plugins/config/doc_book/syntax.yml'
+        Mint.root + "/plugins/config/doc_book/syntax.yml"
     end
   end
 
@@ -103,28 +103,28 @@ describe Mint do
 
       context "when plugins are specified" do
         before do
-          first_plugin.should_receive(callback).ordered.and_return('first')
-          second_plugin.should_receive(callback).ordered.and_return('second')
+          first_plugin.should_receive(callback).ordered.and_return("first")
+          second_plugin.should_receive(callback).ordered.and_return("second")
           third_plugin.should_receive(callback).never
         end
 
         it "reduces .#{callback} across all specified plugins in order" do
           plugins = [first_plugin, second_plugin]
-          Mint.send(callback, 'text', :plugins => plugins).should == 'second'
+          Mint.send(callback, "text", :plugins => plugins).should == "second"
         end
       end
 
       context "when plugins are activated, but no plugins are specified" do
         before do
-          first_plugin.should_receive(callback).ordered.and_return('first')
-          second_plugin.should_receive(callback).ordered.and_return('second')
+          first_plugin.should_receive(callback).ordered.and_return("first")
+          second_plugin.should_receive(callback).ordered.and_return("second")
           third_plugin.should_receive(callback).never
         end
         
         it "reduces .#{callback} across all activated plugins in order" do
           Mint.activate_plugin! first_plugin
           Mint.activate_plugin! second_plugin
-          Mint.send(callback, 'text').should == 'second'
+          Mint.send(callback, "text").should == "second"
         end
       end
 
@@ -136,7 +136,7 @@ describe Mint do
         end
         
         it "returns the parameter text" do
-          Mint.send(callback, 'text').should == 'text'
+          Mint.send(callback, "text").should == "text"
         end
       end
     end
@@ -156,7 +156,7 @@ describe Mint do
 
       it "iterates across all specified plugins in order" do
         plugins = [first_plugin, second_plugin]
-        Mint.after_publish('fake document', :plugins => plugins)
+        Mint.after_publish("fake document", :plugins => plugins)
       end
     end
 
@@ -170,7 +170,7 @@ describe Mint do
       it "iterates across all activated plugins in order" do
         Mint.activate_plugin! first_plugin
         Mint.activate_plugin! second_plugin
-        Mint.after_publish('fake document')
+        Mint.after_publish("fake document")
       end
     end
 
@@ -182,7 +182,7 @@ describe Mint do
       end
       
       it "does not iterate over any plugins" do
-        Mint.after_publish('fake document')
+        Mint.after_publish("fake document")
       end
     end
   end
@@ -207,7 +207,7 @@ describe Mint do
   describe Mint::Plugin do
     # We have to instantiate these plugins in a before block,
     # and not in a let block. Because lets are lazily evaluated,
-    # the first two tests in the '#inherited' suite will not
+    # the first two tests in the "#inherited" suite will not
     # pass.
     before do
       @first_plugin = Class.new(Mint::Plugin)
@@ -220,8 +220,8 @@ describe Mint do
       it "when anonymous, returns a random identifier"
 
       it "when named, returns its name, underscored" do
-        plugin.should_receive(:name).and_return('EPub')
-        plugin.underscore.should == 'epub'
+        plugin.should_receive(:name).and_return("EPub")
+        plugin.underscore.should == "epub"
       end
     end
 
@@ -265,11 +265,11 @@ describe Mint do
         it "allows changes to the un-rendered content" do
           plugin.instance_eval do
             def before_render(text_document)
-              'base'
+              "base"
             end
           end
 
-          plugin.before_render('text').should == 'base'
+          plugin.before_render("text").should == "base"
         end
       end
 
@@ -277,21 +277,21 @@ describe Mint do
         it "allows changes to the rendered HTML" do
           plugin.instance_eval do
             def after_render(html_document)
-              '<!doctype html>'
+              "<!doctype html>"
             end
           end
 
-          plugin.after_render('<html></html>').should == '<!doctype html>'
+          plugin.after_render("<html></html>").should == "<!doctype html>"
         end
       end
 
       describe ".after_mint" do
-        let(:document) { Mint::Document.new 'content.md' } 
+        let(:document) { Mint::Document.new "content.md" } 
 
         it "allows changes to the document extension" do
           plugin.instance_eval do
             def after_publish(document)
-              document.name.gsub! /html$/, 'htm'
+              document.name.gsub! /html$/, "htm"
             end
           end
 
@@ -309,11 +309,11 @@ describe Mint do
               first  = content[0..fake_splitting_point]
               second = content[fake_splitting_point..-1]
 
-              File.open 'first-half.html', 'w+' do |file|
+              File.open "first-half.html", "w+" do |file|
                 file << first
               end
 
-              File.open 'second-half.html', 'w+' do |file|
+              File.open "second-half.html", "w+" do |file|
                 file << second
               end
 
@@ -324,13 +324,13 @@ describe Mint do
           document.publish! :plugins => [plugin]
 
           File.exist?(document.destination_file).should be_false
-          File.exist?('first-half.html').should be_true
-          File.exist?('second-half.html').should be_true
+          File.exist?("first-half.html").should be_true
+          File.exist?("second-half.html").should be_true
         end
 
         it "allows changes to the style file" do
           pending "figure out a better strategy for style manipulation"
-          document = Mint::Document.new 'content.md', :style => 'style.css' 
+          document = Mint::Document.new "content.md", :style => "style.css" 
 
           plugin.instance_eval do
             def after_publish(document)
@@ -340,8 +340,8 @@ describe Mint do
               # stylesheet in our current directory
               style_source = document.style.source_file
               style = File.read style_source
-              File.open style_source, 'w' do |file|
-                file << style.gsub(/#/, '.')
+              File.open style_source, "w" do |file|
+                file << style.gsub(/#/, ".")
               end
             end
           end
@@ -354,13 +354,13 @@ describe Mint do
         context "when the output is in the default directory" do
           it "doesn't allow changes to the document directory" do
             pending "figuring out the best way to prevent directory manipulation"
-            document = Mint::Document.new 'content.md'
+            document = Mint::Document.new "content.md"
             plugin.instance_eval do
               def after_publish
                 original = document.destination_directory
-                new = File.expand_path 'invalid'
+                new = File.expand_path "invalid"
                 FileUtils.mv original, new
-                document.destination = 'invalid'
+                document.destination = "invalid"
               end
 
               lambda do
@@ -372,77 +372,77 @@ describe Mint do
 
         context "when the output is a new directory" do
           it "allows changes to the document directory" do
-            document = Mint::Document.new 'content.md', :destination => 'destination'
+            document = Mint::Document.new "content.md", :destination => "destination"
             plugin.instance_eval do
               def after_publish(document)
                 original = document.destination_directory
-                new = File.expand_path 'book'
+                new = File.expand_path "book"
                 FileUtils.mv original, new
-                document.destination = 'book'
+                document.destination = "book"
               end
             end
 
             document.publish! :plugins => [plugin]
-            File.exist?('destination').should be_false
-            File.exist?('book').should be_true
-            document.destination_directory.should == File.expand_path('book')
+            File.exist?("destination").should be_false
+            File.exist?("book").should be_true
+            document.destination_directory.should == File.expand_path("book")
           end
 
           it "allows compression of the final output" do
-            require 'zip/zip'
-            require 'zip/zipfilesystem'
+            require "zip/zip"
+            require "zip/zipfilesystem"
 
-            document = Mint::Document.new 'content.md', :destination => 'destination'
+            document = Mint::Document.new "content.md", :destination => "destination"
             plugin.instance_eval do
               def after_publish(document)
-                Zip::ZipOutputStream.open 'book.zip' do |zos|
-                  # zos.put_next_entry('mimetype', nil, nil, Zip::ZipEntry::STORED)
-                  # zos.puts 'text/epub'
-                  zos.put_next_entry('chapter-1', nil, nil, Zip::ZipEntry::DEFLATED)
+                Zip::ZipOutputStream.open "book.zip" do |zos|
+                  # zos.put_next_entry("mimetype", nil, nil, Zip::ZipEntry::STORED)
+                  # zos.puts "text/epub"
+                  zos.put_next_entry("chapter-1", nil, nil, Zip::ZipEntry::DEFLATED)
                   zos.puts File.read(document.destination_file)
                 end
 
-                FileUtils.mv 'book.zip', 'book.epub'
+                FileUtils.mv "book.zip", "book.epub"
               end
             end
 
             document.publish! :plugins => [plugin]
 
-            File.exist?('destination').should be_true
-            File.exist?('book.zip').should be_false
-            File.exist?('book.epub').should be_true
+            File.exist?("destination").should be_true
+            File.exist?("book.zip").should be_false
+            File.exist?("book.epub").should be_true
 
             directory_size = 
               Dir["#{document.destination_directory}/**/*"].
               flatten.
               map {|file| File.stat(file).size }.
               reduce(&:+)
-            compressed_size = File.stat('book.epub').size
+            compressed_size = File.stat("book.epub").size
             directory_size.should > compressed_size
           end
         end
 
         context "when the style output is a new directory" do
           it "allows changes to the style directory" do
-            document = Mint::Document.new 'content.md', :style_destination => 'styles'
+            document = Mint::Document.new "content.md", :style_destination => "styles"
             plugin.instance_eval do
               def after_publish(document)
                 original = document.style_destination_directory
-                new = File.expand_path 'looks'
+                new = File.expand_path "looks"
                 FileUtils.mv original, new
-                document.style_destination = 'looks'
+                document.style_destination = "looks"
               end
             end
 
             document.publish! :plugins => [plugin]
 
-            File.exist?('styles').should be_false
-            File.exist?('looks').should be_true
-            document.style_destination_directory.should == File.expand_path('looks')
+            File.exist?("styles").should be_false
+            File.exist?("looks").should be_true
+            document.style_destination_directory.should == File.expand_path("looks")
           end
 
           after do
-            FileUtils.rm_r File.expand_path('looks')
+            FileUtils.rm_r File.expand_path("looks")
           end
         end
       end

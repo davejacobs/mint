@@ -1,4 +1,4 @@
-require 'mint/mint'
+require "mint/mint"
 
 module Mint
   class Resource
@@ -45,7 +45,7 @@ module Mint
     attr_accessor :destination
 
     def destination_file_path
-      root_directory_path + (destination || '') + name
+      root_directory_path + (destination || "") + name
     end
 
     def destination_file

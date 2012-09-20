@@ -1,19 +1,19 @@
-require 'pathname'
-require 'mint'
-require_relative 'support/matchers'
+require "pathname"
+require "mint"
+require_relative "support/matchers"
 
 RSpec.configure do |config|
   config.before(:all) do
     @old_dir = Dir.getwd
-    FileUtils.mkdir_p '/tmp/mint-test'
-    @tmp_dir = File.realpath '/tmp/mint-test'
+    FileUtils.mkdir_p "/tmp/mint-test"
+    @tmp_dir = File.realpath "/tmp/mint-test"
 
-    @content_file = 'content.md'
-    @layout_file = 'layout.haml'
-    @static_style_file = 'static.css'
-    @dynamic_style_file = 'dynamic.sass'
+    @content_file = "content.md"
+    @layout_file = "layout.haml"
+    @static_style_file = "static.css"
+    @dynamic_style_file = "dynamic.sass"
 
-    ['content.md', 'layout.haml', 'static.css', 'dynamic.sass'].each do |file|
+    ["content.md", "layout.haml", "static.css", "dynamic.sass"].each do |file|
       FileUtils.cp "spec/support/fixtures/#{file}", @tmp_dir
     end
 
@@ -26,12 +26,12 @@ RSpec.configure do |config|
   end
 
   config.after(:each) do
-    ['content.html', '.mint/defaults.yaml'].map {|file| Pathname.new file }.
+    ["content.html", ".mint/defaults.yaml"].map {|file| Pathname.new file }.
       select(&:exist?).
       each {|file| FileUtils.rm_rf file }
 
     Mint.templates.
-      map {|template| Pathname.new(template) + 'css' }.
+      map {|template| Pathname.new(template) + "css" }.
       select(&:exist?).
       map(&:children).
       flatten.

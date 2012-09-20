@@ -1,9 +1,9 @@
-require 'sass'
+require "sass"
 
 module Mint
   module CSS
     def self.container
-      'container'
+      "container"
     end
 
     # Maps a "DSL" onto actual CSS. Translates this ...
@@ -22,29 +22,29 @@ module Mint
     # }
     def self.mappings
       { 
-        font: 'font-family',
-        font_size: 'font-size',
-        font_color: 'color',
-        color: 'color',
-        top_margin: 'padding-top',
-        top: 'padding-top',
-        bottom_margin: 'padding-bottom',
-        bottom: 'padding-bottom',
-        left_margin: 'padding-left',
-        left: 'padding-left',
-        right_margin: 'padding-right',
-        right: 'padding-right',
-        height: 'height',
-        width: 'width',
+        font: "font-family",
+        font_size: "font-size",
+        font_color: "color",
+        color: "color",
+        top_margin: "padding-top",
+        top: "padding-top",
+        bottom_margin: "padding-bottom",
+        bottom: "padding-bottom",
+        left_margin: "padding-left",
+        left: "padding-left",
+        right_margin: "padding-right",
+        right: "padding-right",
+        height: "height",
+        width: "width",
         columns: "column-count",
         column_gap: "column-gap",
         orientation: "@page { size: %s }",
-        indentation: 'p+p { text-indent: %s }',
-        indent: 'p+p { text-indent: %s }',
-        bullet: 'li { list-style-type: %s }',
-        bullet_image: 'li { list-style-image: url(%s) }',
-        after_paragraph: 'margin-bottom',
-        before_paragraph: 'margin-top'
+        indentation: "p+p { text-indent: %s }",
+        indent: "p+p { text-indent: %s }",
+        bullet: "li { list-style-type: %s }",
+        bullet_image: "li { list-style-image: url(%s) }",
+        after_paragraph: "margin-bottom",
+        before_paragraph: "margin-top"
       }
     end
 
@@ -53,7 +53,7 @@ module Mint
 
       if selector.nil?
         ""
-      elsif selector.include? '%'
+      elsif selector.include? "%"
         selector % value
       else
         "#{selector || key}: #{value}"
