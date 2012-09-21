@@ -1,3 +1,4 @@
+require "tilt"
 require File.expand_path("../lib/mint/version", __FILE__)
 
 Gem::Specification.new do |s|
@@ -12,7 +13,7 @@ Gem::Specification.new do |s|
   s.author    = "David Jacobs"
   s.email     = "david@wit.io"
   s.summary   = "Clean, simple library for maintaining and styling documents without a word processor"
-  s.description = File.read("README.md")
+  s.description = Tilt.new("README.md").render
 
   s.files = Dir["{bin,config,lib,plugins}/**/*"] + [
     "README.md",
