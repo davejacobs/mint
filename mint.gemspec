@@ -12,66 +12,14 @@ Gem::Specification.new do |s|
   s.author    = "David Jacobs"
   s.email     = "david@wit.io"
   s.summary   = "Clean, simple library for maintaining and styling documents without a word processor"
+  s.description = File.read("README.md")
 
-  # Manifest
-  s.files = [
+  s.files = Dir["{bin,config,lib,plugins}/**/*"] + [
     "README.md",
-    "bin/mint",
-    "bin/mint-epub",
-    "lib/mint.rb",
-    "lib/mint/helpers.rb",
-    "lib/mint/exceptions.rb",
-    "lib/mint/mint.rb",
-    "lib/mint/resource.rb",
-    "lib/mint/layout.rb",
-    "lib/mint/style.rb",
-    "lib/mint/document.rb",
-    "lib/mint/version.rb",
-    "lib/mint/css.rb",
-    "lib/mint/commandline.rb",
-    "lib/mint/plugin.rb",
-    "lib/mint/plugins/epub.rb",
-    "config/syntax.yaml",
-    "templates/base/style.sass",
-    "templates/default/layout.haml",
-    "templates/default/style.sass",
-    "templates/pro/layout.haml",
-    "templates/pro/style.sass",
-    "plugins/templates/epub/layouts/container.haml",
-    "plugins/templates/epub/layouts/layout.haml",
-    "plugins/templates/epub/layouts/title.haml",
-    "plugins/templates/epub/layouts/toc.haml",
-    "plugins/templates/epub/layouts/content.haml",
-    "features/support/env.rb",
-    "features/publish.feature",
-    "features/plugins/epub.feature",
-    "spec/spec_helper.rb",
-    "spec/helpers_spec.rb",
-    "spec/mint_spec.rb",
-    "spec/resource_spec.rb",
-    "spec/layout_spec.rb",
-    "spec/style_spec.rb",
-    "spec/document_spec.rb",
-    "spec/commandline_spec.rb",
-    "spec/plugin_spec.rb",
-    "spec/plugins/epub_spec.rb"
+    "Gemfile"
   ]
 
-  s.test_files = [
-    "features/support/env.rb",
-    "features/publish.feature",
-    "features/plugins/epub.feature",
-    "spec/spec_helper.rb",
-    "spec/helpers_spec.rb",
-    "spec/mint_spec.rb",
-    "spec/resource_spec.rb",
-    "spec/layout_spec.rb",
-    "spec/style_spec.rb",
-    "spec/document_spec.rb",
-    "spec/commandline_spec.rb",
-    "spec/plugin_spec.rb",
-    "spec/plugins/epub_spec.rb"
-  ]
+  s.test_files = Dir["{features,spec}/**/*"]
 
   s.require_path = "lib"
   s.executables  = ["mint", "mint-epub"]
