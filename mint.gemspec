@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
   s.author    = "David Jacobs"
   s.email     = "david@wit.io"
   s.summary   = "Clean, simple library for maintaining and styling documents without a word processor"
-  s.description = Tilt.new("README.md").render
+  s.description = "Clean, simple library for maintaining and styling documents without a word processor. Mint aims to bring the best of the Web to desktop publishing, to be completely flexible, and to let the user decide what his workflow is like. A powerful plugin system means almost any conceivable publishing target is an option."
 
   s.files = Dir["{bin,config,lib,plugins}/**/*"] + [
     "README.md",
