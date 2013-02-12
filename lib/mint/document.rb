@@ -214,7 +214,15 @@ module Mint
 
       def metadata_from(text)
         raw_metadata = YAML.load metadata_chunk(text)
-        raw_metadata.is_a?(String) ? {} : raw_metadata
+        
+        case raw_metadata
+        when String
+          {}
+        when false
+          {}
+        else
+          raw_metadata
+        end
       rescue
         {}
       end
