@@ -206,6 +206,10 @@ module Mint
         it "returns the empty string if a document has bad/no metadata" do
           Document.metadata_from("No metadata here").should == {}
         end
+
+        it "handles a non-simple string that is also not YAML" do
+          Document.metadata_from("# Non-simple string").should == {}
+        end
       end
 
       describe ".parse_metadata_from" do
