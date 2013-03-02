@@ -2,15 +2,21 @@ require "pathname"
 require "fileutils"
 require "yaml"
 require "tilt"
-
+require "tilt/mapping"
 require "active_support/core_ext/hash/slice"
+require "active_support/core_ext/string/output_safety"
+require "mint/css_template"
+require "mint/markdown_template"
 
 module Mint
-  ROOT = (Pathname.new(__FILE__).realpath.dirname + "../..").to_s 
+  ROOT = (Pathname.new(__FILE__).realpath.dirname + "../..").to_s
+
+  # Markdown file extensions supported by Mint
+  MARKDOWN_EXTENSIONS = %w[md markdown mkd].freeze
 
   SCOPES = {
     local:  Pathname.new(".mint"),
-    user:   Pathname.new("~/.mint").expand_path,
+    user:   Pathname.new("~/.config/mint").expand_path,
     global: Pathname.new("#{ROOT}/config").expand_path
   }
 
@@ -19,8 +25,18 @@ module Mint
   # Assume that someone using an Html template has formatted it
   # in Erb and that a Css stylesheet will pass untouched through
   # a Scss parser.
-  Tilt.register Tilt::ERBTemplate, :html
-  Tilt.register Tilt::ScssTemplate, :css
+  @mapping = Tilt::Mapping.new
+  @mapping.register Mint::CSSTemplate,          'css'
+  @mapping.register Mint::MarkdownTemplate,     *MARKDOWN_EXTENSIONS
+  @mapping.register Mint::MarkdownTemplate,     'txt'
+  @mapping.register Tilt::ScssTemplate,         'scss'
+  @mapping.register Tilt::SassTemplate,         'sass'
+  @mapping.register Tilt::ERBTemplate,          'erb'
+  @mapping.register Tilt::HamlTemplate,         'haml'
+
+  def self.mapping
+    @mapping
+  end
 
   # @return [String] the Mint root path name
   def self.root
@@ -61,14 +77,14 @@ module Mint
 
   # @return [Hash] key Mint directories
   def self.directories
-    { 
+    {
       templates: "templates"
     }
   end
 
   # @return [Hash] key Mint files
   def self.files
-    { 
+    {
       syntax: "syntax.yaml",
       defaults: "defaults.yaml"
     }
@@ -88,7 +104,7 @@ module Mint
 
   # @return [Array] all file extensions that Tilt will render
   def self.formats
-    Tilt.mappings.keys
+    mapping.template_map.keys
   end
 
   # @return [Array] CSS formats, for source -> destination
@@ -148,11 +164,11 @@ module Mint
   # template we are looking for is a layout or a style and will affect
   # which type of template is returned for a given template name. For
   # example, `lookup_template :normal` might return a layout template
-  # referring to the file ~/.mint/templates/normal/layout.erb.
+  # referring to the file ~/.config/mint/templates/normal/layout.erb.
   # Adding :style as a second argument returns
-  # ~/.mint/templates/normal/style.css.
+  # ~/.config/mint/templates/normal/style.css.
   #
-  # @param [String, File, #to_s] name_or_file a name or template file 
+  # @param [String, File, #to_s] name_or_file a name or template file
   #   to look up
   # @param [Symbol] type the resource type to look up
   # @return [File] the named, typed template file
@@ -162,7 +178,7 @@ module Mint
   end
 
   # Finds a template named `name` in the Mint path. If `type` is :layout,
-  # will look for `MINT_PATH/templates/layout.*`. If it is :style, will
+  # will look for `MINT_PATH/templates/template_name/layout.*`. If it is :style, will
   # look for `MINT_PATH/templates/template_name/style.*`. Mint assumes
   # that a named template will hold only one layout and one style template.
   # It does not know how to decide between style.css and style.less, for
@@ -179,16 +195,19 @@ module Mint
 
     file_name  = lambda {|x| x + templates_dir + name + type.to_s }
     find_files = lambda {|x| Pathname.glob "#{x.to_s}.*" }
-    acceptable = lambda {|x| x.to_s =~ /#{Mint.formats.join "|"}/ }
 
-    Mint.path.map(&file_name).map(&find_files).flatten.
-      select(&acceptable).select(&:exist?).first.tap do |template|
-      raise TemplateNotFoundException unless template
-    end.to_s
+    Mint.path.
+      map(&file_name).
+      map(&find_files).
+      flatten.
+      select(&:exist?).
+      first.
+      tap {|template| raise TemplateNotFoundException unless template }.
+      to_s
   end
 
   def self.template_path(name, type, opts={})
-    defaults = { 
+    defaults = {
       scope: :local,
       ext: { layout: "haml", style: "sass" }[type]
     }
@@ -211,7 +230,7 @@ module Mint
   def self.template?(file)
     paths = Mint.path.map {|f| File.expand_path f }
     file_path = Pathname.new(file)
-    file_path.exist? and 
+    file_path.exist? and
       file_path.dirname.expand_path.to_s =~ /#{paths.map(&:to_s).join("|")}/
   end
 
@@ -225,7 +244,7 @@ module Mint
     css = Mint.css_formats.join "|"
     name.to_s.
       gsub(/\.(#{css})$/, ".css").
-      gsub(/(\.[^css]+)$/, ".html")
+      gsub(/(\.(?!css).*)$/, ".html")
   end
 
   # Transforms a path into a template that will render the file specified
@@ -233,7 +252,7 @@ module Mint
   #
   # @param [Path, File, String, #to_s] path the file to render
   def self.renderer(path)
-    Tilt.new path.to_s, :smart => true, :ugly => true
+    mapping.new path.to_s
   end
 
   # Publishes a Document object according to its internal specifications.

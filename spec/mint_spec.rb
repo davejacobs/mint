@@ -28,17 +28,17 @@ describe Mint do
 
     it "it returns the paths corresponding to all scopes as an array" do
       Mint.path.should == [Pathname.new(".mint"),
-                           Pathname.new("~/.mint").expand_path,
+                           Pathname.new("~/.config/mint").expand_path,
                            Pathname.new(Mint.root + "/config").expand_path]
     end
 
     it "can filter paths by one scope" do
-      Mint.path(:scopes => [:user]).should == [Pathname.new("~/.mint").expand_path]
+      Mint.path(:scopes => [:user]).should == [Pathname.new("~/.config/mint").expand_path]
     end
 
     it "can filter paths by many scopes" do
       Mint.path(:scopes => [:local, :user]).should == [Pathname.new(".mint"),
-                                                       Pathname.new("~/.mint").expand_path]
+                                                       Pathname.new("~/.config/mint").expand_path]
     end
   end
 
@@ -130,7 +130,7 @@ describe Mint do
     it "chooses the appropriate path for scope" do
       expectations = {
         local: Pathname.new(".mint"),
-        user: Pathname.new("~/.mint").expand_path,
+        user: Pathname.new("~/.config/mint").expand_path,
         global: Pathname.new(Mint.root + "/config").expand_path
       }
 
@@ -212,7 +212,7 @@ describe Mint do
 
     it "allows a scope to be specified" do
       Mint.template_path("pro", :layout, :scope => :user).should == 
-        File.expand_path("~/.mint/templates/pro/layout.haml")
+        File.expand_path("~/.config/mint/templates/pro/layout.haml")
     end
   end
 end

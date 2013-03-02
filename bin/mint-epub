@@ -3,6 +3,7 @@
 # A script for publishing Mint in the ePub format
 # Usage: mint epub [command] [options] [files]
 
+$LOAD_PATH.unshift File.expand_path('../lib', __dir__)
 require "mint"
 require "mint/plugins/epub"
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
-# A script for harnessing Mint at the commandline
-# Usage: mint [command] [options] [files]
+
+# Add /lib to path to override any local installations of Mint
+$LOAD_PATH.unshift File.expand_path('../lib', __dir__)
 
 require "mint"
 require "shellwords"

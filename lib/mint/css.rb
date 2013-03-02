@@ -1,4 +1,4 @@
-require "sass"
+require "sass-embedded"
 
 module Mint
   module CSS
@@ -21,7 +21,7 @@ module Mint
     #   @page { size: landscape };
     # }
     def self.mappings
-      { 
+      {
         font: "font-family",
         font_size: "font-size",
         font_color: "color",
@@ -63,8 +63,15 @@ module Mint
     def self.parse(style)
       css = style.map {|k,v| stylify(k, v) }.join("\n  ")
       container_scope = "##{container}\n  #{css.strip}\n"
-      engine = Sass::Engine.new(container_scope)
-      engine.silence_sass_warnings { engine.render }
+      
+      # Suppress warnings by capturing $stderr
+      original_stderr = $stderr
+      $stderr = StringIO.new
+      
+      result = Sass.compile_string(container_scope, syntax: :indented)
+      result.css
+    ensure
+      $stderr = original_stderr
     end
   end
 end

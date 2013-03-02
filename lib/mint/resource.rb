@@ -4,6 +4,8 @@ module Mint
   class Resource
     attr_accessor :type
 
+    attr_accessor :context
+
     attr_reader :name
     def name=(name)
       @name = name
@@ -26,7 +28,7 @@ module Mint
 
     def source_file_path
       path = Pathname.new(source)
-      path.absolute? ? 
+      path.absolute? ?
         path.expand_path : root_directory_path + path
     end
 
@@ -59,7 +61,7 @@ module Mint
     def destination_directory
       destination_directory_path.to_s
     end
-    
+
     def renderer=(renderer)
       @renderer = renderer
     end
@@ -71,10 +73,11 @@ module Mint
       self.source = source
       self.root = options[:root] || source_directory
       self.destination = options[:destination]
+      self.context = options[:context]
 
       yield self if block_given?
 
-      self.name = Mint.guess_name_from source
+      self.name = options[:name] || Mint.guess_name_from(source)
       self.renderer = Mint.renderer source
     end
 
@@ -83,9 +86,16 @@ module Mint
     end
     alias_method :==, :equal?
 
-    def render(context=Object.new, args={})
+    def render(context=self, args={})
       # see Tilt TEMPLATES.md for more info
-      @renderer.render context, args 
+      @renderer.render context, args
+    end
+
+    def publish!(opts={})
+      FileUtils.mkdir_p self.destination_directory
+      File.open(self.destination_file, "w+") do |f|
+        f << self.render
+      end
     end
   end
 end

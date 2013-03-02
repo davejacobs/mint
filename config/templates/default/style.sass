@@ -1,22 +1,32 @@
-$screen_font_size: 18px
-$screen_line_height: $screen_font_size * 1.3
+$header_font_family: "Hoefler Text", Garamond, Georgia
+$body_font_family: Ubuntu, "Hoefler Text", "Grandesign Neue Serif", Ubuntu, Georgia, FreeSerif, serif 
+$code_font_family: "Ubuntu Mono"
+
+$screen_font_size: 15px
+$screen_line_height: $screen_font_size * 1.5
 $screen_unit: $screen_line_height
 
 $print_font_size: 12pt
 $print_line_height: $print_font_size * 1.3
 $print_unit: $print_line_height
 
+$text_color: #333
 $link_color: #cb0018
 
 @import ../base/style
 
 body
-  font-family: Georgia, 'Hoefler Text', Garamond, FreeSerif, serif
+  text-rendering: optimizeLegibility
 
 h1
+  font-size: $screen_font_size * 1.7
   border-bottom: solid 2px #666
 
+h2
+  font-size: $screen_font_size * 1.3
+
 h3
+  font-size: $screen_font_size * 1.2
   font-style: italic
 
 h4
@@ -29,8 +39,11 @@ p+p
   text-indent: $screen_unit
 
 pre, blockquote
-  font-size: $screen_font_size
   border-left: solid 2px #ddd
+  background-color: #fdffe8
 
 blockquote
   font-style: italic
+
+code
+  font-family: $code_font_family

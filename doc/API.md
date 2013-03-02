@@ -291,7 +291,7 @@ You can also set user-wide options:
 Doing so will create the same style config file, but in your system's user-wide configuration location:
 
 - In Linux and other FHS-compliant systems, and on Mac OS X this 
-  will be in ~/.mint/config.yaml
+  will be in ~/.config/mint/config.yaml
 - In Windows, this will be *(somewhere dumb...)*
 
 Finally, you can set global options for all users:

@@ -2,7 +2,6 @@ require "pathname"
 require "yaml"
 require "optparse"
 require "fileutils"
-
 require "active_support/core_ext/object/blank"
 
 module Mint
@@ -10,7 +9,7 @@ module Mint
     # Commandline-related helper methods
 
     # Returns a map of all options that mint allows by default. Mint will
-    # consume these arguments, with optional parameters, from 
+    # consume these arguments, with optional parameters, from
     # the commandline. (All other arguments are taken to be
     # filenames.)
     #
@@ -53,13 +52,13 @@ module Mint
         end
       end
 
-      transient_argv = argv.dup 
+      transient_argv = argv.dup
       parser.parse! transient_argv
       { argv: transient_argv, options: parsed_options, help: parser.help }
     end
 
     # Mint built-in commands
-    
+
     # Prints a help banner
     #
     # @param [String, #to_s] message a message to output
@@ -71,8 +70,8 @@ module Mint
     # Install the named file as a template
     #
     # @param [File] file the file to install to the appropriate Mint directory
-    # @param [Hash] commandline_options a structured set of options, including 
-    #   a scope label that the method will use to choose the appropriate 
+    # @param [Hash] commandline_options a structured set of options, including
+    #   a scope label that the method will use to choose the appropriate
     #   installation directory
     # @return [void]
     def self.install(file, commandline_options={})
@@ -85,11 +84,8 @@ module Mint
 
       name = commandline_options[:template] || filename
       type = Mint.css_formats.include?(ext) ? :style : :layout
-      destination = Mint.template_path(name, type, :scope => opts[:scope], :ext => ext) 
+      destination = Mint.template_path(name, type, :scope => opts[:scope], :ext => ext)
       FileUtils.mkdir_p File.expand_path("#{destination}/..")
-
-      puts "reading file"
-      puts File.read file
 
       if File.exist? file
         FileUtils.cp file, destination
@@ -101,8 +97,8 @@ module Mint
     # Uninstall the named template
     #
     # @param [String] name the name of the template to be uninstalled
-    # @param [Hash] commandline_options a structured set of options, including 
-    #   a scope label that the method will use to choose the appropriate 
+    # @param [Hash] commandline_options a structured set of options, including
+    #   a scope label that the method will use to choose the appropriate
     #   installation directory
     # @return [void]
     def self.uninstall(name, commandline_options={})
@@ -115,7 +111,7 @@ module Mint
     # @return [void]
     def self.templates(filter=nil, commandline_options={})
       scopes = Mint::SCOPE_NAMES.select do |s|
-        commandline_options[s] 
+        commandline_options[s]
       end.presence || Mint::SCOPE_NAMES
 
       Mint.templates(:scopes => scopes).
@@ -128,12 +124,12 @@ module Mint
         end
     end
 
-    # Retrieve named template file (probably a built-in or installed 
+    # Retrieve named template file (probably a built-in or installed
     # template) and shell out that file to the user's favorite editor.
     #
     # @param [String] name the name of a layout or style to edit
-    # @param [Hash] commandline_options a structured set of options, including 
-    #   a layout or style flag that the method will use to choose the appropriate 
+    # @param [Hash] commandline_options a structured set of options, including
+    #   a layout or style flag that the method will use to choose the appropriate
     #   file to edit
     # @return [void]
     def self.edit(name, commandline_options={})
@@ -153,15 +149,15 @@ module Mint
       abort "[error] no template specified" if name.nil? || name.empty?
 
       file = Mint.lookup_template name, layout_or_style
-      
+
       editor = ENV["EDITOR"] || "vi"
       system "#{editor} #{file}"
     end
 
-    # Updates configuration options persistently in the appropriate scope, 
+    # Updates configuration options persistently in the appropriate scope,
     # which defaults to local.
     #
-    # @param [Hash] opts a structured set of options to set on Mint at the specified 
+    # @param [Hash] opts a structured set of options to set on Mint at the specified
     #   scope
     # @param [Symbol] scope the scope at which to apply the set of options
     # @return [void]
@@ -171,13 +167,13 @@ module Mint
       Helpers.update_yaml! "#{config_directory}/#{Mint.files[:defaults]}", opts
     end
 
-    # Tries to set a config option (at the specified scope) per 
+    # Tries to set a config option (at the specified scope) per
     # the user's command.
     #
     # @param key the key to set
     # @param value the value to set key to
-    # @param [Hash, #[]] commandline_options a structured set of options, including 
-    #   a scope label that the method will use to choose the appropriate 
+    # @param [Hash, #[]] commandline_options a structured set of options, including
+    #   a scope label that the method will use to choose the appropriate
     #   scope
     # @return [void]
     def self.set(key, value, commandline_options={})
@@ -189,19 +185,19 @@ module Mint
       configure({ key => value }, scope)
     end
 
-    # Displays the sum of all active configurations, where local 
+    # Displays the sum of all active configurations, where local
     # configurations override global ones.
     #
     # @return [void]
     def self.config
       puts YAML.dump(Mint.configuration)
     end
-    
+
     # Renders and writes to file all resources described by a document.
     # Specifically: it publishes a document, using the document's accessors
-    # to determine file placement and naming, and then renders its style. 
-    # This method will overwrite any existing content in a document's destination 
-    # files. The `render_style` option provides an easy way to stop Mint from 
+    # to determine file placement and naming, and then renders its style.
+    # This method will overwrite any existing content in a document's destination
+    # files. The `render_style` option provides an easy way to stop Mint from
     # rendering a style, even if the document's style is not nil.
     #
     # @param [Array, #each] files a group of filenames
@@ -210,8 +206,32 @@ module Mint
     # @return [void]
     def self.publish!(files, commandline_options={})
       options = { root: Dir.getwd }.merge(Mint.configuration_with commandline_options)
-      files.each_with_index do |file, idx|
-        Document.new(file, options).publish!(:render_style => (idx == 0))
+
+      if options[:name]
+        unless options[:name] =~ /\.html$/
+          options[:name] = "#{options[:name]}.html"
+        end
+      end
+
+      if options[:merge]
+        file_text = files.reduce("") do |text, file|
+          text + Mint.renderer(file).render
+        end
+
+        # Caveat -- merged files will all be treated as having the type of
+        # the first file passed in.
+        extension = File.extname files[0]
+
+        tmp_path = Helpers.create_temp_file!("mint-merge", extension) do |file|
+          file << file_text
+        end
+
+        Document.new(tmp_path, options).publish!(:render_style => true)
+        FileUtils.rm tmp_path
+      else
+        files.each_with_index do |file, idx|
+          Document.new(file, options).publish!(:render_style => (idx == 0))
+        end
       end
     end
   end

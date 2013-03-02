@@ -35,35 +35,39 @@ module Mint
     # Renders content in the context of layout and returns as a String.
     def render(args={})
       intermediate_content = layout.render self, args
-      Mint.after_render(intermediate_content)
+      Plugin.after_render(intermediate_content, {})
     end
 
     # Writes all rendered content where a) possible, b) required,
     # and c) specified. Outputs to specified file.
-    def publish!(opts={})      
+    def publish!(opts={})
       options = { :render_style => true }.merge(opts)
-      FileUtils.mkdir_p self.destination_directory
-      File.open(self.destination_file, "w+") do |f|
-        f << self.render
-      end
+      super
 
       # Only renders style if a) it's specified by the options path and
       # b) it actually needs rendering (i.e., it's in template form and
       # not raw, browser-parseable CSS) or it if it doesn't need
       # rendering but there is an explicit style_destination.
       if options[:render_style]
+        # Can probably replace this with style.publish! if we can pass in
+        # style_destination_directory and style_destination_file
         FileUtils.mkdir_p style_destination_directory
         File.open(self.style_destination_file, "w+") do |f|
           f << self.style.render
         end
       end
 
-      Mint.after_publish(self, opts)
+      Plugin.after_publish(self, opts)
     end
 
     # Implicit readers are paired with explicit accessors. This
     # allows for processing variables before storing them.
-    attr_reader :content, :metadata, :layout, :style
+    attr_reader :metadata, :layout, :style
+
+    # Returns HTML content marked as safe for template rendering
+    def content
+      @content.html_safe
+    end
 
     # Passes content through a renderer before assigning it to be
     # the Document's content
@@ -76,7 +80,7 @@ module Mint
       original_content = File.read content
 
       @metadata, text = Document.parse_metadata_from original_content
-      intermediate_content = Mint.before_render text
+      intermediate_content = Plugin.before_render text, {}
 
       File.open(tempfile, "w") do |file|
         file << intermediate_content
@@ -91,8 +95,8 @@ module Mint
     # @param [String, Layout, #render] layout a Layout object or name
     #   of a layout to be looked up
     # @return [void]
-    def layout=(layout)      
-      @layout = 
+    def layout=(layout)
+      @layout =
         if layout.respond_to? :render
           layout
         else
@@ -102,14 +106,14 @@ module Mint
     rescue TemplateNotFoundException
       abort "Template '#{layout}' does not exist."
     end
-    
+
     # Sets layout to an existing Style object or looks it up by name
     #
     # @param [String, Style, #render] layout a Layout object or name
     #   of a layout to be looked up
     # @return [void]
     def style=(style)
-      @style = 
+      @style =
         if style.respond_to? :render
           style
         else
@@ -149,7 +153,7 @@ module Mint
     # The style_destination attribute is lazy. It's exposed via
     # virtual attributes like #style_destination_file.
     attr_reader :style_destination
-    
+
     # @param [String] style_destination the subdirectory into
     #   which styles will be rendered or copied
     # @return [void]
@@ -163,7 +167,7 @@ module Mint
     def style_destination_file_path
       if style_destination
         path = Pathname.new style_destination
-        dir = path.absolute? ? 
+        dir = path.absolute? ?
           path : destination_directory_path + path
         dir + style.name
       else
@@ -214,16 +218,20 @@ module Mint
 
       def metadata_from(text)
         raw_metadata = YAML.load metadata_chunk(text)
-        
+
         case raw_metadata
         when String
           {}
         when false
           {}
+        when nil
+          {}
         else
           raw_metadata
         end
-      rescue
+      rescue Psych::SyntaxError
+        {}
+      rescue Exception
         {}
       end
 

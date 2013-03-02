@@ -4,7 +4,7 @@ require "yaml"
 require "active_support/core_ext/string/inflections"
 
 module Mint
-  module Helpers    
+  module Helpers
     def self.underscore(obj, opts={})
       namespaces = obj.to_s.split("::").map do |namespace|
         if opts[:ignore_prefix]
@@ -38,7 +38,7 @@ module Mint
     def self.symbolize(obj)
       slugize(obj).gsub(/-/, "_").to_sym
     end
-  
+
     # Transforms a String or Pathname into a fully expanded Pathname.
     #
     # @param [String, Pathname] str_or_path a path to be expanded
@@ -59,8 +59,8 @@ module Mint
     def self.symbolize_keys(map, opts={})
       transform = lambda {|x| opts[:downcase] ? x.downcase : x }
 
-      map.reduce(Hash.new) do |syms,(k,v)| 
-        syms[transform[k].to_sym] = 
+      map.reduce(Hash.new) do |syms,(k,v)|
+        syms[transform[k].to_sym] =
           case v
           when Hash
             self.symbolize_keys(v, opts)
@@ -107,19 +107,19 @@ module Mint
       Hash[*list1.zip(list2).flatten]
     end
 
-    # Returns the relative path to to_directory from from_directory. 
-    # If to_directory and from_directory have no parents in common besides 
+    # Returns the relative path to to_directory from from_directory.
+    # If to_directory and from_directory have no parents in common besides
     # /, returns the absolute directory of to_directory. Assumes no symlinks.
     #
     # @param [String, Pathname] to_directory the target directory
     # @param [String, Pathname] from_directory the starting directory
-    # @return [Pathname] the relative path to to_directory from 
+    # @return [Pathname] the relative path to to_directory from
     #   from_directory, or an absolute path if they have no parents in common
     #   other than /
     def self.normalize_path(to_directory, from_directory)
       to_path, from_path = [to_directory, from_directory].map {|d| pathize d }
       to_root, from_root = [to_path, from_path].map {|p| p.each_filename.first }
-      to_root == from_root ? 
+      to_root == from_root ?
         to_path.relative_path_from(from_path) :
         to_path
     end
@@ -129,13 +129,22 @@ module Mint
     #
     # @param [Hash, #[]] new_opts a set of options to add to the Yaml file
     # @param [Pathname, #exist] file a file to read from and write to
-    # @return [void] 
+    # @return [void]
     def self.update_yaml!(file, opts={})
       curr_opts = File.exist?(file) ? YAML.load_file(file) : {}
 
       File.open file, "w" do |f|
         YAML.dump(curr_opts.merge(opts), f)
       end
+    end
+
+    def self.create_temp_file!(basename, extension=nil, &block)
+      tmp_args = basename && extension ? [basename, extension] : basename
+      tempfile = Tempfile.new(tmp_args)
+      block.call(tempfile)
+      tempfile.flush
+      tempfile.close
+      tempfile.path
     end
 
     def self.generate_temp_file!(file)

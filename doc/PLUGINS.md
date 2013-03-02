@@ -27,7 +27,7 @@ Ideas
 2. **The callback option (mainly implemented).** `mint epub publish 
    file --option1 --option2` calls `mint publish` with the ePub plugin,
    passing in option2 with opts. *This plugin must be in a 
-   ~/.mint/plugins directory.* (There will be other plugin directories 
+   ~/.config/mint/plugins directory.* (There will be other plugin directories 
    for other scopes.)
 
 3. **The hacky option.** `mint epub publish file --option1 --option2`

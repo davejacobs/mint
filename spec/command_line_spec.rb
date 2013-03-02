@@ -22,7 +22,7 @@ module Mint
           help: "Help message",
           argv: ["command"],
           options: {
-            layout: "zen" 
+            layout: "zen"
           }
         }
       end
@@ -81,6 +81,17 @@ module Mint
       it "publishes a set of files" do
         CommandLine.publish!([@content_file])
         File.exist?("content.html").should be_true
+      end
+
+      it "publishes one concatenated file if :merge is true" do
+        CommandLine.publish!([@content_file, @content_file_2],
+                            :merge => true)
+        File.exist?("content.html").should be_false
+        File.exist?("content-2.html").should be_false
+        File.exist?("merged-content.html").should be_true
+
+        File.read("merged-content.html").should match("Header 2")
+        File.read("merged-content.html").should match("Header 3")
       end
     end
   end

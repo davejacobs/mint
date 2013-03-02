@@ -18,9 +18,21 @@ style:
 
 root:
   short: w
-  long: r
+  long: root
   parameter: true
   description: "Specify a root outside the current directory"
+
+name:
+  short: n
+  long: name
+  parameter: true
+  description: "Specify the name of the output file"
+
+merge:
+  short: m
+  long: merge
+  parameter: false
+  description: "Merge all files into one document"
 
 destination:
   short: d
@@ -29,7 +41,7 @@ destination:
   description: "Specify a destination directory, relative to the root"
 
 style_destination:
-  short: n
+  short: a
   long: style-destination
   parameter: true
   description: "Specify a destination directory for stylesheets, or nil to link in place"

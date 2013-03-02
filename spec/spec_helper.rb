@@ -9,11 +9,16 @@ RSpec.configure do |config|
     @tmp_dir = File.realpath "/tmp/mint-test"
 
     @content_file = "content.md"
+    @content_file_2 = "content-2.md"
     @layout_file = "layout.haml"
     @static_style_file = "static.css"
     @dynamic_style_file = "dynamic.sass"
 
-    ["content.md", "layout.haml", "static.css", "dynamic.sass"].each do |file|
+    ["content.md",
+     "content-2.md",
+     "layout.haml",
+     "static.css",
+     "dynamic.sass"].each do |file|
       FileUtils.cp "spec/support/fixtures/#{file}", @tmp_dir
     end
 
