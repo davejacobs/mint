@@ -40,7 +40,7 @@ This command can be tweaked with options and arguments to be more flexible:
     mint publish Minimalism.md --template resume  # specifies a style template
     mint publish Minimalism.md --destination final --style-destination=styles
 
-For a listing of mint options, take [a look at the API][API].
+For a listing of mint options, take [a look at the tutorial][tutorial] or the [full API](http://github.com/davejacobs/mint/tree/master/doc/API.md).
 
 A basic Mint document
 ---------------------
@@ -103,7 +103,7 @@ I've designed the beginnings of a plugin system. With this system, you can imple
 
 This is going to be useful for things like creating actual office documents or e-books or even bound novels. I'm actually thinking that half the power of this library is its plugin system.
 
-[API]: http://github.com/davejacobs/mint/tree/master/doc/API.md
+[tutorial]: http://github.com/davejacobs/mint/tree/master/doc/API.md
 [Tilt templates]: http://github.com/rtomayko/tilt/blob/master/TEMPLATES.md "A listing of all templates supported by Tilt."
 [CSS]: http://en.wikipedia.org/wiki/Cascading_Style_Sheets
 [SASS/SCSS]: http://sass-lang.com/
