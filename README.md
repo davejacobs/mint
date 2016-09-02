@@ -40,7 +40,7 @@ This command can be tweaked with options and arguments to be more flexible:
     mint publish Minimalism.md --template resume  # specifies a style template
     mint publish Minimalism.md --destination final --style-destination=styles
 
-For a listing of mint options, take [a look at the tutorial][tutorial] or the [full API](http://github.com/davejacobs/mint/tree/master/doc/API.md).
+For a listing of mint options, take [a look at the tutorial][tutorial] or the [full API](http://www.rubydoc.info/github/davejacobs/mint).
 
 A basic Mint document
 ---------------------
