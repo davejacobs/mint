@@ -1,15 +1,15 @@
 # What is Mint?
 
-Mint transforms your plain text documents into beautiful documents. It makes that process as simple (but customizable) as possible.
+Mint transforms your plain text documents into beautiful documents. It makes the process simple but customizable.
 
 Why would you want to keep all of your documents as plain text?
 
 - To focus on words and structure when you write
-- To be able to apply one style to an entire set of documents with one command
-- To keep your documents under version control
-- To make your documents available for scripting--for example, text analysis
+- To control style with a single command, independently of document structure
+- To keep your text and formatting under version control
+- To make your text amenable to scripting--for example, text analysis
 
-What does Mint create from these source files? Beautiful, styled HTML ready to print, e-mail, and present.
+What does Mint create from these source files? Beautiful, styled HTML ready to print, e-mail, export, and present.
 
 In a few words: *Mint processes words so you don't have to.*
 
