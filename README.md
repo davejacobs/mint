@@ -1,5 +1,4 @@
-What is Mint?
--------------
+# What is Mint?
 
 Mint transforms your plain text documents into beautiful documents. It makes that process as simple (but customizable) as possible.
 
@@ -14,8 +13,7 @@ What does Mint create from these source files? Beautiful, styled HTML ready to p
 
 In a few words: *Mint processes words so you don't have to.*
 
-The mint command
-----------------
+## The mint command
 
 If you have a plain text document formatted in Markdown or Textile or almost any other templating language, you're ready to go.
 
@@ -42,8 +40,7 @@ This command can be tweaked with options and arguments to be more flexible:
 
 For a listing of mint options, take [a look at the tutorial][tutorial] or the [full API](http://www.rubydoc.info/github/davejacobs/mint).
 
-A basic Mint document
----------------------
+## A basic Mint document
 
 Mint is loaded with smart defaults, so if you don't want to configure something--say, the basic HTML skeleton of your document or the output directory--you don't have to. You'll probably be surprised at how easy it is to use out of the box, and how configurable it is.
 
@@ -56,8 +53,7 @@ To understand Mint's flexibility, you'll want to [take a look at the API][API].
 
 [Firefox typography]: http://opentype.info/blog/2008/06/14/kerning-and-opentype-features-in-firefox-3/ "Firefox 3 supports kerning and automatic ligatures"
 
-Templates
----------
+## Templates
 
 Templates can be written in any format accepted by the Tilt template interface library. (See [the Tilt TEMPLATES file][Tilt templates] for more information.)
 
@@ -96,8 +92,7 @@ Mint comes preloaded with several styles and layouts.
 
 I've included a base stylesheet that is useful for setting sensible typographic defaults.
 
-Plugins: A work in progress
----------------------------
+## Plugins: A work in progress
 
 I've designed the beginnings of a plugin system. With this system, you can implement a callback or two and have full control over document creation and sharing. I'll get documentation going soon. For now, look to lib/mint/plugins/epub.rb and bin/mint-epub for an example of how to build one. It's not complete and I'm open to API suggestions. 
 
