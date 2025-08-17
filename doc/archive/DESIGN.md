@@ -1,8 +1,6 @@
-Design considerations
-=====================
+# Design
 
-Problem 1: Internal representation of files, external presentation, mutability
-------------------------------------------------------------------------------
+## Problem 1: Internal representation of files, external presentation, mutability
 
 Three revealing questions and/or interests:
 

@@ -1,5 +1,4 @@
-Filesystem
-----------
+# Filesystem
 
 The Mint filesystem looks something like this:
 
