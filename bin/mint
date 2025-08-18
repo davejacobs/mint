@@ -22,6 +22,18 @@ when :publish
       end
     end
   Mint::CommandLine.publish!(files, commandline_options)
+when :preview
+  # Preview mode uses live CSS links instead of inline styles
+  Mint.rendering_mode = :preview
+  files = 
+    if $stdin.tty? || ENV["MINT_NO_PIPE"]
+      argv
+    else
+      $stdin.each_line.reduce [] do |list, line|
+        list.concat(Shellwords.split(line))
+      end
+    end
+  Mint::CommandLine.publish!(files, commandline_options)
 when :help
   Mint::CommandLine.help(help)
 when :install

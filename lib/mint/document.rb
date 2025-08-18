@@ -201,10 +201,32 @@ module Mint
     # Returns a relative path from the document to its stylesheet. Can
     # be called directly from inside a layout template.
     def stylesheet
-      Helpers.normalize_path(self.style_destination_file,
+      tmp_style_dir = Mint.path_for_scope(:user, true) + "tmp"
+      tmp_style_file = tmp_style_dir + File.basename(style.name)
+      Helpers.normalize_path(tmp_style_file.to_s,
                              self.destination_directory).to_s
     end
 
+    # Returns the rendered CSS content for inline inclusion
+    def inline_stylesheet
+      self.style.render
+    end
+
+    # Returns either inline CSS or stylesheet link based on rendering mode
+    # Use this helper in layouts instead of stylesheet or inline_stylesheet directly
+    def stylesheet_tag
+      case Mint.rendering_mode
+      when :preview
+        "<link rel=\"stylesheet\" href=\"#{stylesheet}\">".html_safe
+      else
+        "<style>#{self.style.render}</style>".html_safe
+      end
+    end
+
+    # Parses styles defined in YAML metadata in content, including it
+    # in output CSS style
+    # 
+    # TODO: Implement injection of these styles
     def inline_styles
       CSS.parse(metadata)
     end

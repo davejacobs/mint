@@ -19,7 +19,9 @@ module Mint
       # However, if a destination directory is already specified, we
       # leave it alone.
       if Mint.template?(self.source_directory) and rendered?
-        self.destination ||= "css" 
+        tmp_dir = Mint.path_for_scope(:user, true) + "tmp"
+        self.destination ||= tmp_dir.to_s
+        self.root = "/"
       end
     end
 

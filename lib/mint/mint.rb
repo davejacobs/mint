@@ -22,6 +22,8 @@ module Mint
 
   SCOPE_NAMES = SCOPES.keys
 
+  @rendering_mode = :publish
+
   # Assume that someone using an Html template has formatted it
   # in Erb and that a Css stylesheet will pass untouched through
   # a Scss parser.
@@ -42,7 +44,7 @@ module Mint
   def self.root
     ROOT
   end
-
+  
   # Returns an array with the Mint template path for the named scope
   # or scopes. This path is used to lookup templates and configuration options.
   #
@@ -113,6 +115,14 @@ module Mint
     ["css", "sass", "scss", "less"]
   end
 
+  def self.rendering_mode
+    @rendering_mode
+  end
+
+  def self.rendering_mode=(mode)
+    @rendering_mode = mode
+  end
+  
   # Returns a hash of all active options specified by file (for all scopes).
   # That is, if you specify file as "defaults.yaml", this will return the aggregate
   # of all defaults.yaml-specified options in the Mint path, where more local
