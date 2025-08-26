@@ -158,5 +158,27 @@ module Mint
       tempfile.close
       tempfile.path
     end
+
+    # Transforms markdown links from .md extensions to .html for digital gardens
+    #
+    # @param [String] text the markdown text containing links
+    # @return [String] the text with transformed links
+    def self.transform_markdown_links(text)
+      # Transform relative markdown links like [text](path/file.md) to [text](path/file.html)
+      text.gsub(/(\[([^\]]*)\]\()([^)]*\.md)(\))/) do |match|
+        link_start = $1
+        link_text = $2
+        link_url = $3
+        link_end = $4
+        
+        # Only transform relative links (not absolute URLs)
+        if link_url !~ /^https?:\/\//
+          new_url = link_url.gsub(/\.md$/, '.html')
+          "#{link_start}#{new_url}#{link_end}"
+        else
+          match
+        end
+      end
+    end
   end
 end

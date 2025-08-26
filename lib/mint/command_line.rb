@@ -193,6 +193,24 @@ module Mint
       puts YAML.dump(Mint.configuration)
     end
 
+    # Recursively discovers Markdown files in the given directories
+    #
+    # @param [Array] directories the directories to search
+    # @return [Array] an array of markdown file paths
+    def self.discover_files_recursively(directories)
+      markdown_files = []
+      directories.each do |dir|
+        if File.file?(dir)
+          markdown_files << dir if dir =~ /\.(#{Mint::MARKDOWN_EXTENSIONS.join('|')})$/i
+        elsif File.directory?(dir)
+          Dir.glob("#{dir}/**/*.{#{Mint::MARKDOWN_EXTENSIONS.join(',')}}", File::FNM_CASEFOLD).each do |file|
+            markdown_files << file
+          end
+        end
+      end
+      markdown_files.sort
+    end
+
     # Renders and writes to file all resources described by a document.
     # Specifically: it publishes a document, using the document's accessors
     # to determine file placement and naming, and then renders its style.
@@ -206,6 +224,10 @@ module Mint
     # @return [void]
     def self.publish!(files, commandline_options={})
       options = { root: Dir.getwd }.merge(Mint.configuration_with commandline_options)
+
+      if commandline_options[:recursive]
+        files = discover_files_recursively(files.empty? ? ["."] : files)
+      end
 
       if options[:name]
         unless options[:name] =~ /\.html$/
@@ -230,7 +252,9 @@ module Mint
         FileUtils.rm tmp_path
       else
         files.each_with_index do |file, idx|
-          Document.new(file, options).publish!(:render_style => (idx == 0))
+          # Pass all files list when processing multiple files (for navigation in templates like garden)
+          doc_options = options.merge(all_files: files.size > 1 ? files : [])
+          Document.new(file, doc_options).publish!(:render_style => (idx == 0))
         end
       end
     end

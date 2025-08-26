@@ -12,6 +12,12 @@ module Mint
     def initialize(source, opts={})
       options = Mint.default_options.merge opts
 
+      # Always preserve folder structure if all_files is provided (indicating multi-file processing)
+      if options[:all_files] && options[:all_files].any?
+        preserve_folder_structure!(source, options)
+        @all_files = options[:all_files]
+      end
+
       # Loads source and destination, which will be used for
       # all source_* and destination_* virtual attributes.
       super(source, options)
@@ -80,7 +86,8 @@ module Mint
       original_content = File.read content
 
       @metadata, text = Document.parse_metadata_from original_content
-      intermediate_content = Plugin.before_render text, {}
+      text_with_links = Helpers.transform_markdown_links text
+      intermediate_content = Plugin.before_render text_with_links, {}
 
       File.open(tempfile, "w") do |file|
         file << intermediate_content
@@ -231,7 +238,93 @@ module Mint
       CSS.parse(metadata)
     end
 
+    # Returns information about all files for navigation in some templates (e.g., garden)
+    # Available when processing multiple files
+    def files
+      return [] unless @all_files
+      
+      # Get the base directories
+      source_base_dir = Pathname.new(root_directory_path).expand_path
+      
+      # Calculate where the current file will actually be placed
+      current_source_path = Pathname.new(source_file_path).expand_path
+      current_relative_to_source = current_source_path.relative_path_from(source_base_dir)
+      current_html_filename = current_relative_to_source.to_s.gsub(/\.(#{Mint::MARKDOWN_EXTENSIONS.join('|')})$/i, '.html')
+      
+      dest_base = Pathname.new(root_directory_path).expand_path
+      if destination && !destination.empty?
+        dest_base = dest_base + destination
+      end
+      
+      current_full_path = dest_base + current_html_filename
+      current_destination_dir = current_full_path.dirname
+      
+      @all_files.map do |file|
+        title = extract_title_from_file(file)
+        
+        # Calculate where this target file will be placed
+        file_path = Pathname.new(file).expand_path
+        relative_to_source = file_path.relative_path_from(source_base_dir)
+        html_filename = relative_to_source.to_s.gsub(/\.(#{Mint::MARKDOWN_EXTENSIONS.join('|')})$/i, '.html')
+        
+        target_full_path = dest_base + html_filename
+        
+        # Calculate the relative path from the current file's destination directory to the target file
+        relative_link = target_full_path.relative_path_from(current_destination_dir)
+        
+        {
+          source_path: relative_to_source.to_s,
+          html_path: relative_link.to_s,
+          title: title,
+          depth: relative_to_source.to_s.count('/')
+        }
+      end.sort_by { |f| f[:source_path] }
+    end
+
     # Functions
+
+    private
+
+    # Extracts the title from a markdown file, trying H1 first, then filename
+    def extract_title_from_file(file)
+      content = File.read(file)
+      
+      if content =~ /^#\s+(.+)$/
+        return $1.strip
+      end
+      
+      File.basename(file, '.*').tr('_-', ' ').split.map(&:capitalize).join(' ')
+    rescue
+      File.basename(file, '.*').tr('_-', ' ').split.map(&:capitalize).join(' ')
+    end
+
+    # Preserves folder structure when --recursive is used
+    #
+    # @param [String] source the source file path
+    # @param [Hash] options the options hash to modify
+    def preserve_folder_structure!(source, options)
+      source_path = Pathname.new(source).expand_path
+      root_path = Pathname.new(options[:root] || Dir.getwd).expand_path
+      
+      relative_path = source_path.relative_path_from(root_path)
+      
+      relative_dir = relative_path.dirname
+      filename = relative_path.basename
+      
+      # Set destination to preserve directory structure
+      if relative_dir.to_s != "."
+        # Combine base destination with relative directory structure
+        base_destination = options[:destination] || ""
+        if base_destination.empty?
+          options[:destination] = relative_dir.to_s
+        else
+          options[:destination] = File.join(base_destination, relative_dir.to_s)
+        end
+      end
+      
+      # Set name to HTML version of the markdown file
+      options[:name] = filename.sub_ext('.html').to_s
+    end
 
     class << self
       def metadata_chunk(text)

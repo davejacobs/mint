@@ -81,3 +81,9 @@ simulation:
   long: simulation
   parameter: false
   description: "Simulate transformation without actually creating files"
+
+recursive:
+  short: r
+  long: recursive
+  parameter: false
+  description: "Recursively find and publish all markdown files in subdirectories"
