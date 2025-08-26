@@ -1,0 +1,339 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
+:root {
+  --screen-font-size: 16px;
+  --screen-line-height: calc(var(--screen-font-size) * 1.5);
+  --screen-unit: var(--screen-line-height);
+
+  --print-font-size: 11pt;
+  --print-line-height: 16pt;
+  --print-unit: var(--print-line-height);
+
+  /* Nord color scheme - dark theme */
+  --nord0: #2e3440;    /* Polar Night - darkest */
+  --nord1: #3b4252;    /* Polar Night */
+  --nord2: #434c5e;    /* Polar Night */
+  --nord3: #4c566a;    /* Polar Night - lightest */
+  --nord4: #d8dee9;    /* Snow Storm - darkest */
+  --nord5: #e5e9f0;    /* Snow Storm */
+  --nord6: #eceff4;    /* Snow Storm - lightest */
+  --nord7: #8fbcbb;    /* Frost - teal */
+  --nord8: #88c0d0;    /* Frost - light blue */
+  --nord9: #81a1c1;    /* Frost - blue */
+  --nord10: #5e81ac;   /* Frost - dark blue */
+  --nord11: #bf616a;   /* Aurora - red */
+  --nord12: #d08770;   /* Aurora - orange */
+  --nord13: #ebcb8b;   /* Aurora - yellow */
+  --nord14: #a3be8c;   /* Aurora - green */
+  --nord15: #b48ead;   /* Aurora - purple */
+
+  --nord-text: var(--nord6);
+  --nord-text-subtle: var(--nord4);
+  --nord-background: var(--nord0);
+  --nord-surface: var(--nord1);
+  --nord-border: var(--nord3);
+  --nord-accent: var(--nord8);
+  --nord-secondary: var(--nord7);
+}
+
+@import "../base/style.css";
+
+body {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: var(--nord-text);
+  line-height: 1.5;
+  background-color: var(--nord-background);
+  font-weight: 400;
+  letter-spacing: -0.005em;
+  font-feature-settings: "liga" 1, "kern" 1;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  color: var(--nord-text);
+  letter-spacing: -0.02em;
+}
+
+h1 {
+  font-size: calc(var(--screen-font-size) * 1.8);
+  margin-top: calc(var(--screen-unit) * 2);
+  margin-bottom: calc(var(--screen-unit) * 1.5);
+  line-height: 1.3;
+  color: var(--nord6);
+}
+
+h2 {
+  font-size: calc(var(--screen-font-size) * 1.4);
+  margin-top: calc(var(--screen-unit) * 1.5);
+  margin-bottom: calc(var(--screen-unit) * 0.75);
+  line-height: 1.4;
+  color: var(--nord5);
+}
+
+h3 {
+  font-size: calc(var(--screen-font-size) * 1.2);
+  margin-top: calc(var(--screen-unit) * 1.25);
+  margin-bottom: calc(var(--screen-unit) * 0.5);
+  line-height: 1.4;
+  color: var(--nord4);
+}
+
+h4, h5, h6 {
+  font-size: calc(var(--screen-font-size) * 1.05);
+  margin-top: calc(var(--screen-unit) * 1);
+  margin-bottom: calc(var(--screen-unit) * 0.25);
+  line-height: 1.4;
+  color: var(--nord4);
+}
+
+p {
+  margin: calc(var(--screen-unit) * 0.75) 0;
+}
+
+blockquote {
+  border-left: 3px solid var(--nord8);
+  padding-left: calc(var(--screen-unit) * 1);
+  margin-left: 0;
+  font-style: italic;
+  color: var(--nord-text-subtle);
+  background-color: rgba(59, 66, 82, 0.3);
+  padding: calc(var(--screen-unit) * 0.75) calc(var(--screen-unit) * 1);
+  border-radius: 0 4px 4px 0;
+}
+
+code {
+  font-family: "SF Mono", "JetBrains Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas, monospace;
+  font-size: calc(var(--screen-font-size) * 0.9);
+  background-color: var(--nord2);
+  color: var(--nord6);
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+pre {
+  background-color: var(--nord1);
+  border: 1px solid var(--nord-border);
+  border-radius: 8px;
+  padding: calc(var(--screen-unit) * 1);
+  overflow-x: auto;
+  margin: calc(var(--screen-unit) * 1) 0;
+}
+
+pre code {
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+  font-size: calc(var(--screen-font-size) * 0.85);
+  color: var(--nord6);
+}
+
+a:link, a:visited {
+  color: var(--nord-accent);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+a:hover {
+  color: var(--nord7);
+  border-bottom-color: var(--nord7);
+}
+
+strong {
+  font-weight: 600;
+  color: var(--nord6);
+}
+
+em {
+  font-style: italic;
+  color: var(--nord5);
+}
+
+ul, ol {
+  margin: calc(var(--screen-unit) * 0.75) 0;
+  padding-left: calc(var(--screen-unit) * 1.5);
+}
+
+li {
+  margin: calc(var(--screen-unit) * 0.25) 0;
+}
+
+table {
+  border-collapse: collapse;
+  margin: calc(var(--screen-unit) * 1) 0;
+  width: 100%;
+  background-color: var(--nord-surface);
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+th, td {
+  padding: calc(var(--screen-unit) * 0.5) calc(var(--screen-unit) * 0.75);
+  text-align: left;
+  border-bottom: 1px solid var(--nord-border);
+}
+
+th {
+  background-color: var(--nord2);
+  font-weight: 600;
+  color: var(--nord6);
+  font-size: calc(var(--screen-font-size) * 0.9);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tr:hover {
+  background-color: rgba(76, 86, 106, 0.2);
+}
+
+hr {
+  border: none;
+  height: 1px;
+  background-color: var(--nord-border);
+  margin: calc(var(--screen-unit) * 2) 0;
+}
+
+#container {
+  max-width: 90ch;
+  margin: calc(var(--screen-unit) * 3) auto;
+  padding: calc(var(--screen-unit) * 3) calc(var(--screen-unit) * 4);
+  border: 1px solid var(--nord-border);
+  background-color: var(--nord-surface);
+  box-shadow: 
+    0 4px 6px rgba(0, 0, 0, 0.2),
+    0 10px 20px rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+}
+
+@media (max-width: 768px) {
+  #container {
+    margin: calc(var(--screen-unit) * 1) calc(var(--screen-unit) * 0.5);
+    padding: calc(var(--screen-unit) * 2) calc(var(--screen-unit) * 2);
+    border-radius: 0;
+    box-shadow: none;
+    border: none;
+  }
+}
+
+@media print {
+  @page {
+    margin: 1in;
+    size: letter;
+  }
+  
+  :root {
+    --print-font-size: 11pt;
+    --print-line-height: 16pt;
+    --screen-font-size: var(--print-font-size);
+    --screen-line-height: var(--print-line-height);
+    --screen-unit: var(--print-line-height);
+  }
+  
+  body {
+    background-color: white !important;
+    color: #000 !important;
+    font-size: var(--print-font-size) !important;
+    line-height: var(--print-line-height) !important;
+  }
+  
+  #container {
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: none !important;
+    background-color: white !important;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    color: #000 !important;
+    page-break-after: avoid;
+  }
+  
+  h1 {
+    font-size: 18pt !important;
+    line-height: 22pt !important;
+  }
+  
+  h2 {
+    font-size: 14pt !important;
+    line-height: 18pt !important;
+  }
+  
+  h3 {
+    font-size: 12pt !important;
+    line-height: 16pt !important;
+  }
+  
+  h4, h5, h6 {
+    font-size: 11pt !important;
+    line-height: 16pt !important;
+  }
+  
+  p, li {
+    orphans: 3;
+    widows: 3;
+  }
+  
+  blockquote, pre {
+    page-break-inside: avoid;
+  }
+  
+  a {
+    color: #000 !important;
+    text-decoration: underline !important;
+  }
+  
+  code {
+    background-color: #f5f5f5 !important;
+    border-radius: 0 !important;
+    color: #000 !important;
+    font-size: 9pt !important;
+  }
+  
+  pre {
+    background-color: #f8f8f8 !important;
+    border: 1px solid #ddd !important;
+    border-radius: 0 !important;
+    color: #000 !important;
+  }
+  
+  pre code {
+    background-color: transparent !important;
+    font-size: 9pt !important;
+  }
+  
+  table {
+    border-collapse: collapse !important;
+    border-radius: 0 !important;
+    background-color: white !important;
+    box-shadow: none !important;
+  }
+  
+  th, td {
+    border: 1px solid #000 !important;
+    color: #000 !important;
+  }
+  
+  th {
+    background-color: #f0f0f0 !important;
+  }
+  
+  table, table tr td, table tr th {
+    page-break-inside: avoid;
+  }
+  
+  
+  img {
+    max-width: 100% !important;
+    page-break-inside: avoid;
+  }
+}

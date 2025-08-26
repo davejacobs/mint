@@ -23,25 +23,21 @@ module Mint
         self.destination ||= tmp_dir.to_s
         self.root = "/"
       end
+
     end
 
     # Determines whether a Style object is supposed to be rendered.
     #
     # @return [Boolean] whether or not style should be rendered
     def rendered?
-      source_file_path.extname !~ /\.css$/
+      true  # All styles need rendering now (CSS for imports, Sass for compilation)
     end
 
-    # Renders a Style object if necessary. Otherwise, returns the contents
-    # of its source file.
+    # Renders a Style object through Tilt template system
     #
-    # @return [String] a rendered stylesheet
+    # @return [String] a rendered stylesheet  
     def render
-      if rendered?
-        super
-      else
-        File.read source
-      end
+      super
     end
   end
 end
