@@ -1,137 +1,91 @@
-# What is Mint?
+# Mint
 
-Mint transforms your plain text documents into beautiful documents. It makes the process simple but customizable.
+Transform your plain text documents into beautiful HTML documents with customizable styling and templates.
 
-Why would you want to keep all of your documents as plain text?
+Mint processes words so you don't have to.
 
-- To focus on words and structure when you write
-- To control style with a single command, independently of document structure
-- To keep your text and formatting under version control
-- To make your text amenable to scripting--for example, text analysis
+## Installation
 
-What does Mint create from these source files? Beautiful, styled HTML ready to print, e-mail, export, and present.
+```bash
+gem install mint
+```
 
-In a few words: *Mint processes words so you don't have to.*
+## Quick Start
 
-## The mint command
+Transform a Markdown document into styled HTML:
 
-If you have a plain text document formatted in Markdown or Textile or almost any other templating
-language, you're ready to go.
+```bash
+mint publish Document.md
+```
 
-The easiest Mint command doesn't require configuration. It transforms a document into HTML and links
-it to the default stylesheet, which I've designed for you.
+This creates `Document.html` in your current directory with beautiful default styling.
 
-Simply type:
+## Usage
 
-    mint publish Document.md
+### Basic Commands
 
-And voil&agrave;, Minimalism.html will show up next to Document.md.
+```bash
+# Publish a single document
+mint publish Document.md
 
-Opening Minimalism.html with your favorite web browser--[Firefox is best for typography][Firefox
-typography], but Webkit-based browsers (Chrome, Safari) work, too--will show what looks like a
-word-processed document, complete with big bold headers, italic emphasis, automatically indented
-and numbered lists, and bullets. If you're in a modern browser, you'll even see ligatures and
-proper kerning. The page will be on a white canvas that looks like a page, even though you are in a
-browser.
+# Publish with a template
+mint publish Document.md --template nord
 
-Sending that page to a printer is as easy as clicking "Print" from your browser. What comes out of
-your printer will have a 12 pt base font, normal margins, and a not-too-cramped baseline. (Ah the
-wonder of print stylesheets.)
+# Publish to a specific directory
+mint publish Document.md --destination output
 
-You can throw as many files as you'd like in. Any commandline argument *not* preceded by an option
-(e.g., `--template`) or in the `mint` command vocabulary (more on that in a minute) will be
-interpreted as a file name:
+# Publish multiple files
+mint publish *.md --destination final-drafts
 
-    mint publish Document.md Proposal.md
+# Publish a digital garden (recursive)
+mint publish content/**/*.md --template garden --destination public
+```
 
-This command can be tweaked with options and arguments to be more flexible:
+### Common Options
 
-    mint publish Document.md --template resume                      # specifies a style template
-    mint publish Document.md --style-destination styles             # creates external stylesheet in styles directory
-    mint publish Document.md --style-destination styles/custom.css  # creates external stylesheet at specific path
+| Flag | Description |
+|------|-------------|
+| `-t, --template TEMPLATE` | Use a built-in template (combines layout + style) |
+| `--layout LAYOUT` | Specify only the layout |
+| `-s, --style STYLE` | Specify only the style |
+| `-d, --destination DIR` | Output directory |
+| `-o, --output-file FORMAT` | Custom output filename format |
+| `--style-destination PATH` | Create external stylesheet and link it (defaults to inline style) |
+| `-r, --recursive` | Find all Markdown files in subdirectories |
 
-For a listing of mint options, take [a look at the tutorial][tutorial] or the [full API](http://www.rubydoc.info/github/davejacobs/mint).
+### Built-in Templates
 
-## A basic Mint document
+- `default` - Clean, minimal styling
+- `nord` - Clean, uses Nord color scheme
+- `nord-dark` - Dark version of Nord
+- `garden` - For digital gardens; includes navigation
 
-Mint is loaded with smart defaults, so if you don't want to configure something--say, the basic HTML
-skeleton of your document or the output directory--you don't have to. You'll probably be surprised
-at how easy it is to use out of the box, and how configurable it is.
+## Documentation
 
-    document = Mint::Document.new("Document.md")
-    document.publish!
+- **Complete usage guide:** [TUTORIAL.md](doc/TUTORIAL.md)
+- **Man page:** `man mint` (after installation)
+- **API documentation:** [RubyDoc](http://www.rubydoc.info/github/davejacobs/mint)
 
-If you want to customize your document, though--and that's why I built this library--Mint makes that
-easy with explicit parameters:
+## Why Mint?
 
-    # Create a document with external stylesheet
-    document = Mint::Document.new("Document.md", 
-                                  style_destination: "css",
-                                  template: "zen")
-    document.publish!
+- **Focus on writing** – Keep documents as plain text
+- **Version control friendly** – Text files work great with Git
+- **Scriptable** – Automate document processing
+- **Beautiful output** – Professional-looking HTML ready for print or web
+- **Highly customizable** – Create your own templates and styles
 
-    # Create with specific layout and style
-    document = Mint::Document.new("Resume.md",
-                                  destination: "output",
-                                  layout: "resume",
-                                  style: "professional")
-    document.publish!
+## Templates and Customization
 
-To understand Mint's flexibility, you'll want to [take a look at the API][API].
+Mint supports layouts written in HAML or ERB and stylesheets can be written in CSS, SCSS, or SASS.
 
-[Firefox typography]: http://opentype.info/blog/2008/06/14/kerning-and-opentype-features-in-firefox-3/ "Firefox 3 supports
-kerning and automatic ligatures"
+## Contributing
 
-## Templates
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run the tests: `rspec`
+5. Submit a pull request
 
-Templates can be written in any format accepted by the Tilt template interface library. (See [the
-Tilt TEMPLATES file][Tilt templates] for more information.)
+## License
 
-In a template layouts, Ruby calls are sparse but necessary.
-
-If you're designing a layout, you need to indicate where Mint should place your content. For that
-simple reason, raw HTML files cannot be layouts. Instead, if you want to use HTML templates, you
-should use the ERB format. These files are essentially HTML with the possibility for Ruby calls. You
-can even use the .html extension for your files. Just code the dynamic portion using ERB syntax.
-
-Inside your template, use the `content` method to place your source's content.
-
-For stylesheets, use the `stylesheet_tag` method, which automatically handles both inline and external stylesheets based on the document's style mode:
-
-So if you're writing your layout using Haml, the template might look like this:
-
-    !!! 
-    %html 
-      %head 
-        = stylesheet_tag
-      %body 
-        #container= content
-
-The `stylesheet_tag` method will generate either:
-- `<style>...</style>` tags with inlined CSS for inline mode (default)
-- `<link rel="stylesheet" href="...">` tags for external stylesheets
-
-You can create template stylesheets using [CSS][] or [SCSS][].
-
-Mint comes preloaded with a few templates to get you started.
-
-1. Default
-2. Zen
-3. Nord
-4. Nord Dark
-
-## Plugins: A work in progress
-
-I've designed the beginnings of a plugin system. With this system, you can implement a callback or
-two and have full control over document creation and sharing. I'll get documentation going soon. For
-now, look to lib/mint/plugins/epub.rb and bin/mint-epub for an example of how to build one. It's not
-complete and I'm open to API suggestions.
-
-This is going to be useful for things like creating actual office documents or e-books or even bound
-novels. I'm actually thinking that half the power of this library is its plugin system.
-
-[tutorial]: http://github.com/davejacobs/mint/tree/master/doc/API.md
-[Tilt templates]: http://github.com/rtomayko/tilt/blob/master/TEMPLATES.md "A listing of all templates supported by Tilt."
-[CSS]: http://en.wikipedia.org/wiki/Cascading_Style_Sheets
-[SASS/SCSS]: http://sass-lang.com/
-[Less]: http://lesscss.org/
+MIT License. See [LICENSE](LICENSE) for details.
