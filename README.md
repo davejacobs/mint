@@ -32,12 +32,12 @@ mint publish Document.md
 mint publish Document.md --template nord
 
 # Publish to a specific directory
-mint publish Document.md --destination output
+mint publish Document.md --destination public
 
 # Publish multiple files
 mint publish *.md --destination final-drafts
 
-# Publish a digital garden (recursive)
+# Publish a digital garden, with linked navigation
 mint publish content/**/*.md --template garden --destination public
 ```
 
@@ -50,7 +50,7 @@ mint publish content/**/*.md --template garden --destination public
 | `-s, --style STYLE` | Specify only the style |
 | `-d, --destination DIR` | Output directory |
 | `-o, --output-file FORMAT` | Custom output filename format |
-| `--style-destination PATH` | Create external stylesheet and link it (defaults to inline style) |
+| `--style-destination PATH` | Create external stylesheet and link it (rather than default of inlining style) |
 | `-r, --recursive` | Find all Markdown files in subdirectories |
 
 ### Built-in Templates
@@ -74,7 +74,7 @@ mint publish content/**/*.md --template garden --destination public
 - **Beautiful output** – Professional-looking HTML ready for print or web
 - **Highly customizable** – Create your own templates and styles
 
-## Templates and Customization
+## Templates and customization
 
 Mint supports layouts written in HAML or ERB and stylesheets can be written in CSS, SCSS, or SASS.
 
