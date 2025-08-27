@@ -6,17 +6,17 @@ This directory contains a comprehensive test suite for the Mint command-line int
 
 ### Core test files
 
-- **`argument_parsing_spec.rb`** - Tests command-line argument parsing and option handling
-- **`template_management_spec.rb`** - Tests template installation, uninstallation, editing, and listing
-- **`publish_workflow_spec.rb`** - Tests markdown publishing, file discovery, and output generation
-- **`configuration_management_spec.rb`** - Tests configuration setting, reading, and scope management
-- **`bin_integration_spec.rb`** - Tests actual `bin/mint` executable integration
-- **`full_workflow_integration_spec.rb`** - End-to-end workflow tests for common user scenarios
+- **`argument_parsing_spec.rb`** – Tests command-line argument parsing and option handling
+- **`template_management_spec.rb`** – Tests template installation, uninstallation, editing, and listing
+- **`publish_workflow_spec.rb`** – Tests markdown publishing, file discovery, and output generation
+- **`configuration_management_spec.rb`** – Tests configuration setting, reading, and scope management
+- **`bin_integration_spec.rb`** – Tests actual `bin/mint` executable integration
+- **`full_workflow_integration_spec.rb`** – End-to-end workflow tests for common user scenarios
 
 ### Support files
 
-- **`../support/cli_helpers.rb`** - Helper methods for CLI testing (temp directories, file creation, output capture)
-- **`run_cli_tests.rb`** - Custom test runner with better output formatting
+- **`../support/cli_helpers.rb`** – Helper methods for CLI testing (temp directories, file creation, output capture)
+- **`run_cli_tests.rb`** – Custom test runner with better output formatting
 
 ## Running tests
 
@@ -79,9 +79,9 @@ end
 ## Debugging failed tests
 
 ### Common issues
-1. **Missing templates** - Tests create minimal templates; check `create_template_directory`
-2. **File paths** - All paths should be relative within temp directory
-3. **Configuration** - Use `setup_basic_config` to establish minimal config
+1. **Missing templates** – Tests create minimal templates; check `create_template_directory`
+2. **File paths** – All paths should be relative within temp directory
+3. **Configuration** – Use `setup_basic_config` to establish minimal config
 
 ### Debug helpers
 

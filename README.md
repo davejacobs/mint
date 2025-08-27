@@ -55,10 +55,10 @@ mint publish content/**/*.md --template garden --destination public
 
 ### Built-in Templates
 
-- `default` - Clean, minimal styling
-- `nord` - Clean, uses Nord color scheme
-- `nord-dark` - Dark version of Nord
-- `garden` - For digital gardens; includes navigation
+- `default` – Clean, minimal styling
+- `nord` – Clean, uses Nord color scheme
+- `nord-dark` – Dark version of Nord
+- `garden` – For digital gardens; includes navigation
 
 ## Documentation
 
