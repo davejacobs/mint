@@ -14,7 +14,7 @@
 - [x]: Set all defaults early
 - [ ]: Different flags for different commands, e.g., --force for edit-layout but not publish
 - [ ]: Change to use Tilt Markdown Template instead of one-off Markdown renderer
-- [ ]: Get rid of confusing two before/after_publish methods (Mint.after_publish and Plugin.after_publish)
+- [ ]: Fix plugin system to work
 
 ## Build out core new features
 
