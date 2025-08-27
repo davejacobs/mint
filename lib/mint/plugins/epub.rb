@@ -1,7 +1,6 @@
 require "nokogiri"
 require "hashie"
-require "zip/zip"
-require "zip/zipfilesystem"
+require "zip"
 require "active_support/core_ext/hash/deep_merge"
 require "active_support/core_ext/hash/keys"
 
