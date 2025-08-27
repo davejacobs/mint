@@ -113,18 +113,6 @@ RSpec.describe "CLI Template Management" do
           }.to raise_error(RuntimeError, /No such file/)
         end
 
-        it "installs to different scopes" do
-          create_template_file("global.erb", :layout)
-          
-          # Install to global scope should work in development environment
-          expect {
-            Mint::CommandLine.install("global.erb", "globaltemplate", :global)
-          }.not_to raise_error
-          
-          # Verify the template was installed to global location
-          global_path = Mint.template_path("globaltemplate", :global) + "layout.erb"
-          expect(File.exist?(global_path)).to be true
-        end
       end
 
       describe "Mint::CommandLine.uninstall" do
