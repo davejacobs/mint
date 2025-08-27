@@ -1,0 +1,135 @@
+.TH MINT 1 "December 2024" "mint" "User Commands"
+.SH NAME
+mint \- transform plain text documents into beautiful styled HTML
+.SH SYNOPSIS
+.B mint
+.I COMMAND
+[\fIOPTIONS\fR] [\fIFILE\fR...]
+.SH DESCRIPTION
+Mint transforms your plain text documents into beautiful documents. It makes that process as simple (but customizable) as possible.
+
+Mint processes Markdown, Textile, and other templating languages into styled HTML documents ready to print, email, and present.
+.SH COMMANDS
+.TP
+.B publish
+Transform one or more source files into HTML documents
+.SH OPTIONS
+.TP
+.BR \-d ", " \-\-destination " " \fIDIRECTORY\fR
+Specify a destination directory, relative to the root
+.TP
+.BR \-\-inline\-style
+Inline CSS into the HTML document (default behavior)
+.TP
+.BR \-\-style\-destination " " \fIDESTINATION\fR
+Create stylesheet at specified directory or file path and link it. This option is mutually exclusive with --inline-style.
+.TP
+.BR \-\-template " " \fITEMPLATE\fR
+Specify a template to use for both layout and styling
+.TP
+.BR \-\-layout " " \fILAYOUT\fR
+Specify a specific layout template
+.TP
+.BR \-\-style " " \fISTYLE\fR
+Specify a specific style template
+.TP
+.BR \-g ", " \-\-global
+Specify config changes on a global level
+.TP
+.BR \-u ", " \-\-user
+Specify config changes on a user-wide level
+.TP
+.BR \-l ", " \-\-local
+Specify config changes on a local level (default)
+.TP
+.BR \-r ", " \-\-recursive
+Recursively find all Markdown files in subdirectories
+.TP
+.BR \-v ", " \-\-verbose
+Enable verbose output
+.TP
+.BR \-h ", " \-\-help
+Display help information
+.SH STYLE OPTIONS
+Mint offers flexible control over how stylesheets are incorporated into your documents:
+
+.SS Inline Styles (Default)
+By default, Mint inlines CSS directly into your HTML documents, creating self-contained files:
+.RS
+.nf
+mint publish document.md
+.fi
+.RE
+
+.SS External Stylesheets
+Create external stylesheets that are linked from your HTML documents:
+.RS
+.nf
+mint publish document.md --style-destination css
+mint publish document.md --style-destination styles/main.css
+.fi
+.RE
+
+External stylesheets are useful when you want to share stylesheets across multiple documents, keep HTML files smaller, or allow separate caching of styles.
+.SH EXAMPLES
+.TP
+Transform a single Markdown file:
+.nf
+mint publish document.md
+.fi
+.TP
+Transform multiple files:
+.nf
+mint publish doc1.md doc2.md doc3.md
+.fi
+.TP
+Use a specific template:
+.nf
+mint publish resume.md --template resume
+.fi
+.TP
+Create external stylesheet:
+.nf
+mint publish document.md --style-destination css
+.fi
+.TP
+Recursively process all Markdown files:
+.nf
+mint publish --recursive
+.fi
+.SH TEMPLATES
+Mint comes with several built-in templates:
+.IP \(bu 2
+.B default
+\- Clean, professional styling
+.IP \(bu 2
+.B zen
+\- Minimalist design
+.IP \(bu 2
+.B protocol
+\- Technical documentation style
+.IP \(bu 2
+.B newspaper
+\- Multi-column layout
+.IP \(bu 2
+.B nord/nord-dark
+\- Modern color schemes
+.PP
+Templates can be written in any format accepted by the Tilt template interface library (ERB, Haml, etc.).
+.SH FILES
+.TP
+.I ~/.config/mint/
+User-specific configuration and templates
+.TP
+.I .mint/
+Project-specific configuration and templates
+.TP
+.I config.yaml
+Configuration file (can exist at global, user, or local levels)
+.SH SEE ALSO
+.BR markdown (1),
+.BR tilt (1)
+.SH AUTHOR
+David Jacobs <david@wit.io>
+.SH HOMEPAGE
+https://github.com/davejacobs/mint
