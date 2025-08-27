@@ -7,10 +7,6 @@ $LOAD_PATH.unshift File.expand_path('../lib', __dir__)
 require "mint"
 require "mint/plugins/epub"
 
-# NOTE: This is not how I want this plugin to be called.
-# However, I do want a first iteration of the plugin
-# system on master, so we'll go with this for now.
-
 def usage
   abort "mint epub publish file"
 end
