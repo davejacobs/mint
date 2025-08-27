@@ -3,6 +3,7 @@ require File.expand_path("../lib/mint/version", __FILE__)
 Gem::Specification.new do |s|
   s.specification_version = 3 if s.respond_to? :specification_version
   s.required_rubygems_version = ">= 1.3.6"
+  s.required_ruby_version = ">= 3.0"
   
   s.name        = "mint"
   s.version     = Mint::VERSION
