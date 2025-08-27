@@ -142,7 +142,7 @@ describe Mint do
   describe ".lookup_template" do
     it "returns template directory path by name" do
       result = Mint.lookup_template("default")
-      expect(result).to include("templates/default")
+      expect(result.to_s).to include("templates/default")
       expect(File.directory?(result)).to be true
     end
   end

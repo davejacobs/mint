@@ -39,7 +39,7 @@ module Mint
       @mapping
     else
       @mapping = Tilt::Mapping.new.tap do |m|
-        m.register Mint::CssTemplate,       'css'                # Inline Css @imports, creating a single file
+        m.register Mint::CSSTemplate,       'css'                # Inline Css @imports, creating a single file
         m.register Mint::MarkdownTemplate, 'txt'                # Process Txt as Markdown
         m.register Mint::MarkdownTemplate, *MARKDOWN_EXTENSIONS
         m.register Tilt::ScssTemplate,      'scss'
@@ -127,21 +127,20 @@ module Mint
       SCOPE_NAMES
     end
     
-    new_opts = {}
-    
-    if opts[:layout_or_style_or_template]
-      option_type, option_value = opts[:layout_or_style_or_template]
+    processed_opts = opts.dup
+    if processed_opts[:layout_or_style_or_template]
+      option_type, option_value = processed_opts.delete(:layout_or_style_or_template)
       case option_type
       when :template
-        new_opts[:template] = option_value
+        processed_opts[:template] = option_value
       when :layout
-        new_opts[:layout] = option_value
+        processed_opts[:layout] = option_value
       when :style
-        new_opts[:style] = option_value
+        processed_opts[:style] = option_value
       end
     end
     
-    configuration(scopes: scopes).merge new_opts
+    configuration(scopes: scopes).merge processed_opts
   end
 
   # @return [Array] the full path for each known template in the Mint path
@@ -165,9 +164,9 @@ module Mint
     
     # Only treat as a direct file if it's an actual file (not directory) 
     if File.file?(name) && formats.include?(File.extname(name)[1..-1])
-      name
+      Pathname.new(name).dirname
     else
-      find_template(name, type)
+      Pathname.new(find_template_directory(name))
     end
   end
 

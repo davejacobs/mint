@@ -96,9 +96,7 @@ module Mint
     # Use cases:
     # - Add footnote syntax on top of Markdown
     # - Perform text analysis for use in later callbacks (?)
-    # 
-    # TODO: Use opts, which are currently ignored
-    def self.before_render(text_document, opts)
+    def self.before_render(text_document)
       text_document
     end
 
@@ -112,9 +110,7 @@ module Mint
     #
     # Questions:
     # - Could I allow jQuery use here?
-    # 
-    # TODO: Use opts, which are currently ignored
-    def self.after_render(html_document, opts)
+    def self.after_render(html_document)
       html_document
     end
 
@@ -134,9 +130,7 @@ module Mint
     # NOTE: Unlike the other two callbacks, this doesn't use the result of 
     #   the callback expression for anything. This callback is purely for 
     #   side effects like rearranging the file system.
-    # 
-    # TODO: Use opts, which are currently ignored
-    def self.after_publish(document, opts)
+    def self.after_publish(document)
     end
   end
 end

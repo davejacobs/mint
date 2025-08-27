@@ -287,7 +287,7 @@ RSpec.describe "CLI Template Management" do
           
           expect(layout_file).to include("findme/layout.erb")
           expect(style_file).to include("findme/style.css")
-          expect(template_dir).to include("findme")
+          expect(template_dir.to_s).to include("findme")
           expect(File.exist?(layout_file)).to be true
           expect(File.exist?(style_file)).to be true
           expect(File.directory?(template_dir)).to be true

@@ -65,7 +65,7 @@ module Mint
     # Renders content in the context of layout and returns as a String.
     def render(args={})
       intermediate_content = layout.render self, args
-      Plugin.after_render(intermediate_content, {})
+      Mint.after_render(intermediate_content, {})
     end
 
     # Writes all rendered content where a) possible, b) required,
@@ -81,7 +81,7 @@ module Mint
         end
       end
 
-      Plugin.after_publish(self, opts)
+      Mint.after_publish(self, opts)
     end
 
     # Implicit readers are paired with explicit accessors. This
@@ -105,7 +105,7 @@ module Mint
 
       @metadata, text = Document.parse_metadata_from original_content
       text_with_links = Helpers.transform_markdown_links text
-      intermediate_content = Plugin.before_render text_with_links, {}
+      intermediate_content = Mint.before_render text_with_links, {}
 
       File.open(tempfile, "w") do |file|
         file << intermediate_content
