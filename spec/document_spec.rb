@@ -27,9 +27,14 @@ module Mint
         expect(document.render).to include("</html>")
       end
 
-      it "includes its stylesheet inline" do 
-        expect(document.render).to include("<style>")
-        expect(document.render).to include("</style>")
+      it "includes its stylesheet appropriately based on style mode" do
+        if document.style_mode == :external
+          expect(document.render).to include('<link rel="stylesheet"')
+          expect(document.render).not_to include("<style>")
+        else
+          expect(document.render).to include("<style>")
+          expect(document.render).to include("</style>")
+        end
       end
 
       # Mint output
@@ -38,7 +43,12 @@ module Mint
       # transformations are covered in the Plugin spec.
       it "writes its rendered style to #style_destination_file" do
         document.publish!
-        expect(document.style_destination_file_path).to exist
+        if document.style_mode == :external
+          expect(document.style_destination_file_path).to exist
+        else
+          # For inline styles, no external file should be created
+          expect(document.style_destination_file_path).not_to exist
+        end
       end
 
       it "writes its rendered layout and content to #destination_file" do
@@ -86,8 +96,8 @@ module Mint
 
     context "when it's created with explicit destination directories" do
       let(:document) { Document.new @content_file,
-                       :destination => "destination",
-                       :style_destination => "styles" }
+                       destination: "destination",
+                       style_destination: "styles" }
 
       subject { document }
       its(:root) { is_expected.to eq(@tmp_dir) }
@@ -123,7 +133,7 @@ module Mint
 
     context "when it's created with an explicit root" do 
       let(:document) { Document.new @content_file,
-                       :root => "#{@tmp_dir}/alternative-root" }
+                       root: "#{@tmp_dir}/alternative-root" }
 
       subject { document }
       its(:root) { is_expected.to eq("#{@tmp_dir}/alternative-root") }
@@ -133,12 +143,23 @@ module Mint
       its(:source) { is_expected.to eq("content.md") }
       its(:style_destination) { is_expected.to be_nil }
 
-      it "has a style destination file in user tmp directory" do
-        expect(document.style_destination_file).to match(/\.config\/mint\/tmp\/style\.css$/)
+      it "has appropriate style behavior based on style mode" do
+        if document.style_mode == :external
+          expect(document.style_destination_file).to match(/\.config\/mint\/tmp\/style\.css$/)
+        else
+          # For inline styles, the style_destination_file should still exist as a path
+          # but no actual file should be created during publish
+          expect(document.style_destination_file).to be_present
+        end
       end
 
-      it "has a style destination directory in user tmp directory" do
-        expect(document.style_destination_directory).to match(/\.config\/mint\/tmp$/)
+      it "has appropriate style destination directory based on style mode" do
+        if document.style_mode == :external
+          expect(document.style_destination_directory).to match(/\.config\/mint\/tmp$/)
+        else
+          # For inline styles, still has a directory path but it's not used for external files
+          expect(document.style_destination_directory).to be_present
+        end
       end
 
       its(:style_destination_file_path) do

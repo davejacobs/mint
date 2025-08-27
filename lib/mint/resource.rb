@@ -66,18 +66,18 @@ module Mint
       @renderer = renderer
     end
 
-    def initialize(source, options={})
+    def initialize(source, root: nil, destination: nil, context: nil, name: nil, &block)
       return nil unless source
 
       self.type = :resource
       self.source = source
-      self.root = options[:root] || source_directory
-      self.destination = options[:destination]
-      self.context = options[:context]
+      self.root = root || source_directory
+      self.destination = destination
+      self.context = context
 
-      yield self if block_given?
+      yield self if block
 
-      self.name = options[:name] || Mint.guess_name_from(source)
+      self.name = name || Mint.guess_name_from(source)
       self.renderer = Mint.renderer source
     end
 

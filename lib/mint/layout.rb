@@ -6,10 +6,8 @@ module Mint
     # and optional configuration options.
     #
     # @param [String] source the absolute or relative file path
-    # @param [Hash, #[]] opts layout options
-    def initialize(source, opts = {})
-      options = Mint.default_options.merge opts
-      super(source, options)
+    def initialize(source, root: nil, destination: nil, context: nil, name: nil, &block)
+      super(source, root: root, destination: destination, context: context, name: name, &block)
       self.type = :layout
     end
   end

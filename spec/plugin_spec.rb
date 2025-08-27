@@ -330,7 +330,7 @@ describe Mint do
 
         it "allows changes to the style file" do
           pending "figure out a better strategy for style manipulation"
-          document = Mint::Document.new "content.md", :style => "style.css" 
+          document = Mint::Document.new "content.md", style: "style.css" 
 
           plugin.instance_eval do
             def after_publish(document)
@@ -372,7 +372,7 @@ describe Mint do
 
         context "when the output is a new directory" do
           it "allows changes to the document directory" do
-            document = Mint::Document.new "content.md", :destination => "destination"
+            document = Mint::Document.new "content.md", destination: "destination"
             plugin.class_eval do
               def self.after_publish(document)
                 original = document.destination_directory
@@ -392,7 +392,7 @@ describe Mint do
             require "zip"
             require "zip/filesystem"
 
-            document = Mint::Document.new "content.md", :destination => "destination"
+            document = Mint::Document.new "content.md", destination: "destination"
             plugin.class_eval do
               def self.after_publish(document)
                 Zip::OutputStream.open("book.zip") do |zos|
@@ -422,7 +422,7 @@ describe Mint do
 
         context "when the style output is a new directory" do
           it "allows changes to the style directory" do
-            document = Mint::Document.new "content.md", :style_destination => "styles"
+            document = Mint::Document.new "content.md", style_destination: "styles"
             plugin.class_eval do
               def self.after_publish(document)
                 original = document.style_destination_directory

@@ -24,6 +24,7 @@ module Mint
     {
       root: Dir.getwd,
       destination: nil,
+      style_mode: :inline,
       style_destination: nil,
       output_file: '#{basename}.#{new_extension}',
       layout_or_style_or_template: [:template, 'default'],
@@ -32,9 +33,6 @@ module Mint
       verbose: false
     }
   end
-  
-  # Rendering mode for publish command specifically; can be :publish or :preview
-  @rendering_mode     = :publish  
   
   def self.mapping
     if @mapping
@@ -80,13 +78,6 @@ module Mint
     ["css", "sass", "scss", "less"]
   end
 
-  def self.rendering_mode
-    @rendering_mode
-  end
-
-  def self.rendering_mode=(mode)
-    @rendering_mode = mode
-  end
   
   # Returns a hash of all active options specified by file (for all scopes).
   # That is, if you specify file as "defaults.yaml", this will return the aggregate

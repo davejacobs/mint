@@ -2,15 +2,12 @@ require "mint/resource"
 
 module Mint
   class Style < Resource
-    # Creates a new Layout object using a mandatory source file
+    # Creates a new Style object using a mandatory source file
     # and optional configuration options.
     #
     # @param [String] source the absolute or relative file path
-    # @param [Hash, #[]] opts style options
-    def initialize(source, opts = {})
-      options = Mint.default_options.merge opts
-
-      super(source, options)
+    def initialize(source, root: nil, destination: nil, context: nil, name: nil, &block)
+      super(source, root: root, destination: destination, context: context, name: name, &block)
       self.type = :style
 
       # We want to render final stylesheet to the /css subdirectory if
@@ -25,7 +22,6 @@ module Mint
         self.destination ||= tmp_dir.to_s
         self.root = "/"
       end
-
     end
 
     # Determines whether a Style object is supposed to be rendered.

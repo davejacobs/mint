@@ -41,8 +41,13 @@ module Mint
           parsed_options[:destination] = d
         end
 
-        cli.on "-a", "--style-destination DESTINATION", "Specify a destination directory for stylesheets, or nil to link in place" do |a|
-          parsed_options[:style_destination] = a
+        cli.on "--inline-style", "Inline CSS into the HTML document (default)" do
+          parsed_options[:style_mode] = :inline
+        end
+
+        cli.on "--style-destination DESTINATION", "Create stylesheet at specified directory or file path and link it" do |destination|
+          parsed_options[:style_mode] = :external
+          parsed_options[:style_destination] = destination
         end
 
         cli.on "-g", "--global", "Specify config changes on a global level" do
@@ -65,6 +70,10 @@ module Mint
       transient_argv = argv.dup
       parser.parse! transient_argv
       
+      if parsed_options[:style_mode] == :inline && parsed_options[:style_destination]
+        raise ArgumentError, "--inline-style and --style-destination cannot be used together"
+      end
+      
       default_options = Mint.default_options.merge(destination: Dir.getwd)
       { argv: transient_argv, options: default_options.merge(parsed_options), help: parser.help }
     end
@@ -86,6 +95,10 @@ module Mint
     # @param [Symbol] scope the scope at which to install
     # @return [void]
     def self.install(file, name, scope = :local)
+      if file.nil?
+        raise "[error] No file specified for installation"
+      end
+      
       filename, ext = file.split "."
 
       template_name = name || filename
@@ -326,8 +339,21 @@ module Mint
 
       files.each_with_index do |file, idx|
         # Pass all files list when processing multiple files (for navigation in templates like garden)
-        doc_options = options.merge(all_files: files.size > 1 ? files : [])
-        Document.new(file, doc_options).publish!(:render_style => (idx == 0))
+        all_files = files.size > 1 ? files : nil
+        
+        Document.new(file,
+          root: options[:root],
+          destination: options[:destination],
+          context: options[:context],
+          name: options[:name],
+          style_mode: options[:style_mode],
+          style_destination: options[:style_destination],
+          layout: options[:layout],
+          style: options[:style],
+          template: options[:template],
+          layout_or_style_or_template: options[:layout_or_style_or_template],
+          all_files: all_files
+        ).publish!(:render_style => (idx == 0))
       end
     end
   end

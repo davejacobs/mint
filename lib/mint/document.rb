@@ -7,27 +7,38 @@ module Mint
     METADATA_DELIM = "\n\n"
 
     # Creates a new Mint Document object. Can be block initialized.
-    # Accepts source and options. Block initialization occurs after
-    # all defaults are set, so not all options must be specified.
-    def initialize(source, opts = {})
-      options = Mint.default_options.merge opts
+    def initialize(source, 
+                   root: nil, 
+                   destination: nil, 
+                   context: nil, 
+                   name: nil, 
+                   style_mode: :inline, 
+                   style_destination: nil, 
+                   layout: nil, 
+                   style: nil, 
+                   template: nil,
+                   layout_or_style_or_template: [:template, 'default'],
+                   all_files: nil,
+                   &block)
+                   
+      destination = preserve_folder_structure!(source, root, destination)
+      
+      @all_files = all_files if all_files && all_files.any?
 
-      preserve_folder_structure!(source, options)
-      if options[:all_files] && options[:all_files].any?
-        @all_files = options[:all_files]
-      end
+      style_mode = :external if style_destination && style_mode == :inline
 
       # Loads source and destination, which will be used for
       # all source_* and destination_* virtual attributes.
-      super(source, options)
-      self.type     = :document
+      super(source, root: root, destination: destination, context: context, name: name)
+      self.type = :document
 
       # Each of these should invoke explicitly defined method
-      self.content  = source
-      self.style_destination = options[:style_destination]
+      self.content = source
+      self.style_mode = style_mode
+      self.style_destination = style_destination
 
-      if options[:layout_or_style_or_template]
-        type, name = options[:layout_or_style_or_template]
+      if layout_or_style_or_template
+        type, name = layout_or_style_or_template
         case type
         when :template
           self.template = name
@@ -38,16 +49,17 @@ module Mint
         end
       end
 
-      self.layout = options[:layout] if options[:layout]
-      self.style = options[:style] if options[:style]
+      # Individual layout/style options can override the above
+      self.layout = layout if layout
+      self.style = style if style
 
       # The template option will override layout and style choices
-      self.template = options[:template] if options[:template]
+      self.template = template if template
 
       # Yield self to block after all other parameters are loaded,
       # so we only have to tweak. (We don't have to give up our
       # defaults or re-test blocks beyond them being tweaked.)
-      yield self if block_given?
+      yield self if block
     end
 
     # Renders content in the context of layout and returns as a String.
@@ -62,13 +74,7 @@ module Mint
       options = { :render_style => true }.merge(opts)
       super
 
-      # Only renders style if a) it's specified by the options path and
-      # b) it actually needs rendering (i.e., it's in template form and
-      # not raw, browser-parseable CSS) or it if it doesn't need
-      # rendering but there is an explicit style_destination.
-      if options[:render_style]
-        # Can probably replace this with style.publish! if we can pass in
-        # style_destination_directory and style_destination_file
+      if @style_mode == :external && options[:render_style]
         FileUtils.mkdir_p style_destination_directory
         File.open(self.style_destination_file, "w+") do |f|
           f << self.style.render
@@ -120,7 +126,7 @@ module Mint
           layout
         else
           layout_file = Mint.lookup_layout layout
-          Layout.new layout_file
+          Layout.new(layout_file, root: self.root, destination: self.destination, context: self.context)
         end
     end
 
@@ -135,7 +141,7 @@ module Mint
           style
         else
           style_file = Mint.lookup_style style
-          Style.new style_file
+          Style.new(style_file, root: self.root, destination: self.destination, context: self.context)
         end
     end
 
@@ -167,7 +173,13 @@ module Mint
     #
     # The style_destination attribute is lazy. It's exposed via
     # virtual attributes like #style_destination_file.
-    attr_reader :style_destination
+    attr_reader :style_destination, :style_mode
+
+    # @param [Symbol] style_mode how styles should be incorporated (:inline or :external)
+    # @return [void]
+    def style_mode=(style_mode)
+      @style_mode = style_mode
+    end
 
     # @param [String] style_destination the subdirectory into
     #   which styles will be rendered or copied
@@ -227,13 +239,13 @@ module Mint
       self.style.render
     end
 
-    # Returns either inline CSS or stylesheet link based on rendering mode
+    # Returns either inline CSS or stylesheet link based on style mode
     # Use this helper in layouts instead of stylesheet or inline_stylesheet directly
     def stylesheet_tag
-      case Mint.rendering_mode
-      when :preview
+      case @style_mode
+      when :external
         "<link rel=\"stylesheet\" href=\"#{stylesheet}\">".html_safe
-      else
+      else # :inline (default)
         "<style>#{self.style.render}</style>".html_safe
       end
     end
@@ -310,9 +322,9 @@ module Mint
     #
     # @param [String] source the source file path
     # @param [Hash] options the options hash to modify
-    def preserve_folder_structure!(source, options)
+    def preserve_folder_structure!(source, root, destination)
       source_path = Pathname.new(source).expand_path
-      root_path = Pathname.new(options[:root] || Dir.getwd).expand_path
+      root_path = Pathname.new(root || Dir.getwd).expand_path
       
       relative_path = source_path.relative_path_from(root_path)
       
@@ -322,16 +334,15 @@ module Mint
       # Set destination to preserve directory structure
       if relative_dir.to_s != "."
         # Combine base destination with relative directory structure
-        base_destination = options[:destination] || ""
+        base_destination = destination || ""
         if base_destination.empty?
-          options[:destination] = relative_dir.to_s
+          destination = relative_dir.to_s
         else
-          options[:destination] = File.join(base_destination, relative_dir.to_s)
+          destination = File.join(base_destination, relative_dir.to_s)
         end
       end
       
-      # Set name to HTML version of the markdown file
-      options[:name] = filename.sub_ext('.html').to_s
+      destination
     end
 
     class << self

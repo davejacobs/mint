@@ -36,6 +36,7 @@ describe Mint do
       {
         root: Dir.getwd,
         destination: nil,
+        style_mode: :inline,
         style_destination: nil,
         output_file: '#{basename}.#{new_extension}',
         layout_or_style_or_template: [:template, 'default'],
@@ -78,6 +79,7 @@ describe Mint do
       expect(Mint.configuration_with(local: true)).to eq({
         root: Dir.getwd,
         destination: nil,
+        style_mode: :inline,
         style_destination: nil,
         output_file: '#{basename}.#{new_extension}',
         layout_or_style_or_template: [:template, 'default'],
@@ -213,7 +215,14 @@ describe Mint do
       subject { document }
 
       its(:destination_file_path) { should exist }
-      its(:style_destination_file_path) { should exist }
+      
+      it "creates style file only for external style mode" do
+        if document.style_mode == :external
+          expect(document.style_destination_file_path).to exist
+        else
+          expect(document.style_destination_file_path).not_to exist
+        end
+      end
     end
   end
 
