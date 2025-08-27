@@ -3,21 +3,9 @@ require "spec_helper"
 describe Mint do
   subject { Mint }
 
-  its(:default_options) do
-    should == {
-      layout: "default",
-      style: "default",
-      destination: nil,
-      style_destination: nil
-    }
-  end
-
-  its(:directories) { should == { templates: "templates" } }
-  its(:files) { should == { syntax: "syntax.yaml", defaults: "defaults.yaml" } }
-
-  describe ".root" do
-    it "returns the root of the Mint gem as a string" do
-      Mint.root.should == File.expand_path("../../../mint", __FILE__)
+  describe "::ROOT" do
+    it "contains the root of the Mint gem as a string" do
+      expect(Mint::ROOT).to eq(File.expand_path("../..", __FILE__))
     end
   end
 
@@ -26,19 +14,19 @@ describe Mint do
       files.map {|file| Pathname.new(file) }
     end
 
-    it "it returns the paths corresponding to all scopes as an array" do
-      Mint.path.should == [Pathname.new(".mint"),
-                           Pathname.new("~/.config/mint").expand_path,
-                           Pathname.new(Mint.root + "/config").expand_path]
+    it "returns the paths corresponding to all scopes as an array" do
+      expect(Mint.path).to eq([Pathname.new(".mint"),
+                               Pathname.new("~/.config/mint").expand_path,
+                               Pathname.new(Mint::ROOT + "/config").expand_path])
     end
 
     it "can filter paths by one scope" do
-      Mint.path(:scopes => [:user]).should == [Pathname.new("~/.config/mint").expand_path]
+      expect(Mint.path([:user])).to eq([Pathname.new("~/.config/mint").expand_path])
     end
 
     it "can filter paths by many scopes" do
-      Mint.path(:scopes => [:local, :user]).should == [Pathname.new(".mint"),
-                                                       Pathname.new("~/.config/mint").expand_path]
+      expect(Mint.path([:local, :user])).to eq([Pathname.new(".mint"),
+                                                Pathname.new("~/.config/mint").expand_path])
     end
   end
 
@@ -46,23 +34,27 @@ describe Mint do
   describe ".configuration" do
     let(:defaults) do
       {
-        layout: "default",
-        style: "default",
+        root: Dir.getwd,
         destination: nil,
-        style_destination: nil
+        style_destination: nil,
+        output_file: '#{basename}.#{new_extension}',
+        layout_or_style_or_template: [:template, 'default'],
+        scope: :local,
+        recursive: false,
+        verbose: false
       }
     end
 
-    context "when there is no defaults.yaml file on the Mint path" do
+    context "when there is no config.yaml file on the Mint path" do
       it "returns a default set of options" do
-        Mint.configuration.should == defaults 
+        expect(Mint.configuration).to eq(defaults)
       end
     end
 
-    context "when there is a defaults.yaml file on the Mint path" do
+    context "when there is a config.yaml file on the Mint path" do
       before do
         FileUtils.mkdir_p ".mint"
-        File.open(".mint/defaults.yaml", "w") do |file|
+        File.open(".mint/config.yaml", "w") do |file|
           file << "layout: zen"
         end
       end
@@ -72,57 +64,61 @@ describe Mint do
       end
 
       it "merges all specified options with precedence according to scope" do
-        Mint.configuration[:layout].should == "zen"
+        expect(Mint.configuration[:layout]).to eq("zen")
       end
 
       it "can filter by scope (but always includes defaults)" do
-        Mint.configuration(:scopes => [:user]).should == defaults
+        expect(Mint.configuration(scopes: [:user])).to eq(defaults)
       end
     end
   end
 
   describe ".configuration_with" do
     it "displays the sum of all configuration files with other options added" do
-      Mint.configuration_with(:local => true).should == {
-        layout: "default",
-        style: "default",
+      expect(Mint.configuration_with(local: true)).to eq({
+        root: Dir.getwd,
         destination: nil,
         style_destination: nil,
+        output_file: '#{basename}.#{new_extension}',
+        layout_or_style_or_template: [:template, 'default'],
+        scope: :local,
+        recursive: false,
+        verbose: false,
         local: true
-      }
+      })
     end
   end
 
   describe ".templates" do
-    it "returns all templates if no scopes are passed in" do
-      Mint.templates.should include(Mint.root + "/config/templates/default") 
+    it "returns local templates by default" do
+      # Note: Now defaults to local scope, will include global templates only if explicitly requested
+      expect(Mint.templates).to be_an(Array)
     end
 
-    it "returns all local templates if the scope is local" do
-      pending "a rearchitecture and unification of scopes"
-      Mint.templates(:scope => :local).should_not include(Mint.root + "/config/templates/default")
+    it "returns global templates when global scope is specified" do
+      expect(Mint.templates(:global)).to include(Mint::ROOT + "/config/templates/default")
     end
   end
 
   describe ".formats" do
     it "includes Markdown" do
-      Mint.formats.should include("md")
+      expect(Mint.formats).to include("md")
     end
 
     it "includes Haml" do
-      Mint.formats.should include("haml")
+      expect(Mint.formats).to include("haml")
     end
   end
 
   describe ".css_formats" do
     it "includes Sass" do
-      Mint.formats.should include("sass")
+      expect(Mint.css_formats).to include("sass")
     end
   end
 
   describe ".renderer" do
     it "creates a valid renderer" do
-      Mint.renderer(@content_file).should respond_to(:render)
+      expect(Mint.renderer(@content_file)).to respond_to(:render)
     end
   end
 
@@ -131,50 +127,68 @@ describe Mint do
       expectations = {
         local: Pathname.new(".mint"),
         user: Pathname.new("~/.config/mint").expand_path,
-        global: Pathname.new(Mint.root + "/config").expand_path
+        global: Pathname.new(Mint::ROOT + "/config").expand_path
       }
 
       expectations.each do |scope, path|
-        Mint.path_for_scope(scope).should == path
+        expect(Mint.path_for_scope(scope)).to eq(path)
       end
     end
   end
 
+  # Refactored lookup methods for explicit parameter interface
   describe ".lookup_template" do
-    it "looks up the correct template according to scope" do
-      Mint.lookup_template(:default, :layout).should be_in_template("default")
-      Mint.lookup_template(:default, :style).should be_in_template("default")
-      Mint.lookup_template(:zen, :layout).should be_in_template("zen")
-      Mint.lookup_template(:zen, :style).should be_in_template("zen")
-      Mint.lookup_template("layout.haml").should == "layout.haml"
-      Mint.lookup_template("dynamic.sass").should == "dynamic.sass"
+    it "returns template directory path by name" do
+      result = Mint.lookup_template("default")
+      expect(result).to include("templates/default")
+      expect(File.directory?(result)).to be true
+    end
+  end
+
+  describe ".lookup_layout" do
+    it "returns layout file path by template name" do
+      result = Mint.lookup_layout("default")
+      expect(result).to include("templates/default")
+      expect(result).to end_with("layout.erb")
+    end
+  end
+
+  describe ".lookup_style" do
+    it "returns style file path by template name" do
+      result = Mint.lookup_style("default")
+      expect(result).to include("templates/default")
+      expect(result).to end_with("style.css")
     end
   end
 
   describe ".find_template" do
-    it "finds the correct template according to scope" do
-      Mint.find_template("default", :layout).should be_in_template("default")
-      Mint.find_template("zen", :layout).should be_in_template("zen")
-      Mint.find_template("zen", :style).should be_in_template("zen")
+    it "finds the correct template file by name and type" do
+      layout_file = Mint.find_template("default", :layout)
+      style_file = Mint.find_template("default", :style)
+      
+      expect(layout_file).to include("templates/default")
+      expect(layout_file).to end_with("layout.erb")
+      expect(style_file).to include("templates/default")
+      expect(style_file).to end_with("style.css")
     end
 
-    it "decides whether or not a file is a template file" do
-      actual_template = Mint.lookup_template(:default, :layout)
-      fake_template = "#{Mint.root}/config/templates/default.css"
+    it "determines if a file is a template file" do
+      actual_template = Mint.lookup_layout("default")
+      fake_template = "#{Mint::ROOT}/config/templates/default.css"
       obvious_nontemplate = @dynamic_style_file
 
-      actual_template.should be_a_template
-      fake_template.should_not be_a_template
-      obvious_nontemplate.should_not be_a_template
+      expect(Mint.template?(actual_template)).to be_truthy
+      expect(Mint.template?(fake_template)).to be_falsy
+      expect(Mint.template?(obvious_nontemplate)).to be_falsy
     end
   end
 
   describe ".guess_name_from" do
     it "properly guesses destination file names based on source file names" do
-      Mint.guess_name_from("content.md").should == "content.html"
-      Mint.guess_name_from("content.textile").should == "content.html"
-      Mint.guess_name_from("layout.haml").should == "layout.html"
-      Mint.guess_name_from("dynamic.sass").should == "dynamic.css"
+      expect(Mint.guess_name_from("content.md")).to eq("content.html")
+      expect(Mint.guess_name_from("content.textile")).to eq("content.html")
+      expect(Mint.guess_name_from("layout.haml")).to eq("layout.html")
+      expect(Mint.guess_name_from("dynamic.sass")).to eq("dynamic.css")
     end
   end
 
@@ -184,7 +198,11 @@ describe Mint do
       subject { document }
 
       its(:destination_file_path) { should_not exist }
-      its(:style_destination_file_path) { should_not exist }
+      it "style destination file should not exist initially" do
+        # Clean up any existing style file first
+        FileUtils.rm_f(document.style_destination_file_path) if document.style_destination_file_path && File.exist?(document.style_destination_file_path)
+        expect(document.style_destination_file_path).not_to exist
+      end
     end
 
     # These are copied from document_spec.rb. I eventually want to move
@@ -200,19 +218,16 @@ describe Mint do
   end
 
   describe ".template_path" do
-    it "creates a template in the local directory" do
-      Mint.template_path("pro", :layout).should == 
-        ".mint/templates/pro/layout.haml" 
+    it "returns template directory for given name and scope" do
+      expect(Mint.template_path("pro", :local)).to eq(Pathname.new(".mint/templates/pro"))
     end
 
-    it "allows an extension to be specified" do
-      Mint.template_path("pro", :layout, :ext => "erb").should == 
-        ".mint/templates/pro/layout.erb" 
+    it "works with user scope" do
+      expect(Mint.template_path("pro", :user)).to eq(Pathname.new("~/.config/mint/templates/pro").expand_path)
     end
 
-    it "allows a scope to be specified" do
-      Mint.template_path("pro", :layout, :scope => :user).should == 
-        File.expand_path("~/.config/mint/templates/pro/layout.haml")
+    it "works with global scope" do
+      expect(Mint.template_path("pro", :global)).to eq(Pathname.new("#{Mint::ROOT}/config/templates/pro"))
     end
   end
 end

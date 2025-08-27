@@ -4,63 +4,63 @@ module Mint
   describe Helpers do
     describe ".underscore" do
       it "underscores class names per ActiveSupport conventions" do
-        Helpers.underscore("ClassName").should == "class_name"
+        expect(Helpers.underscore("ClassName")).to eq("class_name")
       end
 
       it "allows for camel case prefixes" do
-        Helpers.underscore("EPub").should == "e_pub"
-        Helpers.underscore("EPub", :ignore_prefix => true).should == "epub"
+        expect(Helpers.underscore("EPub")).to eq("e_pub")
+        expect(Helpers.underscore("EPub", :ignore_prefix => true)).to eq("epub")
       end
 
       it "allows for namespace removal" do
-        Helpers.underscore("Mint::EPub", 
-                           :namespaces => true).should == "mint/e_pub"
-        Helpers.underscore("Mint::EPub", 
-                           :namespaces => false).should == "e_pub"
-        Helpers.underscore("Mint::EPub", 
+        expect(Helpers.underscore("Mint::EPub", 
+                           :namespaces => true)).to eq("mint/e_pub")
+        expect(Helpers.underscore("Mint::EPub", 
+                           :namespaces => false)).to eq("e_pub")
+        expect(Helpers.underscore("Mint::EPub", 
                            :namespaces => true, 
-                           :ignore_prefix => true).should == "mint/epub"
+                           :ignore_prefix => true)).to eq("mint/epub")
       end
     end
     
     describe ".slugize" do
       it "downcases everything" do
-        Helpers.slugize("This could use FEWER CAPITALS").should ==
-          "this-could-use-fewer-capitals"
+        expect(Helpers.slugize("This could use FEWER CAPITALS")).to eq(
+          "this-could-use-fewer-capitals")
       end
 
       it "parses 'and'" do
-        Helpers.slugize("You & me").should == "you-and-me"
+        expect(Helpers.slugize("You & me")).to eq("you-and-me")
       end
 
       it "parses spaces" do
-        Helpers.slugize("You     and me").should == "you-and-me"
+        expect(Helpers.slugize("You     and me")).to eq("you-and-me")
       end
 
       it "removes non-word/non-digits" do
-        Helpers.slugize("You // and :: me").should == "you-and-me"
+        expect(Helpers.slugize("You // and :: me")).to eq("you-and-me")
       end
 
       it "condenses multiple hyphens" do
-        Helpers.slugize("You-----and me").should == "you-and-me"
+        expect(Helpers.slugize("You-----and me")).to eq("you-and-me")
       end
     end
 
     describe ".symbolize" do
       it "converts hyphens to underscores" do
-        Helpers.symbolize("you-and-me").should == :you_and_me
+        expect(Helpers.symbolize("you-and-me")).to eq(:you_and_me)
       end
     end
 
     describe ".pathize" do
       it "converts a String to a Pathname" do
-        Helpers.pathize("filename.md").should == 
-          Pathname.new("filename.md").expand_path
+        expect(Helpers.pathize("filename.md")).to eq(
+          Pathname.new("filename.md").expand_path)
       end
 
       it "does not convert a Pathname" do
         pathname = Pathname.new("filename.md")
-        Helpers.pathize(pathname).should == pathname.expand_path
+        expect(Helpers.pathize(pathname)).to eq(pathname.expand_path)
       end
     end
 
@@ -78,7 +78,7 @@ module Mint
           key3: "value3"
         }
 
-        Helpers.symbolize_keys(flat_map).should == expected_map
+        expect(Helpers.symbolize_keys(flat_map)).to eq(expected_map)
       end
 
       it "recursively turns all string keys in a nested map into symbols" do
@@ -102,7 +102,7 @@ module Mint
           }
         }
 
-        Helpers.symbolize_keys(nested_map).should == expected_map
+        expect(Helpers.symbolize_keys(nested_map)).to eq(expected_map)
       end
 
       it "recursively downcases all keys if specified" do
@@ -126,22 +126,22 @@ module Mint
           }
         }
 
-        Helpers.symbolize_keys(capitalized_map, :downcase => true).should == expected_map
+        expect(Helpers.symbolize_keys(capitalized_map, :downcase => true)).to eq(expected_map)
       end
     end
 
     describe ".listify" do
       it "joins a list of three or more with an ampersand, without the Oxford comma" do
-        Helpers.listify(["Alex", "Chris", "John"]).should ==
-          "Alex, Chris & John"
+        expect(Helpers.listify(["Alex", "Chris", "John"])).to eq(
+          "Alex, Chris & John")
       end
 
       it "joins a list of two with an ampersand" do
-        Helpers.listify(["Alex", "Chris"]).should == "Alex & Chris"
+        expect(Helpers.listify(["Alex", "Chris"])).to eq("Alex & Chris")
       end
 
       it "does not do anything to a list of one" do
-        Helpers.listify(["Alex"]).should == "Alex"
+        expect(Helpers.listify(["Alex"])).to eq("Alex")
       end
     end
 
@@ -169,18 +169,18 @@ module Mint
       end
 
       it "converts all nonstandard keys to standard ones" do
-        Helpers.standardize(@nonstandard, 
-                            :table => @table).should == @standard
+        expect(Helpers.standardize(@nonstandard, 
+                            :table => @table)).to eq(@standard)
       end
     end
 
     describe ".hashify" do
       it "zips two lists of the same size into a Hash" do
-        Helpers.hashify([:one, :two, :three], [1, 2, 3]).should == {
+        expect(Helpers.hashify([:one, :two, :three], [1, 2, 3])).to eq({
           one: 1,
           two: 2,
           three: 3
-        }
+        })
       end
     end
 
@@ -188,28 +188,28 @@ module Mint
       it "handles two files in the same directory" do
         path1 = "~/file1"
         path2 = "~/file2"
-        Helpers.normalize_path(path1, path2).should == 
-          Pathname.new("../file1")
+        expect(Helpers.normalize_path(path1, path2)).to eq(
+          Pathname.new("../file1"))
       end
       
       it "handles two files one directory apart" do
         path1 = "~/file1"
         path2 = "~/subdir/file2"
-        Helpers.normalize_path(path1, path2).should == 
-          Pathname.new("../../file1")
+        expect(Helpers.normalize_path(path1, path2)).to eq(
+          Pathname.new("../../file1"))
       end
 
       it "handles two files linked only at the directory root" do
         path1 = "/home/david/file1"
         path2 = "/usr/local/src/file2"
-        Helpers.normalize_path(path1, path2).should == 
-          Pathname.new("/home/david/file1")
+        expect(Helpers.normalize_path(path1, path2)).to eq(
+          Pathname.new("/home/david/file1"))
       end
       
       it "returns nil for identical files" do
         path1 = "~/file1"
         path2 = "~/file1"
-        Helpers.normalize_path(path1, path2).should == Pathname.new(".")
+        expect(Helpers.normalize_path(path1, path2)).to eq(Pathname.new("."))
       end
     end
 
@@ -222,7 +222,7 @@ module Mint
 
       it "combines specified data with data in YAML file and updates file" do
         Helpers.update_yaml! "example.yaml", "conflicting" => "baz"
-        YAML.load_file("example.yaml")["conflicting"].should == "baz"
+        expect(YAML.load_file("example.yaml")["conflicting"]).to eq("baz")
       end
     end
 
@@ -233,16 +233,16 @@ module Mint
       end
 
       it "creates a randomly named temp file" do
-        @path.should exist
+        expect(@path).to exist
       end
 
       it "creates a temp file with the correct name and extension" do
-        @path.basename.to_s.should =~ /content/
-        @path.extname.should == ".md"
+        expect(@path.basename.to_s).to match(/content/)
+        expect(@path.extname).to eq(".md")
       end
 
       it "fills the temp file with the specified content" do
-        @path.read.should =~ /This is just a test/
+        expect(@path.read).to match(/This is just a test/)
       end
     end
   end

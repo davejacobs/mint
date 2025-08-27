@@ -1,6 +1,8 @@
 require "pathname"
 require "mint"
+require "rspec/its"
 require_relative "support/matchers"
+require_relative "support/cli_helpers"
 
 RSpec.configure do |config|
   config.before(:all) do

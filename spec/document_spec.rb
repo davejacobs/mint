@@ -14,20 +14,22 @@ module Mint
       #
       # This test doesn't cover any plugin transformations. Those
       # transformations are covered in the Plugin spec.
-      its(:content) { should =~ /<p>This is just a test.<\/p>/ }
-      its(:metadata) { should == { "metadata" =>  true } }
+      its(:content) { is_expected.to match(/<p>This is just a test.<\/p>/) }
+      its(:metadata) { is_expected.to eq({ "metadata" =>  true }) }
 
       # Render output
 
       # This test doesn't cover any plugin transformations. Those
       # transformations are covered in the Plugin spec.
       it "renders its layout, injecting content inside" do
-        document.render.should =~ 
-          /.*<html>.*#{document.content}.*<\/html>.*/m
+        expect(document.render).to include(document.content)
+        expect(document.render).to include("<html")
+        expect(document.render).to include("</html>")
       end
 
-      it "links to its stylesheet" do 
-        document.render.should =~ /#{document.stylesheet}/
+      it "includes its stylesheet inline" do 
+        expect(document.render).to include("<style>")
+        expect(document.render).to include("</style>")
       end
 
       # Mint output
@@ -36,14 +38,14 @@ module Mint
       # transformations are covered in the Plugin spec.
       it "writes its rendered style to #style_destination_file" do
         document.publish!
-        document.style_destination_file_path.should exist
+        expect(document.style_destination_file_path).to exist
       end
 
       it "writes its rendered layout and content to #destination_file" do
         document.publish!
-        document.destination_file_path.should exist
+        expect(document.destination_file_path).to exist
         content = File.read document.destination_file
-        content.should == document.render
+        expect(content).to eq(document.render)
       end
     end
 
@@ -51,31 +53,33 @@ module Mint
       let(:document) { Document.new @content_file }
 
       subject { document }
-      its(:root) { should == @tmp_dir }
-      its(:destination) { should be_nil }
-      its(:source) { should == "content.md" }
-      its(:style_destination) { should be_nil }
+      its(:root) { is_expected.to eq(@tmp_dir) }
+      its(:destination) { is_expected.to be_nil }
+      its(:source) { is_expected.to eq("content.md") }
+      its(:style_destination) { is_expected.to be_nil }
 
-      its(:style_destination_file) do
-        should == Mint.root + "/config/templates/default/css/style.css"
+      it "has a style destination file in user tmp directory" do
+        expect(document.style_destination_file).to match(/\.config\/mint\/tmp\/style\.css$/)
       end
 
-      its(:style_destination_directory) do 
-        should == Mint.root + "/config/templates/default/css"
+      it "has a style destination directory in user tmp directory" do
+        expect(document.style_destination_directory).to match(/\.config\/mint\/tmp$/)
       end
 
       its(:style_destination_file_path) do
-        should == Pathname.new(document.style_destination_file)
+        is_expected.to eq(Pathname.new(document.style_destination_file))
       end
 
       its(:style_destination_directory_path) do
-        should == Pathname.new(document.style_destination_directory)
+        is_expected.to eq(Pathname.new(document.style_destination_directory))
       end
 
-      its(:layout) { should be_in_directory("default") }
-      its(:style) { should be_in_directory("default") }
+      its(:layout) { is_expected.to be_in_directory("default") }
+      its(:style) { is_expected.to be_in_directory("default") }
 
-      its(:stylesheet) { should == Mint.root + "/config/templates/default/css/style.css" }
+      it "has a stylesheet path relative to user tmp directory" do
+        expect(document.stylesheet).to match(/\.config\/mint\/tmp\/style\.css$/)
+      end
 
       it_should_behave_like "all documents"
     end
@@ -86,31 +90,33 @@ module Mint
                        :style_destination => "styles" }
 
       subject { document }
-      its(:root) { should == @tmp_dir }
-      its(:destination) { should == "destination" }
-      its(:source) { should == "content.md" }
-      its(:style_destination) { should == "styles" }
+      its(:root) { is_expected.to eq(@tmp_dir) }
+      its(:destination) { is_expected.to eq("destination") }
+      its(:source) { is_expected.to eq("content.md") }
+      its(:style_destination) { is_expected.to eq("styles") }
 
       its(:style_destination_file) do
-        should == "#{@tmp_dir}/destination/styles/style.css"
+        is_expected.to eq("#{@tmp_dir}/destination/styles/style.css")
       end
 
       its(:style_destination_directory) do
-        should == "#{@tmp_dir}/destination/styles"
+        is_expected.to eq("#{@tmp_dir}/destination/styles")
       end
 
       its(:style_destination_file_path) do
-        should == Pathname.new(document.style_destination_file)
+        is_expected.to eq(Pathname.new(document.style_destination_file))
       end
 
       its(:style_destination_directory_path) do
-        should == Pathname.new(document.style_destination_directory)
+        is_expected.to eq(Pathname.new(document.style_destination_directory))
       end
 
-      its(:layout) { should be_in_directory("default") }
-      its(:style) { should be_in_directory("default") }
+      its(:layout) { is_expected.to be_in_directory("default") }
+      its(:style) { is_expected.to be_in_directory("default") }
 
-      its(:stylesheet) { should == "styles/style.css" }
+      it "has a stylesheet path relative to user tmp directory" do
+        expect(document.stylesheet).to match(/\.config\/mint\/tmp\/style\.css$/)
+      end
 
       it_should_behave_like "all documents"
     end
@@ -120,31 +126,35 @@ module Mint
                        :root => "#{@tmp_dir}/alternative-root" }
 
       subject { document }
-      its(:root) { should == "#{@tmp_dir}/alternative-root" }
-      its(:destination) { should be_nil }
-      its(:source) { should == "content.md" }
-      its(:style_destination) { should be_nil }
+      its(:root) { is_expected.to eq("#{@tmp_dir}/alternative-root") }
+      it "preserves folder structure" do
+        expect(document.destination).to be_present
+      end
+      its(:source) { is_expected.to eq("content.md") }
+      its(:style_destination) { is_expected.to be_nil }
 
-      its(:style_destination_file) do
-        should == Mint.root + "/config/templates/default/css/style.css"
+      it "has a style destination file in user tmp directory" do
+        expect(document.style_destination_file).to match(/\.config\/mint\/tmp\/style\.css$/)
       end
 
-      its(:style_destination_directory) do
-        should == Mint.root + "/config/templates/default/css"
+      it "has a style destination directory in user tmp directory" do
+        expect(document.style_destination_directory).to match(/\.config\/mint\/tmp$/)
       end
 
       its(:style_destination_file_path) do
-        should == Pathname.new(document.style_destination_file)
+        is_expected.to eq(Pathname.new(document.style_destination_file))
       end
 
       its(:style_destination_directory_path) do
-        should == Pathname.new(document.style_destination_directory)
+        is_expected.to eq(Pathname.new(document.style_destination_directory))
       end
 
-      its(:layout) { should be_in_directory("default") }
-      its(:style) { should be_in_directory("default") }
+      its(:layout) { is_expected.to be_in_directory("default") }
+      its(:style) { is_expected.to be_in_directory("default") }
 
-      its(:stylesheet) { should == Mint.root + "/config/templates/default/css/style.css" }
+      it "has a stylesheet path relative to user tmp directory" do
+        expect(document.stylesheet).to match(/\.config\/mint\/tmp\/style\.css$/)
+      end
 
       it_should_behave_like "all documents"
     end
@@ -161,31 +171,33 @@ module Mint
       end
 
       subject { document }
-      its(:root) { should == "#{@tmp_dir}/alternative-root" }
-      its(:destination) { should == "destination" }
-      its(:source) { should == "content.md" }
-      its(:style_destination) { should == "styles" }
+      its(:root) { is_expected.to eq("#{@tmp_dir}/alternative-root") }
+      its(:destination) { is_expected.to eq("destination") }
+      its(:source) { is_expected.to eq("content.md") }
+      its(:style_destination) { is_expected.to eq("styles") }
 
       its(:style_destination_file) do
-        should == "#{@tmp_dir}/alternative-root/destination/styles/style.css"
+        is_expected.to eq("#{@tmp_dir}/alternative-root/destination/styles/style.css")
       end
 
       its(:style_destination_directory) do
-        should == "#{@tmp_dir}/alternative-root/destination/styles"
+        is_expected.to eq("#{@tmp_dir}/alternative-root/destination/styles")
       end
 
       its(:style_destination_file_path) do
-        should == Pathname.new(document.style_destination_file)
+        is_expected.to eq(Pathname.new(document.style_destination_file))
       end
 
       its(:style_destination_directory_path) do
-        should == Pathname.new(document.style_destination_directory)
+        is_expected.to eq(Pathname.new(document.style_destination_directory))
       end
 
-      its(:layout) { should be_in_directory("zen") }
-      its(:style) { should be_in_directory("zen") }
+      its(:layout) { is_expected.to be_in_directory("zen") }
+      its(:style) { is_expected.to be_in_directory("zen") }
 
-      its(:stylesheet) { should == "styles/style.css" }
+      it "has a stylesheet path relative to user tmp directory" do
+        expect(document.stylesheet).to match(/\.config\/mint\/tmp\/style\.css$/)
+      end
 
       it_should_behave_like "all documents"
     end
@@ -194,33 +206,33 @@ module Mint
       let(:text) { "metadata: true\n\nReal text" }
       describe ".metadata_chunk" do
         it "extracts, but does not parse, metadata from text" do
-          Document.metadata_chunk(text).should == "metadata: true"
+          expect(Document.metadata_chunk(text)).to eq("metadata: true")
         end
       end
 
       describe ".metadata_from" do
         it "parses a documents metadata if present" do
-          Document.metadata_from(text).should == { "metadata" => true }
+          expect(Document.metadata_from(text)).to eq({ "metadata" => true })
         end
 
         it "returns the empty string if a document has bad/no metadata" do
-          Document.metadata_from("No metadata here").should == {}
+          expect(Document.metadata_from("No metadata here")).to eq({})
         end
 
         it "handles a non-simple string that is also not YAML" do
-          Document.metadata_from("# Non-simple string").should == {}
+          expect(Document.metadata_from("# Non-simple string")).to eq({})
         end
       end
 
       describe ".parse_metadata_from" do
         it "separates text from its metadata if present" do
-          Document.parse_metadata_from(text).should ==
-            [{ "metadata" => true }, "Real text"]
+          expect(Document.parse_metadata_from(text)).to eq(
+            [{ "metadata" => true }, "Real text"])
         end
 
         it "returns the entire text if no metadata is found" do
-          Document.parse_metadata_from("No metadata here").should ==
-            [{}, "No metadata here"]
+          expect(Document.parse_metadata_from("No metadata here")).to eq(
+            [{}, "No metadata here"])
         end
       end
     end

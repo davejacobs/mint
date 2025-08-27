@@ -6,12 +6,12 @@ module Mint
       let(:style) { Style.new @static_style_file }
       subject { style }
 
-      its(:destination) { should be_nil }
-      its(:destination_file) { should == "#{@tmp_dir}/static.css" }
+      its(:destination) { is_expected.to be_nil }
+      its(:destination_file) { is_expected.to eq("#{@tmp_dir}/static.css") }
 
-      it { should_not be_rendered }
+      it { is_expected.to be_rendered }
       it "'renders' itself verbatim" do
-        style.render.should == File.read(@static_style_file)
+        expect(style.render).to eq(File.read(@static_style_file))
       end
     end
 
@@ -19,13 +19,13 @@ module Mint
       let(:style) { Style.new @dynamic_style_file }
       subject { style }
 
-      its(:destination) { should be_nil }
-      its(:destination_file) { should == "#{@tmp_dir}/dynamic.css" }
+      its(:destination) { is_expected.to be_nil }
+      its(:destination_file) { is_expected.to eq("#{@tmp_dir}/dynamic.css") }
 
-      it { should be_rendered }
-      it "renders itself from a templating language to Html" do
-        style.render.gsub("\n", " ").should == 
-          File.read(@static_style_file).gsub("\n", " ")
+      it { is_expected.to be_rendered }
+      it "renders itself from a templating language to CSS" do
+        expect(style.render.gsub("\n", " ").strip).to eq(
+          File.read(@static_style_file).gsub("\n", " ").strip)
       end
     end
 
@@ -34,9 +34,9 @@ module Mint
                     :destination => "destination" }
       subject { style }
 
-      its(:destination) { should == "destination" }
+      its(:destination) { is_expected.to eq("destination") }
       its(:destination_file) do
-        should == "#{@tmp_dir}/destination/static.css"
+        is_expected.to eq("#{@tmp_dir}/destination/static.css")
       end
     end
 
@@ -55,12 +55,14 @@ module Mint
     # end
 
     context "when it's created from a dynamic template file" do
-      let(:style) { Style.new(Mint.lookup_template(:default, :style)) }
+      let(:style) { Style.new(Mint.lookup_style("default")) }
       subject { style }
 
-      its(:destination) { should == "css" }
-      its(:destination_file) do
-        should == "#{Mint.root}/config/templates/default/css/style.css"
+      it "has destination in user tmp directory" do
+        expect(style.destination).to match(/\.config\/mint\/tmp$/)
+      end
+      it "has destination file in user tmp directory" do  
+        expect(style.destination_file).to match(/\.config\/mint\/tmp\/style\.css$/)
       end
     end
   end

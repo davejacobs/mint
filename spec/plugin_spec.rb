@@ -9,11 +9,11 @@ describe Mint do
   describe ".plugins" do
     it "returns all registered plugins" do
       plugin = Class.new(Mint::Plugin)
-      Mint.plugins.should == [plugin]
+      expect(Mint.plugins).to eq([plugin])
     end
 
     it "returns an empty array if there are no registered plugins" do
-      Mint.plugins.should == []
+      expect(Mint.plugins).to eq([])
     end
   end
 
@@ -22,13 +22,13 @@ describe Mint do
 
     it "registers a plugin once" do
       Mint.register_plugin! plugin
-      Mint.plugins.should == [plugin]
+      expect(Mint.plugins).to eq([plugin])
     end
 
     it "does not register a plugin more than once" do
       Mint.register_plugin! plugin
-      lambda { Mint.register_plugin! plugin }.should_not change { Mint.plugins }
-      Mint.plugins.should == [plugin]
+      expect { Mint.register_plugin! plugin }.not_to change { Mint.plugins }
+      expect(Mint.plugins).to eq([plugin])
     end
   end
 
@@ -37,13 +37,13 @@ describe Mint do
 
     it "activates a plugin once" do
       Mint.activate_plugin! plugin
-      Mint.activated_plugins.should == [plugin]
+      expect(Mint.activated_plugins).to eq [plugin]
     end
 
     it "does not register a plugin more than once" do
       Mint.activate_plugin! plugin
-      lambda { Mint.activate_plugin! plugin }.should_not change { Mint.activated_plugins }
-      Mint.activated_plugins.should == [plugin]
+      expect { Mint.activate_plugin! plugin }.not_to change { Mint.activated_plugins }
+      expect(Mint.activated_plugins).to eq [plugin]
     end
   end
 
@@ -51,17 +51,17 @@ describe Mint do
     let(:plugin) { Class.new }
 
     it "does nothing if no plugins are registered" do
-      lambda { Mint.clear_plugins! }.should_not raise_error
+      expect { Mint.clear_plugins! }.not_to raise_error
     end
 
     it "removes all registered plugins" do
       Mint.register_plugin! plugin
-      lambda { Mint.clear_plugins! }.should change { Mint.plugins.length }.by(-1)
+      expect { Mint.clear_plugins! }.to change { Mint.plugins.length }.by(-1)
     end
 
     it "removes all activated plugins" do
       Mint.activate_plugin! plugin
-      lambda { Mint.clear_plugins! }.should change { Mint.activated_plugins.length }.by(-1)
+      expect { Mint.clear_plugins! }.to change { Mint.activated_plugins.length }.by(-1)
     end
   end
 
@@ -69,9 +69,9 @@ describe Mint do
     let(:plugin) { Class.new(Mint::Plugin) }
 
     it "gives access to a directory where template files can be stored" do
-      plugin.should_receive(:name).and_return("DocBook")
-      Mint.template_directory(plugin).should == 
-        Mint.root + "/plugins/templates/doc_book"
+      expect(plugin).to receive(:name).and_return("DocBook")
+      expect(Mint.template_directory(plugin)).to eq(
+        Mint::ROOT + "/plugins/templates/doc_book")
     end
   end
 
@@ -79,9 +79,9 @@ describe Mint do
     let(:plugin) { Class.new(Mint::Plugin) }
 
     it "gives access to a directory where template files can be stored" do
-      plugin.should_receive(:name).and_return("DocBook")
-      Mint.config_directory(plugin).should == 
-        Mint.root + "/plugins/config/doc_book"
+      expect(plugin).to receive(:name).and_return("DocBook")
+      expect(Mint.config_directory(plugin)).to eq(
+        Mint::ROOT + "/plugins/config/doc_book")
     end
   end
 
@@ -89,9 +89,9 @@ describe Mint do
     let(:plugin) { Class.new(Mint::Plugin) }
 
     it "gives access to a directory where template files can be stored" do
-      plugin.should_receive(:name).and_return("DocBook")
-      Mint.commandline_options_file(plugin).should == 
-        Mint.root + "/plugins/config/doc_book/syntax.yml"
+      expect(plugin).to receive(:name).and_return("DocBook")
+      expect(Mint.commandline_options_file(plugin)).to eq(
+        Mint::ROOT + "/plugins/config/doc_book/syntax.yml")
     end
   end
 
@@ -103,40 +103,40 @@ describe Mint do
 
       context "when plugins are specified" do
         before do
-          first_plugin.should_receive(callback).ordered.and_return("first")
-          second_plugin.should_receive(callback).ordered.and_return("second")
-          third_plugin.should_receive(callback).never
+          expect(first_plugin).to receive(callback).ordered.and_return("first")
+          expect(second_plugin).to receive(callback).ordered.and_return("second")
+          expect(third_plugin).to receive(callback).never
         end
 
         it "reduces .#{callback} across all specified plugins in order" do
           plugins = [first_plugin, second_plugin]
-          Mint.send(callback, "text", :plugins => plugins).should == "second"
+          expect(Mint.send(callback, "text", :plugins => plugins)).to eq("second")
         end
       end
 
       context "when plugins are activated, but no plugins are specified" do
         before do
-          first_plugin.should_receive(callback).ordered.and_return("first")
-          second_plugin.should_receive(callback).ordered.and_return("second")
-          third_plugin.should_receive(callback).never
+          expect(first_plugin).to receive(callback).ordered.and_return("first")
+          expect(second_plugin).to receive(callback).ordered.and_return("second")
+          expect(third_plugin).to receive(callback).never
         end
         
         it "reduces .#{callback} across all activated plugins in order" do
           Mint.activate_plugin! first_plugin
           Mint.activate_plugin! second_plugin
-          Mint.send(callback, "text").should == "second"
+          expect(Mint.send(callback, "text")).to eq("second")
         end
       end
 
       context "when plugins are not specified" do
         before do
-          first_plugin.should_receive(callback).never
-          second_plugin.should_receive(callback).never
-          third_plugin.should_receive(callback).never
+          expect(first_plugin).to receive(callback).never
+          expect(second_plugin).to receive(callback).never
+          expect(third_plugin).to receive(callback).never
         end
         
         it "returns the parameter text" do
-          Mint.send(callback, "text").should == "text"
+          expect(Mint.send(callback, "text")).to eq("text")
         end
       end
     end
@@ -149,9 +149,9 @@ describe Mint do
 
     context "when plugins are specified" do
       before do
-        first_plugin.should_receive(:after_publish).ordered
-        second_plugin.should_receive(:after_publish).ordered
-        third_plugin.should_receive(:after_publish).never
+        expect(first_plugin).to receive(:after_publish).ordered
+        expect(second_plugin).to receive(:after_publish).ordered
+        expect(third_plugin).to receive(:after_publish).never
       end
 
       it "iterates across all specified plugins in order" do
@@ -162,9 +162,9 @@ describe Mint do
 
     context "when plugins are activated, but no plugins are specified" do
       before do
-        first_plugin.should_receive(:after_publish).ordered
-        second_plugin.should_receive(:after_publish).ordered
-        third_plugin.should_receive(:after_publish).never
+        expect(first_plugin).to receive(:after_publish).ordered
+        expect(second_plugin).to receive(:after_publish).ordered
+        expect(third_plugin).to receive(:after_publish).never
       end
       
       it "iterates across all activated plugins in order" do
@@ -176,9 +176,9 @@ describe Mint do
 
     context "when plugins are not specified" do
       before do
-        first_plugin.should_receive(:after_publish).never
-        second_plugin.should_receive(:after_publish).never
-        third_plugin.should_receive(:after_publish).never
+        expect(first_plugin).to receive(:after_publish).never
+        expect(second_plugin).to receive(:after_publish).never
+        expect(third_plugin).to receive(:after_publish).never
       end
       
       it "does not iterate over any plugins" do
@@ -220,29 +220,29 @@ describe Mint do
       it "when anonymous, returns a random identifier"
 
       it "when named, returns its name, underscored" do
-        plugin.should_receive(:name).and_return("EPub")
-        plugin.underscore.should == "epub"
+        expect(plugin).to receive(:name).and_return("EPub")
+        expect(plugin.underscore).to eq("epub")
       end
     end
 
     describe ".inherited" do
       it "registers the subclass with Mint as a plugin" do
-        lambda do
+        expect do
           Class.new(Mint::Plugin)
-        end.should change { Mint.plugins.length }.by(1)
+        end.to change { Mint.plugins.length }.by(1)
       end
 
       it "preserves the order of subclassing" do
-        Mint.plugins.should == [@first_plugin, @second_plugin]
+        expect(Mint.plugins).to eq([@first_plugin, @second_plugin])
       end
 
       it "does not change the order of a plugin when it is monkey-patched" do
-        lambda do
+        expect do
           @first_plugin.instance_eval do 
             def monkey_patch
             end
           end
-        end.should_not change { Mint.plugins }
+        end.not_to change { Mint.plugins }
       end
     end
 
@@ -269,7 +269,7 @@ describe Mint do
             end
           end
 
-          plugin.before_render("text").should == "base"
+          expect(plugin.before_render("text")).to eq("base")
         end
       end
 
@@ -281,7 +281,7 @@ describe Mint do
             end
           end
 
-          plugin.after_render("<html></html>").should == "<!doctype html>"
+          expect(plugin.after_render("<html></html>")).to eq("<!doctype html>")
         end
       end
 
@@ -289,20 +289,20 @@ describe Mint do
         let(:document) { Mint::Document.new "content.md" } 
 
         it "allows changes to the document extension" do
-          plugin.instance_eval do
-            def after_publish(document)
+          plugin.class_eval do
+            def self.after_publish(document)
               document.name.gsub! /html$/, "htm"
             end
           end
 
-          lambda do
+          expect do
             plugin.after_publish(document)
-          end.should change { document.name.length }.by(-1)
+          end.to change { document.name.length }.by(-1)
         end
 
         it "allows splitting up the document into two, without garbage" do
-          plugin.instance_eval do
-            def after_publish(document)
+          plugin.class_eval do
+            def self.after_publish(document)
               content = document.content
               fake_splitting_point = content.length / 2
 
@@ -323,9 +323,9 @@ describe Mint do
 
           document.publish! :plugins => [plugin]
 
-          File.exist?(document.destination_file).should be_false
-          File.exist?("first-half.html").should be_true
-          File.exist?("second-half.html").should be_true
+          expect(File.exist?(document.destination_file)).to be_falsy
+          expect(File.exist?("first-half.html")).to be_truthy
+          expect(File.exist?("second-half.html")).to be_truthy
         end
 
         it "allows changes to the style file" do
@@ -363,9 +363,9 @@ describe Mint do
                 document.destination = "invalid"
               end
 
-              lambda do
+              expect do
                 document.publish! :plugins => [plugin]
-              end.should raise_error(InvalidPluginAction)
+              end.to raise_error(InvalidPluginAction)
             end
           end
         end
@@ -373,8 +373,8 @@ describe Mint do
         context "when the output is a new directory" do
           it "allows changes to the document directory" do
             document = Mint::Document.new "content.md", :destination => "destination"
-            plugin.instance_eval do
-              def after_publish(document)
+            plugin.class_eval do
+              def self.after_publish(document)
                 original = document.destination_directory
                 new = File.expand_path "book"
                 FileUtils.mv original, new
@@ -383,22 +383,20 @@ describe Mint do
             end
 
             document.publish! :plugins => [plugin]
-            File.exist?("destination").should be_false
-            File.exist?("book").should be_true
-            document.destination_directory.should == File.expand_path("book")
+            expect(File.exist?("destination")).to be_falsy
+            expect(File.exist?("book")).to be_truthy
+            expect(document.destination_directory).to eq(File.expand_path("book"))
           end
 
           it "allows compression of the final output" do
-            require "zip/zip"
-            require "zip/zipfilesystem"
+            require "zip"
+            require "zip/filesystem"
 
             document = Mint::Document.new "content.md", :destination => "destination"
-            plugin.instance_eval do
-              def after_publish(document)
-                Zip::ZipOutputStream.open "book.zip" do |zos|
-                  # zos.put_next_entry("mimetype", nil, nil, Zip::ZipEntry::STORED)
-                  # zos.puts "text/epub"
-                  zos.put_next_entry("chapter-1", nil, nil, Zip::ZipEntry::DEFLATED)
+            plugin.class_eval do
+              def self.after_publish(document)
+                Zip::OutputStream.open("book.zip") do |zos|
+                  zos.put_next_entry("chapter-1.html")
                   zos.puts File.read(document.destination_file)
                 end
 
@@ -408,9 +406,9 @@ describe Mint do
 
             document.publish! :plugins => [plugin]
 
-            File.exist?("destination").should be_true
-            File.exist?("book.zip").should be_false
-            File.exist?("book.epub").should be_true
+            expect(File.exist?("destination")).to be_truthy
+            expect(File.exist?("book.zip")).to be_falsy
+            expect(File.exist?("book.epub")).to be_truthy
 
             directory_size = 
               Dir["#{document.destination_directory}/**/*"].
@@ -418,15 +416,15 @@ describe Mint do
               map {|file| File.stat(file).size }.
               reduce(&:+)
             compressed_size = File.stat("book.epub").size
-            directory_size.should > compressed_size
+            expect(directory_size).to be > compressed_size
           end
         end
 
         context "when the style output is a new directory" do
           it "allows changes to the style directory" do
             document = Mint::Document.new "content.md", :style_destination => "styles"
-            plugin.instance_eval do
-              def after_publish(document)
+            plugin.class_eval do
+              def self.after_publish(document)
                 original = document.style_destination_directory
                 new = File.expand_path "looks"
                 FileUtils.mv original, new
@@ -436,9 +434,9 @@ describe Mint do
 
             document.publish! :plugins => [plugin]
 
-            File.exist?("styles").should be_false
-            File.exist?("looks").should be_true
-            document.style_destination_directory.should == File.expand_path("looks")
+            expect(File.exist?("styles")).to be_falsy
+            expect(File.exist?("looks")).to be_truthy
+            expect(document.style_destination_directory).to eq(File.expand_path("looks"))
           end
 
           after do

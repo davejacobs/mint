@@ -39,7 +39,7 @@ module Mint
 
     describe ".parse" do
       it "transforms a map of human-readable styles into a CSS string" do
-        CSS.parse({ "Font" => "Helvetica" }).should == "#container {\n  font-family: Helvetica; }\n" 
+        expect(CSS.parse({ "Font" => "Helvetica" })).to eq("#container {\n  font-family: Helvetica;\n}") 
       end
     end
   end

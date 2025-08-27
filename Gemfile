@@ -22,6 +22,6 @@ end
 # Testing dependencies
 group :test do
   gem "rspec", "~> 3.13", ">= 3.13.1"
-  gem "cucumber", "~> 10.0"
-  gem "aruba", "~> 2.3", ">= 2.3.1"
+  gem "rspec-its", "~> 1.3"
+  gem "colorize", "~> 1.1"
 end
