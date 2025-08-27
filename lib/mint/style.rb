@@ -7,8 +7,10 @@ module Mint
     #
     # @param [String] source the absolute or relative file path
     # @param [Hash, #[]] opts style options
-    def initialize(source, opts=Mint.default_options)
-      super(source, opts)
+    def initialize(source, opts = {})
+      options = Mint.default_options.merge opts
+
+      super(source, options)
       self.type = :style
 
       # We want to render final stylesheet to the /css subdirectory if
@@ -19,7 +21,7 @@ module Mint
       # However, if a destination directory is already specified, we
       # leave it alone.
       if Mint.template?(self.source_directory) and rendered?
-        tmp_dir = Mint.path_for_scope(:user, true) + "tmp"
+        tmp_dir = Mint.path_for_scope(:user) + "tmp"
         self.destination ||= tmp_dir.to_s
         self.root = "/"
       end

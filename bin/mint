@@ -9,7 +9,8 @@ require "shellwords"
 argv, commandline_options, help = 
   Mint::CommandLine.parse(ARGV).values_at(:argv, :options, :help)
 
-case argv.shift.downcase.to_sym
+original_command = argv.first
+case (argv.shift || "help").downcase.to_sym
 when :publish
   # Aruba chokes here, so we use this hack to convince Mint we're
   # not in a pipeline
@@ -37,15 +38,31 @@ when :preview
 when :help
   Mint::CommandLine.help(help)
 when :install
-  Mint::CommandLine.install(argv.shift, commandline_options)
+  file = argv.shift
+  name = argv.shift
+  scope = commandline_options[:scope] || :local
+  Mint::CommandLine.install(file, name, scope)
 when :uninstall
-  Mint::CommandLine.uninstall(argv.shift, commandline_options)
+  name = argv.shift
+  scope = commandline_options[:scope] || :local
+  Mint::CommandLine.uninstall(name, scope)
 when :templates
-  Mint::CommandLine.templates(argv.shift, commandline_options)
-when :edit
-  Mint::CommandLine.edit(argv.shift, commandline_options)
+  filter = argv.shift
+  scope = commandline_options[:scope] || :local
+  Mint::CommandLine.templates(filter, scope)
+when :"edit-layout"
+  name = argv.shift
+  scope = commandline_options[:scope] || :local
+  Mint::CommandLine.edit(name, :layout, scope)
+when :"edit-style" 
+  name = argv.shift
+  scope = commandline_options[:scope] || :local
+  Mint::CommandLine.edit(name, :style, scope)
 when :set
-  Mint::CommandLine.set(argv.shift, argv.shift, commandline_options)
+  key = argv.shift
+  value = argv.shift
+  scope = commandline_options[:scope] || :local
+  Mint::CommandLine.set(key, value, scope)
 when :config
   Mint::CommandLine.config
 else
@@ -56,8 +73,15 @@ else
   # document list.
   
   begin
-    system 'mint-#{argv.first} #{argv[1..-1].join " "}'
+    if File.executable? "mint-#{original_command}"
+      system "mint-#{original_command} #{argv[1..-1].join ' '}"
+    else
+      $stderr.puts "Error: Unknown command '#{original_command}'"
+      Mint::CommandLine.help(help)
+      exit 1
+    end
   rescue
     Mint::CommandLine.help(help)
+    exit 1
   end
 end

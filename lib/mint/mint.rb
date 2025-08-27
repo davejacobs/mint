@@ -10,99 +10,63 @@ require "mint/css_template"
 require "mint/markdown_template"
 
 module Mint
-  ROOT = (Pathname.new(__FILE__).realpath.dirname + "../..").to_s
-
-  # Markdown file extensions supported by Mint
+  ROOT                = (Pathname.new(__FILE__).realpath.dirname + "../..").to_s
   MARKDOWN_EXTENSIONS = %w[md markdown mkd].freeze
+  LOCAL_SCOPE         = Pathname.new(".mint")
+  USER_SCOPE          = Pathname.new("~/.config/mint").expand_path
+  GLOBAL_SCOPE        = Pathname.new("#{ROOT}/config").expand_path
+  SCOPES              = { local: LOCAL_SCOPE, user: USER_SCOPE, global: GLOBAL_SCOPE }
+  SCOPE_NAMES         = SCOPES.keys
+  CONFIG_FILE         = "config.yaml"
+  TEMPLATES_DIRECTORY = "templates"
 
-  SCOPES = {
-    local:  Pathname.new(".mint"),
-    user:   Pathname.new("~/.config/mint").expand_path,
-    global: Pathname.new("#{ROOT}/config").expand_path
-  }
-
-  SCOPE_NAMES = SCOPES.keys
-
-  @rendering_mode = :publish
-
-  # Assume that someone using an Html template has formatted it
-  # in Erb and that a Css stylesheet will pass untouched through
-  # a Scss parser.
-  @mapping = Tilt::Mapping.new
-  @mapping.register Mint::CSSTemplate,          'css'
-  @mapping.register Mint::MarkdownTemplate,     *MARKDOWN_EXTENSIONS
-  @mapping.register Mint::MarkdownTemplate,     'txt'
-  @mapping.register Tilt::ScssTemplate,         'scss'
-  @mapping.register Tilt::SassTemplate,         'sass'
-  @mapping.register Tilt::ERBTemplate,          'erb'
-  @mapping.register Tilt::HamlTemplate,         'haml'
-
-  def self.mapping
-    @mapping
-  end
-
-  # @return [String] the Mint root path name
-  def self.root
-    ROOT
+  def self.default_options
+    {
+      root: Dir.getwd,
+      destination: nil,
+      style_destination: nil,
+      output_file: '#{basename}.#{new_extension}',
+      layout_or_style_or_template: [:template, 'default'],
+      scope: :local,
+      recursive: false,
+      verbose: false
+    }
   end
   
-  # Returns an array with the Mint template path for the named scope
-  # or scopes. This path is used to lookup templates and configuration options.
-  #
-  # @param [Hash] opts a list of options, including :scopes
-  # @return [Array] the Mint path as an Array of Pathnames
-  def self.path(opts={})
-    opts = { scopes: SCOPE_NAMES }.merge(opts)
-    SCOPES.slice(*opts[:scopes]).values
-  end
-
-  # Returns the part of Mint.path relevant to scope.
-  # I want to refactor this so that Mint.path is always a Hash...
-  # should take care of this in the Mint.path=() method.
-  # Right now, this is a hack. It assumes a sane MINT_PATH, where the
-  # first entry is most local, the second is user-level,
-  # and the last entry is most global.
-  #
-  # @param [Symbol] scope the scope we want to find the path for
-  # @param [Boolean] as_path if as_path is true, will return Pathname object
-  # @return [String] the Mint path for +scope+ as a String or Pathname
-  def self.path_for_scope(scope=:local, as_path=false)
-    case Mint.path
-    when Array
-      index = { local: 0, user: 1, global: 2 }[scope]
-      Mint.path[index]
-    when Hash
-      Mint.path[scope]
+  # Rendering mode for publish command specifically; can be :publish or :preview
+  @rendering_mode     = :publish  
+  
+  def self.mapping
+    if @mapping
+      @mapping
     else
-      nil
+      @mapping = Tilt::Mapping.new.tap do |m|
+        m.register Mint::CssTemplate,       'css'                # Inline Css @imports, creating a single file
+        m.register Mint::MarkdownTemplate, 'txt'                # Process Txt as Markdown
+        m.register Mint::MarkdownTemplate, *MARKDOWN_EXTENSIONS
+        m.register Tilt::ScssTemplate,      'scss'
+        m.register Tilt::SassTemplate,      'sass'
+        m.register Tilt::ERBTemplate,       'erb', 'html'        # Allow for Erb inside HTML
+        m.register Tilt::HamlTemplate,      'haml'
+      end
     end
   end
 
-  # @return [Hash] key Mint directories
-  def self.directories
-    {
-      templates: "templates"
-    }
+  # Returns an array with the Mint template path for the named scope
+  # or scopes. This path is used to lookup templates and configuration options.
+  #
+  # @param [Array] scopes a list of scopes to include
+  # @return [Array] the Mint path as an Array of Pathnames
+  def self.path(scopes = SCOPE_NAMES)
+    SCOPES.slice(*scopes).values
   end
 
-  # @return [Hash] key Mint files
-  def self.files
-    {
-      syntax: "syntax.yaml",
-      defaults: "defaults.yaml"
-    }
-  end
-
-  # @return [Hash] last-resort options for creating Mint documents.
-  def self.default_options
-    {
-      # Do not set default `template`--will override style and
-      # layout when already specified -- causes tricky bugs
-      layout: "default",     # default layout
-      style: "default",      # default style
-      destination: nil,      # do not create a subdirectory
-      style_destination: nil # do not copy style to root
-    }
+  # Returns the base directory for Mint configuration at the specified scope.
+  #
+  # @param [Symbol] scope the scope we want to find the path for
+  # @return [Pathname] the Mint path for +scope+ as a Pathname
+  def self.path_for_scope(scope = :local)
+    SCOPES[scope]
   end
 
   # @return [Array] all file extensions that Tilt will render
@@ -137,10 +101,16 @@ module Mint
     # Merge config options from all config files on the Mint path,
     # where more local options take precedence over more global
     # options
-    configuration = Mint.path(:scopes => opts[:scopes]).
-      map {|p| p + Mint.files[:defaults] }.
+    configuration = Mint.path(opts[:scopes]).
+      map {|p| p + Mint::CONFIG_FILE }.
       select(&:exist?).
-      map {|p| YAML.load_file p }.
+      map do |p| 
+        begin
+          YAML.load_file p
+        rescue Psych::SyntaxError, StandardError => e
+          {}
+        end
+      end.
       reverse.
       reduce(Mint.default_options) {|r,p| r.merge p }
 
@@ -154,30 +124,46 @@ module Mint
   # @return [Hash] a structured set of configuration options with opts
   #   overriding any options from config files
   def self.configuration_with(opts)
-    configuration.merge opts
+    scopes = if opts[:local] || opts[:user] || opts[:global]
+      if opts[:local]
+        [:local]
+      elsif opts[:user]  
+        [:user]
+      elsif opts[:global]
+        [:global]
+      end
+    else
+      SCOPE_NAMES
+    end
+    
+    new_opts = {}
+    
+    if opts[:layout_or_style_or_template]
+      option_type, option_value = opts[:layout_or_style_or_template]
+      case option_type
+      when :template
+        new_opts[:template] = option_value
+      when :layout
+        new_opts[:layout] = option_value
+      when :style
+        new_opts[:style] = option_value
+      end
+    end
+    
+    configuration(scopes: scopes).merge new_opts
   end
 
   # @return [Array] the full path for each known template in the Mint path
-  def self.templates(opts={})
-    opts = { scopes: SCOPE_NAMES }.merge(opts)
-    Mint.path(:scopes => opts[:scopes]).
-      map {|p| p + directories[:templates] }.
+  def self.templates(scope = :local)
+    Mint.path([scope]).
+      map {|p| p + TEMPLATES_DIRECTORY }.
       select(&:exist?).
       map {|p| p.children.select(&:directory?).map(&:to_s) }.
       flatten.
       sort
   end
 
-  # Decides whether the template specified by `name_or_file` is a real
-  # file or the name of a template. If it is a real file, Mint will
-  # return a that file. Otherwise, Mint will look for a file with that
-  # name in the Mint path. The `type` argument indicates whether the
-  # template we are looking for is a layout or a style and will affect
-  # which type of template is returned for a given template name. For
-  # example, `lookup_template :normal` might return a layout template
-  # referring to the file ~/.config/mint/templates/normal/layout.erb.
-  # Adding :style as a second argument returns
-  # ~/.config/mint/templates/normal/style.css.
+  # Returns the template directory for the given template name
   #
   # @param [String, File, #to_s] name_or_file a name or template file
   #   to look up
@@ -185,7 +171,29 @@ module Mint
   # @return [File] the named, typed template file
   def self.lookup_template(name_or_file, type=:layout)
     name = name_or_file.to_s
-    File.exist?(name) ? name : find_template(name, type)
+    
+    # Only treat as a direct file if it's an actual file (not directory) 
+    if File.file?(name) && formats.include?(File.extname(name)[1..-1])
+      name
+    else
+      find_template(name, type)
+    end
+  end
+
+  # Returns the layout file for the given template name
+  #
+  # @param [String] name the template name to look up
+  # @return [String] path to the layout file
+  def self.lookup_layout(name)
+    find_template(name, :layout)
+  end
+
+  # Returns the style file for the given template name
+  #
+  # @param [String] name the template name to look up
+  # @return [String] path to the style file  
+  def self.lookup_style(name)
+    find_template(name, :style)
   end
 
   # Finds a template named `name` in the Mint path. If `type` is :layout,
@@ -202,35 +210,74 @@ module Mint
   #
   # @return [File] the named, typed template file
   def self.find_template(name, type)
-    templates_dir = Mint.directories[:templates]
-
-    file_name  = lambda {|x| x + templates_dir + name + type.to_s }
+    file_name  = lambda {|x| x + Mint::TEMPLATES_DIRECTORY + name + type.to_s }
     find_files = lambda {|x| Pathname.glob "#{x.to_s}.*" }
+    acceptable = lambda {|x| 
+      ext = File.extname(x.to_s)[1..-1]
+      return false unless ext
+      case type
+      when :layout
+        formats.include?(ext)
+      when :style  
+        css_formats.include?(ext)
+      else
+        false
+      end
+    }
 
-    Mint.path.
+    template_file = Mint.path.
       map(&file_name).
       map(&find_files).
       flatten.
+      select(&acceptable).
       select(&:exist?).
-      first.
-      tap {|template| raise TemplateNotFoundException unless template }.
-      to_s
+      first
+      
+    unless template_file
+      template_dirs = Mint.path.map {|p| p + Mint::TEMPLATES_DIRECTORY + name }.select(&:exist?)
+      if template_dirs.any?
+        expected_exts = case type
+                        when :layout then formats.join(', ')
+                        when :style then css_formats.join(', ')
+                        end
+        raise TemplateNotFoundException, "Template '#{name}' exists but has no valid #{type} file. Expected #{type}.{#{expected_exts}}"
+      else
+        raise TemplateNotFoundException, "Template '#{name}' does not exist."
+      end
+    end
+    
+    template_file.to_s
   end
 
-  def self.template_path(name, type, opts={})
-    defaults = {
-      scope: :local,
-      ext: { layout: "haml", style: "sass" }[type]
-    }
-    opts = defaults.merge(opts)
-    path = Mint.path_for_scope(opts[:scope])
-
-    case type
-    when :layout, :style
-      "#{path}/templates/#{name}/#{type}.#{opts[:ext]}"
-    when :all
-      "#{path}/templates/#{name}"
+  # Finds a template directory by name
+  #
+  # @param [String] name the template name to find
+  # @return [String] path to the template directory
+  def self.find_template_directory(name)
+    template_dir = Mint.path.
+      map {|p| p + Mint::TEMPLATES_DIRECTORY + name }.
+      select(&:exist?).
+      first
+      
+    unless template_dir
+      raise TemplateNotFoundException, "Template '#{name}' does not exist."
     end
+    
+    template_dir.to_s
+  end
+
+  # Finds a specific template file by name and type
+  #
+  # @param [String] name the template name to find
+  # @param [Symbol] type :layout or :style
+  # @return [String] path to the template file
+  def self.find_template_file(name, type)
+    find_template(name, type)
+  end
+
+  # Returns the template directory for the given scope, if found
+  def self.template_path(name, scope)
+    Mint.path_for_scope(scope) + "templates/#{name}"
   end
 
   # Checks (non-rigorously) to see if the file is somewhere on the

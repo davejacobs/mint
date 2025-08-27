@@ -131,7 +131,16 @@ module Mint
     # @param [Pathname, #exist] file a file to read from and write to
     # @return [void]
     def self.update_yaml!(file, opts={})
-      curr_opts = File.exist?(file) ? YAML.load_file(file) : {}
+      curr_opts = if File.exist?(file)
+                    begin
+                      YAML.load_file(file) || {}
+                    rescue Psych::SyntaxError, StandardError
+                      # Handle corrupted YAML gracefully by treating it as empty
+                      {}
+                    end
+                  else
+                    {}
+                  end
 
       File.open file, "w" do |f|
         YAML.dump(curr_opts.merge(opts), f)

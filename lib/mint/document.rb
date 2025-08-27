@@ -9,12 +9,11 @@ module Mint
     # Creates a new Mint Document object. Can be block initialized.
     # Accepts source and options. Block initialization occurs after
     # all defaults are set, so not all options must be specified.
-    def initialize(source, opts={})
+    def initialize(source, opts = {})
       options = Mint.default_options.merge opts
 
-      # Always preserve folder structure if all_files is provided (indicating multi-file processing)
+      preserve_folder_structure!(source, options)
       if options[:all_files] && options[:all_files].any?
-        preserve_folder_structure!(source, options)
         @all_files = options[:all_files]
       end
 
@@ -25,12 +24,25 @@ module Mint
 
       # Each of these should invoke explicitly defined method
       self.content  = source
-      self.layout   = options[:layout]
-      self.style    = options[:style]
       self.style_destination = options[:style_destination]
 
+      if options[:layout_or_style_or_template]
+        type, name = options[:layout_or_style_or_template]
+        case type
+        when :template
+          self.template = name
+        when :layout
+          self.layout = name
+        when :style
+          self.style = name
+        end
+      end
+
+      self.layout = options[:layout] if options[:layout]
+      self.style = options[:style] if options[:style]
+
       # The template option will override layout and style choices
-      self.template = options[:template]
+      self.template = options[:template] if options[:template]
 
       # Yield self to block after all other parameters are loaded,
       # so we only have to tweak. (We don't have to give up our
@@ -107,11 +119,9 @@ module Mint
         if layout.respond_to? :render
           layout
         else
-          layout_file = Mint.lookup_template layout, :layout
+          layout_file = Mint.lookup_layout layout
           Layout.new layout_file
         end
-    rescue TemplateNotFoundException
-      abort "Template '#{layout}' does not exist."
     end
 
     # Sets layout to an existing Style object or looks it up by name
@@ -124,11 +134,9 @@ module Mint
         if style.respond_to? :render
           style
         else
-          style_file = Mint.lookup_template style, :style
+          style_file = Mint.lookup_style style
           Style.new style_file
         end
-    rescue TemplateNotFoundException
-      abort "Template '#{style}' does not exist."
     end
 
     # Overrides layout and style settings with named template.
@@ -208,7 +216,7 @@ module Mint
     # Returns a relative path from the document to its stylesheet. Can
     # be called directly from inside a layout template.
     def stylesheet
-      tmp_style_dir = Mint.path_for_scope(:user, true) + "tmp"
+      tmp_style_dir = Mint.path_for_scope(:user) + "tmp"
       tmp_style_file = tmp_style_dir + File.basename(style.name)
       Helpers.normalize_path(tmp_style_file.to_s,
                              self.destination_directory).to_s
@@ -278,7 +286,7 @@ module Mint
           title: title,
           depth: relative_to_source.to_s.count('/')
         }
-      end.sort_by { |f| f[:source_path] }
+      end.sort_by {|f| f[:source_path] }
     end
 
     # Functions

@@ -6,55 +6,67 @@ require "active_support/core_ext/object/blank"
 
 module Mint
   module CommandLine
-    # Commandline-related helper methods
-
-    # Returns a map of all options that mint allows by default. Mint will
-    # consume these arguments, with optional parameters, from
-    # the commandline. (All other arguments are taken to be
-    # filenames.)
-    #
-    # @return [Hash] a structured set of options that the commandline
-    #   executable accepts
-    def self.options
-      options_file = "../../../config/#{Mint.files[:syntax]}"
-      YAML.load_file File.expand_path(options_file, __FILE__)
-    end
-
-    # Parses ARGV according to the specified or default commandline syntax
+    # Parses ARGV using OptionParser
     #
     # @param [Array] argv a list of arguments to parse
-    # @param [Hash] opts default parsing options (to specify syntax file)
     # @return [Hash] an object that contains parsed options, remaining arguments,
     #   and a help message
-    def self.parse(argv, opts={})
-      opts = { syntax: options }.merge(opts)
+    def self.parse(argv)
       parsed_options = {}
 
       parser = OptionParser.new do |cli|
         cli.banner = "Usage: mint [command] files [options]"
 
-        Helpers.symbolize_keys(opts[:syntax]).each do |k,v|
-          has_param = v[:parameter]
+        cli.on "-t", "--template TEMPLATE", "Specify the template (layout + style)" do |t|
+          parsed_options[:layout_or_style_or_template] = [:template, t]
+        end
 
-          v[:short] = "-#{v[:short]}"
-          v[:long] = "--#{v[:long]}"
+        cli.on "-l", "--layout LAYOUT", "Specify only the layout" do |l|
+          parsed_options[:layout_or_style_or_template] = [:layout, l]
+        end
 
-          if has_param
-            v[:long] << " PARAM"
-            cli.on v[:short], v[:long], v[:description] do |p|
-              parsed_options[k.to_sym] = p
-            end
-          else
-            cli.on v[:short], v[:long], v[:description] do
-              parsed_options[k.to_sym] = true
-            end
-          end
+        cli.on "-s", "--style STYLE", "Specify only the style" do |s|
+          parsed_options[:layout_or_style_or_template] = [:style, s]
+        end
+
+        cli.on "-w", "--root ROOT", "Specify a root outside the current directory" do |r|
+          parsed_options[:root] = r
+        end
+
+        cli.on "-o", "--output-file FORMAT", "Specify the output file format with substitutions: \#{basename}, \#{original_extension}, \#{new_extension}" do |o|
+          parsed_options[:output_file] = o
+        end
+
+        cli.on "-d", "--destination DESTINATION", "Specify a destination directory, relative to the root" do |d|
+          parsed_options[:destination] = d
+        end
+
+        cli.on "-a", "--style-destination DESTINATION", "Specify a destination directory for stylesheets, or nil to link in place" do |a|
+          parsed_options[:style_destination] = a
+        end
+
+        cli.on "-g", "--global", "Specify config changes on a global level" do
+          parsed_options[:scope] = :global
+        end
+
+        cli.on "-u", "--user", "Specify config changes on a user-wide level" do
+          parsed_options[:scope] = :user
+        end
+
+        cli.on "-l", "--local", "Specify config changes on a project-specific level" do
+          parsed_options[:scope] = :local
+        end
+
+        cli.on "-r", "--recursive", "Recursively find all Markdown files in subdirectories" do
+          parsed_options[:recursive] = true
         end
       end
 
       transient_argv = argv.dup
       parser.parse! transient_argv
-      { argv: transient_argv, options: parsed_options, help: parser.help }
+      
+      default_options = Mint.default_options.merge(destination: Dir.getwd)
+      { argv: transient_argv, options: default_options.merge(parsed_options), help: parser.help }
     end
 
     # Mint built-in commands
@@ -70,85 +82,173 @@ module Mint
     # Install the named file as a template
     #
     # @param [File] file the file to install to the appropriate Mint directory
-    # @param [Hash] commandline_options a structured set of options, including
-    #   a scope label that the method will use to choose the appropriate
-    #   installation directory
+    # @param [String] name the template name to install as
+    # @param [Symbol] scope the scope at which to install
     # @return [void]
-    def self.install(file, commandline_options={})
-      opts = { scope: :local }.merge(commandline_options)
-      scope = [:global, :user].
-        select {|e| commandline_options[e] }.
-        first || :local
-
+    def self.install(file, name, scope = :local)
       filename, ext = file.split "."
 
-      name = commandline_options[:template] || filename
+      template_name = name || filename
       type = Mint.css_formats.include?(ext) ? :style : :layout
-      destination = Mint.template_path(name, type, :scope => opts[:scope], :ext => ext)
-      FileUtils.mkdir_p File.expand_path("#{destination}/..")
+      destination = Mint.template_path(template_name, scope) + "#{type}.#{ext}"
+      FileUtils.mkdir_p File.dirname(destination)
 
       if File.exist? file
         FileUtils.cp file, destination
       else
-        raise "[error] no such file"
+        raise "[error] No such file: #{file}"
       end
     end
 
     # Uninstall the named template
     #
     # @param [String] name the name of the template to be uninstalled
-    # @param [Hash] commandline_options a structured set of options, including
-    #   a scope label that the method will use to choose the appropriate
-    #   installation directory
+    # @param [Symbol] scope the scope from which to uninstall
     # @return [void]
-    def self.uninstall(name, commandline_options={})
-      opts = { scope: :local }.merge(commandline_options)
-      FileUtils.rm_r Mint.template_path(name, :all, :scope => opts[:scope])
+    def self.uninstall(name, scope = :local)
+      FileUtils.rm_r Mint.template_path(name, scope)
     end
 
     # List the installed templates
     #
+    # @param [String] filter optional filter pattern
+    # @param [Symbol] scope the scope to list templates from
     # @return [void]
-    def self.templates(filter=nil, commandline_options={})
-      scopes = Mint::SCOPE_NAMES.select do |s|
-        commandline_options[s]
-      end.presence || Mint::SCOPE_NAMES
-
-      Mint.templates(:scopes => scopes).
-        grep(Regexp.new(filter || "")).
+    def self.templates(filter = "", scope = :local)
+      filter = filter.to_s  # Convert nil to empty string
+      Mint.templates(scope).
+        grep(Regexp.new(filter)).
         sort.
         each do |template|
-          print File.basename template
-          print " [#{template}]" if commandline_options[:verbose]
-          puts
+          puts "#{File.basename template} [#{template}]"
         end
+    end
+
+    # Processes the output file format string with substitutions
+    #
+    # @param [String] format_string the format string with #{} substitutions
+    # @param [String] input_file the original input file path
+    # @return [String] the processed output file name
+    def self.process_output_format(format_string, input_file)
+      basename = File.basename(input_file, ".*")
+      original_extension = File.extname(input_file)[1..-1] || ""
+      
+      # TODO: Remove hardcoded new_extension
+      new_extension = "html"
+      
+      format_string.
+        gsub('#{basename}', basename).
+        gsub('#{original_extension}', original_extension).
+        gsub('#{new_extension}', new_extension)
+    end
+
+    # Creates a new template directory and file at the specified scope
+    #
+    # @param [String] name the name of the template to create
+    # @param [Symbol] type the type of template (:layout or :style)
+    # @param [Symbol] scope the scope at which to create the template
+    # @return [String] the path to the created template file
+    def self.create_template(name, type, scope)
+      content, ext =
+        case type
+        when :layout
+          [default_layout_content, "erb"]
+        when :style
+          [default_style_content, "css"]
+        else
+          abort "Invalid template type: #{type}"
+        end
+      
+      template_dir = Mint.template_path(name, scope)
+      file_path = "#{template_dir}/#{type}.#{ext}"
+      FileUtils.mkdir_p template_dir
+      File.write(file_path, content)
+      file_path
+    end
+
+    # @return [String] default content for layout templates
+    def self.default_layout_content
+      <<~LAYOUT_TEMPLATE
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="utf-8">
+            <title>Document</title>
+            <% if style %>
+              <link rel="stylesheet" href="<%= style %>">
+            <% end %>
+          </head>
+          <body>
+            <%= content %>
+          </body>
+        </html>
+      LAYOUT_TEMPLATE
+    end
+
+    # @return [String] default content for style templates
+    def self.default_style_content
+      <<~STYLE_TEMPLATE
+        body {
+          font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
+          line-height: 1.25;
+          max-width: 960px;
+          margin: 0 auto;
+          padding: 2rem;
+          color: #333;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+          color: #2c3e50;
+        }
+
+        a {
+          color: #3498db;
+          text-decoration: none;
+        }
+
+        a:hover {
+          text-decoration: underline;
+        }
+
+        code {
+          background-color: #f8f9fa;
+          padding: 0.2em 0.4em;
+          border-radius: 3px;
+          font-family: 'Monaco', 'Ubuntu Mono', monospace;
+        }
+      STYLE_TEMPLATE
     end
 
     # Retrieve named template file (probably a built-in or installed
     # template) and shell out that file to the user's favorite editor.
     #
-    # @param [String] name the name of a layout or style to edit
-    # @param [Hash] commandline_options a structured set of options, including
-    #   a layout or style flag that the method will use to choose the appropriate
-    #   file to edit
+    # @param [String] name the name of a template to edit
+    # @param [Symbol] type either :layout or :style
+    # @param [Symbol] scope the scope at which to look for/create the template
     # @return [void]
-    def self.edit(name, commandline_options={})
-      layout = commandline_options[:layout]
-      style = commandline_options[:style]
+    def self.edit(name, type, scope)
+      abort "[error] No template specified" if name.nil? || name.empty?
 
-      # Allow for convenient editing (edit "default" works just as well
-      # as edit :style => "default")
-      if style
-        name, layout_or_style = style, :style
-      elsif layout
-        name, layout_or_style = layout, :layout
-      else
-        layout_or_style = :style
+      begin
+        file = case type
+               when :layout
+                 Mint.lookup_layout(name)
+               when :style
+                 Mint.lookup_style(name)
+               else
+                 abort "[error] Invalid template type: #{type}. Use :layout or :style"
+               end
+      rescue Mint::TemplateNotFoundException        
+        print "Template '#{name}' does not exist. Create it? [y/N]: "
+        response = STDIN.gets.chomp.downcase
+        
+        if response == 'y' || response == 'yes'
+          file = create_template(name, type, scope)
+          puts "Created template: #{file}"
+        else
+          abort "Template creation cancelled."
+        end
       end
-
-      abort "[error] no template specified" if name.nil? || name.empty?
-
-      file = Mint.lookup_template name, layout_or_style
 
       editor = ENV["EDITOR"] || "vi"
       system "#{editor} #{file}"
@@ -162,9 +262,9 @@ module Mint
     # @param [Symbol] scope the scope at which to apply the set of options
     # @return [void]
     def self.configure(opts, scope=:local)
-      config_directory = Mint.path_for_scope(scope, true)
+      config_directory = Mint.path_for_scope(scope)
       FileUtils.mkdir_p config_directory
-      Helpers.update_yaml! "#{config_directory}/#{Mint.files[:defaults]}", opts
+      Helpers.update_yaml! "#{config_directory}/#{Mint::CONFIG_FILE}", opts
     end
 
     # Tries to set a config option (at the specified scope) per
@@ -172,16 +272,9 @@ module Mint
     #
     # @param key the key to set
     # @param value the value to set key to
-    # @param [Hash, #[]] commandline_options a structured set of options, including
-    #   a scope label that the method will use to choose the appropriate
-    #   scope
+    # @param scope the scope at which to set the configuration
     # @return [void]
-    def self.set(key, value, commandline_options={})
-      commandline_options[:local] = true
-      scope = [:global, :user, :local].
-        select {|e| commandline_options[e] }.
-        first
-
+    def self.set(key, value, scope = :local)
       configure({ key => value }, scope)
     end
 
@@ -223,39 +316,18 @@ module Mint
     #   that will guide Mint.publish!
     # @return [void]
     def self.publish!(files, commandline_options={})
+      # TODO: Establish commandline defaults in one place
+      # TODO: Use `commandline_options` everywhere instead of `options` and `doc_options`
       options = { root: Dir.getwd }.merge(Mint.configuration_with commandline_options)
 
       if commandline_options[:recursive]
         files = discover_files_recursively(files.empty? ? ["."] : files)
       end
 
-      if options[:name]
-        unless options[:name] =~ /\.html$/
-          options[:name] = "#{options[:name]}.html"
-        end
-      end
-
-      if options[:merge]
-        file_text = files.reduce("") do |text, file|
-          text + Mint.renderer(file).render
-        end
-
-        # Caveat -- merged files will all be treated as having the type of
-        # the first file passed in.
-        extension = File.extname files[0]
-
-        tmp_path = Helpers.create_temp_file!("mint-merge", extension) do |file|
-          file << file_text
-        end
-
-        Document.new(tmp_path, options).publish!(:render_style => true)
-        FileUtils.rm tmp_path
-      else
-        files.each_with_index do |file, idx|
-          # Pass all files list when processing multiple files (for navigation in templates like garden)
-          doc_options = options.merge(all_files: files.size > 1 ? files : [])
-          Document.new(file, doc_options).publish!(:render_style => (idx == 0))
-        end
+      files.each_with_index do |file, idx|
+        # Pass all files list when processing multiple files (for navigation in templates like garden)
+        doc_options = options.merge(all_files: files.size > 1 ? files : [])
+        Document.new(file, doc_options).publish!(:render_style => (idx == 0))
       end
     end
   end

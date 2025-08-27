@@ -28,11 +28,11 @@ module Mint
   end
 
   def self.template_directory(plugin)
-    Mint.root + "/plugins/templates/" + plugin.underscore
+    Mint::ROOT + "/plugins/templates/" + plugin.underscore
   end
 
   def self.config_directory(plugin)
-    Mint.root + "/plugins/config/" + plugin.underscore
+    Mint::ROOT + "/plugins/config/" + plugin.underscore
   end
 
   def self.commandline_options_file(plugin)
