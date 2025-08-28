@@ -39,6 +39,31 @@ describe Mint::CssParser do
       imports = Mint::CssParser.extract_imports(css)
       expect(imports).to eq([])
     end
+
+    it "ignores commented out @import statements" do
+      css = <<~CSS
+        /* @import "commented.css"; */
+        @import "active.css";
+        body { 
+          /* @import url("also-commented.css"); */
+          margin: 0; 
+        }
+      CSS
+      imports = Mint::CssParser.extract_imports(css)
+      expect(imports).to eq(["active.css"])
+    end
+
+    it "ignores multi-line commented imports" do
+      css = <<~CSS
+        /*
+         * @import "multi-line-comment.css";
+         * @import 'another-commented.css';
+         */
+        @import "valid.css";
+      CSS
+      imports = Mint::CssParser.extract_imports(css)
+      expect(imports).to eq(["valid.css"])
+    end
   end
 
   describe ".resolve_css_files" do

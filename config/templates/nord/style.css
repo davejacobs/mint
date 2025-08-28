@@ -36,7 +36,7 @@
   --nord-secondary: var(--nord8);
 }
 
-@import "../base/style.css";
+/*@import "../base/style.css";*/
 
 body {
   font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;

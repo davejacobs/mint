@@ -11,12 +11,16 @@ module Mint
     def self.extract_imports(css_content)
       imports = []
       
+      # Remove CSS comments first to avoid matching commented @import statements
+      # Remove /* ... */ style comments
+      css_without_comments = css_content.gsub(/\/\*.*?\*\//m, '')
+      
       # Match @import statements with various formats:
       # @import "file.css";
       # @import 'file.css';
       # @import url("file.css");
       # @import url('file.css');
-      css_content.scan(/@import\s+(?:url\()?['"]([^'"]+)['"](?:\))?;?/i) do |match|
+      css_without_comments.scan(/@import\s+(?:url\()?['"]([^'"]+)['"](?:\))?;?/i) do |match|
         imports << match[0]
       end
       

@@ -80,7 +80,8 @@ describe "Original style mode integration" do
         content = File.read(output_file)
         # Should have links to the actual template CSS files
         expect(content).to match(/<link rel="stylesheet" href="[^"]*\/config\/templates\/nord\/style\.css">/)
-        expect(content).to match(/<link rel="stylesheet" href="[^"]*\/config\/templates\/base\/style\.css">/)
+        # Nord template has base import commented out, so should not include base/style.css
+        expect(content).not_to match(/<link rel="stylesheet" href="[^"]*\/config\/templates\/base\/style\.css">/)
         expect(content).not_to include('<style>')
       end
     end
