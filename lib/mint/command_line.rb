@@ -41,8 +41,8 @@ module Mint
           parsed_options[:destination] = d
         end
 
-        cli.on "--inline-style", "Inline CSS into the HTML document (default)" do
-          parsed_options[:style_mode] = :inline
+        cli.on "--style-mode MODE", ["inline", "external"], "Specify how styles are included (inline, external)" do |mode|
+          parsed_options[:style_mode] = mode.to_sym
         end
 
         cli.on "--style-destination DESTINATION", "Create stylesheet at specified directory or file path and link it" do |destination|
@@ -71,7 +71,7 @@ module Mint
       parser.parse! transient_argv
       
       if parsed_options[:style_mode] == :inline && parsed_options[:style_destination]
-        raise ArgumentError, "--inline-style and --style-destination cannot be used together"
+        raise ArgumentError, "--style-mode inline and --style-destination cannot be used together"
       end
       
       default_options = Mint.default_options.merge(destination: Dir.getwd)

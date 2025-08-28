@@ -207,5 +207,25 @@ RSpec.describe "CLI Argument Parsing" do
         end
       end
     end
+
+    context "with style mode options" do
+      it "parses --style-mode inline" do
+        result = Mint::CommandLine.parse(["--style-mode", "inline", "file.md"])
+        
+        expect(result[:options][:style_mode]).to eq(:inline)
+      end
+
+      it "parses --style-mode external" do
+        result = Mint::CommandLine.parse(["--style-mode", "external", "file.md"])
+        
+        expect(result[:options][:style_mode]).to eq(:external)
+      end
+
+      it "defaults to inline style mode" do
+        result = Mint::CommandLine.parse(["file.md"])
+        
+        expect(result[:options][:style_mode]).to eq(:inline)
+      end
+    end
   end
 end

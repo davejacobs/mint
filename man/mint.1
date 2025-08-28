@@ -18,11 +18,11 @@ Transform one or more source files into HTML documents
 .BR \-d ", " \-\-destination " " \fIDIRECTORY\fR
 Specify a destination directory, relative to the root
 .TP
-.BR \-\-inline\-style
-Inline CSS into the HTML document (default behavior)
+.BR \-\-style\-mode " " \fIMODE\fR
+Specify how styles are included (inline, external). Default is inline.
 .TP
 .BR \-\-style\-destination " " \fIDESTINATION\fR
-Create stylesheet at specified directory or file path and link it. This option is mutually exclusive with --inline-style.
+Create stylesheet at specified directory or file path and link it. This sets style mode to external.
 .TP
 .BR \-\-template " " \fITEMPLATE\fR
 Specify a template to use for both layout and styling
