@@ -1,7 +1,17 @@
 @import '../reset.css';
+@import url('https://fonts.googleapis.com/css2?family=Alegreya+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap');
+
+:root {
+  --body-font-family: 'Georgia';
+  --header-font-family: 'Georgia';
+  --screen-font-size: 16px;
+  --screen-line-height: 1.45;
+}
 
 body {
-  font-family: var(--body-font-family), Georgia, serif;
+  font-family: var(--body-font-family), sans-serif;
+  font-size: var(--screen-font-size);
+  line-height: var(--screen-line-height);
 }
 
 h1, h2 {
@@ -9,7 +19,7 @@ h1, h2 {
 }
 
 h2, h3, h4, h5, h6 {
-  line-height: var(--screen-line-height);
+  line-height: 1.25;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -19,32 +29,36 @@ h1, h2, h3, h4, h5, h6 {
 
 h1 {
   font-size: calc(var(--screen-font-size) * 1.5);
-  margin-top: var(--screen-unit);
-  margin-bottom: var(--screen-unit);
+  margin-top: 1rem;
+  margin-bottom: 1rem;
 }
 
 h2 {
-  font-size: calc(var(--screen-font-size) * 1.2);
-  margin-top: calc(var(--screen-unit) * 3 / 2);
-  margin-bottom: calc(var(--screen-unit) * 1 / 2);
+  font-size: calc(var(--screen-font-size) * 1.3);
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
 }
 
 h3 {
-  font-size: calc(var(--screen-font-size) * 1.1);
-  margin-top: calc(var(--screen-unit) * 7 / 4);
-  margin-bottom: calc(var(--screen-unit) * 1 / 4);
+  font-size: calc(var(--screen-font-size) * 1.15);
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+  font-weight: 500;
 }
 
 h4 {
   font-size: calc(var(--screen-font-size) * 1.05);
-  margin-top: calc(var(--screen-unit) * 7 / 8);
-  margin-bottom: calc(var(--screen-unit) * 1 / 8);
+  margin-top: 1.25rem;
+  margin-bottom: 1rem;
+  font-weight: 500;
+  color: #555;
 }
 
 h5, h6 {
   font-size: var(--screen-font-size);
-  margin-top: calc(var(--screen-unit) * 7 / 8);
-  margin-bottom: calc(var(--screen-unit) * 1 / 8);
+  margin-top: 1.25rem;
+  margin-bottom: 1rem;
 }
 
 ul {
@@ -56,8 +70,9 @@ ul ul {
 }
 
 ul, ol {
-  margin: calc(var(--screen-unit) / 4) 0 0 calc(var(--screen-unit) / 2);
-  padding-left: calc(var(--screen-unit) * 1.2);
+  margin: 0.5rem 0 0.5rem 0rem;
+  padding-left: 1.5rem;
+  list-style-position: inside;
 }
 
 ul li p, ol li p {
@@ -65,11 +80,11 @@ ul li p, ol li p {
 }
 
 ul li + li, ol li + li {
-  margin-top: calc(var(--screen-unit) / 4);
+  margin-top: 0.5rem;
 }
 
 p {
-  margin: calc(var(--screen-unit) / 2) 0;
+  margin: 1rem 0;
 }
 
 ul + p, ol + p, blockquote + p, pre + p {
@@ -86,25 +101,28 @@ a:hover {
 }
 
 code {
-  font-family: Monaco, Menlo, Mensch, Consolas, Monotype, mono;
+  font-family: 'SF Mono', Monaco, Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace;
   font-style: normal;
+  font-size: 1rem;
+  background-color: #f5f5f5;
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
 }
 
 pre {
   display: block;
-  margin-left: var(--screen-unit);
-  margin-right: calc(var(--screen-unit) * 2);
-  padding: calc(var(--screen-unit) / 3) var(--screen-unit);
-  padding-left: calc(var(--screen-unit) * 3 / 4);
+  margin: 1rem 0;
+  padding: 1rem;
   white-space: pre;
+  background-color: #f5f5f5;
+  border-radius: 6px;
+  overflow-x: auto;
 }
 
 blockquote {
   display: block;
-  margin-left: var(--screen-unit);
-  margin-right: calc(var(--screen-unit) * 2);
-  padding: calc(var(--screen-unit) / 3) var(--screen-unit);
-  padding-left: calc(var(--screen-unit) * 3 / 4);
+  margin: 1rem 0 1rem 1rem;
+  padding: 1rem;
 }
 
 pre p, blockquote p {
@@ -116,21 +134,33 @@ img {
   display: block;
 }
 
+table {
+  border-collapse: collapse;
+  margin: 1rem 0;
+  width: 100%;
+}
+
+th, td {
+  padding: 0.5rem;
+  text-align: left;
+}
+
+th {
+  border-bottom: 1px solid #ccc;
+}
+
 @media screen {
   body {
     font-size: var(--screen-font-size);
     line-height: var(--screen-line-height);
-    background-color: #666;
     color: var(--text-color);
   }
 
   #container {
     display: block;
-    border: solid 1px #999;
-    width: 780px;
+    max-width: 960px;
     padding: 40px 60px;
     margin: calc(var(--screen-unit) / 2) auto;
-    background-color: #fff;
     box-sizing: border-box;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
@@ -148,7 +178,10 @@ img {
   }
 
   pre code {
-    font-size: calc(var(--screen-font-size) * 3 / 4);
+    font-size: 0.85rem;
+    background-color: transparent;
+    padding: 0;
+    border-radius: 0;
   }
 }
 
