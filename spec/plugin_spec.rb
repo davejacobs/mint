@@ -188,21 +188,21 @@ describe Mint do
   end
 
   # TODO: Document expected document functionality changes related to plugins
-  describe Mint::Document do
-    context "when plugins are registered with Mint" do
-      describe "#content=" do
-        it "applies each registered plugin's before_render filter"
-      end
+  # describe Mint::Document do
+  #   context "when plugins are registered with Mint" do
+  #     describe "#content=" do
+  #       it "applies each registered plugin's before_render filter"
+  #     end
 
-      describe "#render" do
-        it "applies each registered plugin's after_render filter"
-      end
+  #     describe "#render" do
+  #       it "applies each registered plugin's after_render filter"
+  #     end
 
-      describe "#publish!" do
-        it "applies each registered plugin's after_publish filter"
-      end
-    end
-  end
+  #     describe "#publish!" do
+  #       it "applies each registered plugin's after_publish filter"
+  #     end
+  #   end
+  # end
 
   describe Mint::Plugin do
     # We have to instantiate these plugins in a before block,
@@ -217,7 +217,7 @@ describe Mint do
     describe ".underscore" do
       let(:plugin) { Class.new(Mint::Plugin) }
 
-      it "when anonymous, returns a random identifier"
+      # it "when anonymous, returns a random identifier"
 
       it "when named, returns its name, underscored" do
         expect(plugin).to receive(:name).and_return("EPub")
@@ -255,7 +255,7 @@ describe Mint do
         end
       end
 
-      it "returns a hash of options the plugin can take, including constraints"
+      # it "returns a hash of options the plugin can take, including constraints"
     end
 
     context "plugin callbacks" do
@@ -328,47 +328,47 @@ describe Mint do
           expect(File.exist?("second-half.html")).to be_truthy
         end
 
-        it "allows changes to the style file" do
-          pending "figure out a better strategy for style manipulation"
-          document = Mint::Document.new "content.md", style: "style.css" 
+        # it "allows changes to the style file" do
+        #   pending "figure out a better strategy for style manipulation"
+        #   document = Mint::Document.new "content.md", style: "style.css" 
 
-          plugin.instance_eval do
-            def after_publish(document)
-              # I'd like to take document.style_destination_file,
-              # but the current Mint API doesn't allow for this
-              # if we're setting the style via a concrete
-              # stylesheet in our current directory
-              style_source = document.style.source_file
-              style = File.read style_source
-              File.open style_source, "w" do |file|
-                file << style.gsub(/#/, ".")
-              end
-            end
-          end
+        #   plugin.instance_eval do
+        #     def after_publish(document)
+        #       # I'd like to take document.style_destination_file,
+        #       # but the current Mint API doesn't allow for this
+        #       # if we're setting the style via a concrete
+        #       # stylesheet in our current directory
+        #       style_source = document.style.source_file
+        #       style = File.read style_source
+        #       File.open style_source, "w" do |file|
+        #         file << style.gsub(/#/, ".")
+        #       end
+        #     end
+        #   end
 
-          document.publish! :plugins => [plugin]
+        #   document.publish! :plugins => [plugin]
 
-          File.read(document.style.source_file).should =~ /\#container/
-        end
+        #   File.read(document.style.source_file).should =~ /\#container/
+        # end
 
-        context "when the output is in the default directory" do
-          it "doesn't allow changes to the document directory" do
-            pending "figuring out the best way to prevent directory manipulation"
-            document = Mint::Document.new "content.md"
-            plugin.instance_eval do
-              def after_publish
-                original = document.destination_directory
-                new = File.expand_path "invalid"
-                FileUtils.mv original, new
-                document.destination = "invalid"
-              end
+        # context "when the output is in the default directory" do
+        #   it "doesn't allow changes to the document directory" do
+        #     pending "figuring out the best way to prevent directory manipulation"
+        #     document = Mint::Document.new "content.md"
+        #     plugin.instance_eval do
+        #       def after_publish
+        #         original = document.destination_directory
+        #         new = File.expand_path "invalid"
+        #         FileUtils.mv original, new
+        #         document.destination = "invalid"
+        #       end
 
-              expect do
-                document.publish! :plugins => [plugin]
-              end.to raise_error(InvalidPluginAction)
-            end
-          end
-        end
+        #       expect do
+        #         document.publish! :plugins => [plugin]
+        #       end.to raise_error(InvalidPluginAction)
+        #     end
+        #   end
+        # end
 
         context "when the output is a new directory" do
           it "allows changes to the document directory" do
