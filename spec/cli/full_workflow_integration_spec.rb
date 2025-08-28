@@ -179,7 +179,7 @@ RSpec.describe "Full CLI Workflow Integration" do
           )
 
           # Configure for documentation
-          Mint::CommandLine.set("layout", "docs", :local)
+          Mint::CommandLine.set("layout", "default", :local)
           Mint::CommandLine.set("destination", "build", :local)
 
           # Publish all documentation

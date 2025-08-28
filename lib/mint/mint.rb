@@ -170,20 +170,48 @@ module Mint
     end
   end
 
-  # Returns the layout file for the given template name
+  # Returns the layout file for the given template name or directory
   #
-  # @param [String] name the template name to look up
+  # @param [String] name the template name or directory path to look up
   # @return [String] path to the layout file
   def self.lookup_layout(name)
-    find_template(name, :layout)
+    if File.directory?(name)
+      find_template_in_directory(name, :layout)
+    else
+      find_template(name, :layout)
+    end
   end
 
-  # Returns the style file for the given template name
+  # Returns the style file for the given template name or directory
   #
-  # @param [String] name the template name to look up
+  # @param [String] name the template name or directory path to look up
   # @return [String] path to the style file  
   def self.lookup_style(name)
-    find_template(name, :style)
+    if File.directory?(name)
+      find_template_in_directory(name, :style)
+    else
+      find_template(name, :style)
+    end
+  end
+
+  # Finds a template file in a specific directory
+  #
+  # @param [String] directory_path the directory to look in
+  # @param [Symbol] type either :layout or :style
+  # @return [String] path to the template file
+  def self.find_template_in_directory(directory_path, type)
+    acceptable_exts = case type
+                      when :layout then formats
+                      when :style then css_formats
+                      end
+
+    acceptable_exts.each do |ext|
+      template_file = File.join(directory_path, "#{type}.#{ext}")
+      return template_file if File.exist?(template_file)
+    end
+
+    expected_exts = acceptable_exts.join(', ')
+    raise TemplateNotFoundException, "Template directory '#{directory_path}' exists but has no valid #{type} file. Expected #{type}.{#{expected_exts}}"
   end
 
   # Finds a template named `name` in the Mint path. If `type` is :layout,
