@@ -29,6 +29,13 @@ RSpec.describe "CLI Argument Parsing" do
         expect(result[:options][:layout_or_style_or_template]).to eq([:layout, "custom"])
       end
 
+      it "parses -l option for layout" do
+        result = Mint::CommandLine.parse(["-l", "custom", "file.md"])
+        
+        expect(result[:argv]).to eq(["file.md"])
+        expect(result[:options][:layout_or_style_or_template]).to eq([:layout, "custom"])
+      end
+
       it "parses --style option" do
         result = Mint::CommandLine.parse(["--style", "minimal", "file.md"])
         
@@ -107,9 +114,6 @@ RSpec.describe "CLI Argument Parsing" do
 
         result = Mint::CommandLine.parse(["-u"])
         expect(result[:options][:scope]).to eq(:user)
-
-        result = Mint::CommandLine.parse(["-l"])
-        expect(result[:options][:scope]).to eq(:local)
       end
     end
 

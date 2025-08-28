@@ -44,7 +44,7 @@ mint publish content/**/*.md --template garden --destination public
 | Flag | Description |
 |------|-------------|
 | `-t, --template TEMPLATE` | Use a built-in template (combines layout + style) |
-| `--layout LAYOUT` | Specify only the layout |
+| `-l, --layout LAYOUT` | Specify only the layout |
 | `-s, --style STYLE` | Specify only the style |
 | `-d, --destination DIR` | Output directory |
 | `-o, --output-file FORMAT` | Custom output filename format |

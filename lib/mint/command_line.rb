@@ -58,7 +58,7 @@ module Mint
           parsed_options[:scope] = :user
         end
 
-        cli.on "-l", "--local", "Specify config changes on a project-specific level" do
+        cli.on "--local", "Specify config changes on a project-specific level" do
           parsed_options[:scope] = :local
         end
 
