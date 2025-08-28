@@ -1,4 +1,4 @@
-# Design
+# Internal file representation
 
 ## Problem 1: Internal representation of files, external presentation, mutability
 
