@@ -32,13 +32,15 @@ module Mint
       css_files = []
       main_css_file = Pathname.new(main_css_path).expand_path
       html_file = Pathname.new(html_output_path).expand_path
-      css_files << main_css_file.relative_path_from(html_file.dirname).to_s
-      return css_files unless main_css_file.exist? && main_css_file.extname == '.css'
+      main_css_relative = main_css_file.relative_path_from(html_file.dirname).to_s
+      
+      return [main_css_relative] unless main_css_file.exist? && main_css_file.extname == '.css'
       
       begin
         css_content = File.read(main_css_path)
         imports = extract_imports(css_content)
         
+        # Add imported files first (they should load before the main file)
         imports.each do |import_path|
           import_file = (main_css_file.dirname + import_path).expand_path
           if import_file.exist? && import_file.extname == '.css'
@@ -47,9 +49,13 @@ module Mint
           end
         end
         
+        # Add main file last (after its imports)
+        css_files << main_css_relative
+        
       rescue => e
         # If we can't read the CSS file, just return the main file
         # This allows the system to gracefully handle missing or unreadable files
+        css_files = [main_css_relative]
       end
       
       css_files

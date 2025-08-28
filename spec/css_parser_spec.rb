@@ -90,7 +90,7 @@ describe Mint::CssParser do
       File.write(reset_css, "* { box-sizing: border-box; }")
       
       css_files = Mint::CssParser.resolve_css_files(main_css, html_output)
-      expect(css_files).to eq(["../css/main.css", "../css/reset.css"])
+      expect(css_files).to eq(["../css/reset.css", "../css/main.css"])
     end
 
     it "ignores non-existent imported files" do
@@ -119,6 +119,39 @@ describe Mint::CssParser do
       
       css_files = Mint::CssParser.resolve_css_files(main_scss, html_output)
       expect(css_files).to eq(["../scss/main.scss"])
+    end
+
+    it "places imported CSS files before main CSS file for correct cascade order" do
+      # Create directory structure:
+      # temp_dir/
+      #   css/
+      #     base.css (imports reset.css and fonts.css)
+      #     reset.css
+      #     fonts.css
+      #   output/
+      #     index.html
+      
+      css_dir = File.join(temp_dir, "css")
+      output_dir = File.join(temp_dir, "output")
+      FileUtils.mkdir_p([css_dir, output_dir])
+      
+      base_css = File.join(css_dir, "base.css")
+      reset_css = File.join(css_dir, "reset.css")
+      fonts_css = File.join(css_dir, "fonts.css")
+      html_output = File.join(output_dir, "index.html")
+      
+      File.write(base_css, '@import "reset.css"; @import "fonts.css"; body { margin: 0; }')
+      File.write(reset_css, "* { box-sizing: border-box; }")
+      File.write(fonts_css, "@font-face { font-family: 'MyFont'; }")
+      
+      css_files = Mint::CssParser.resolve_css_files(base_css, html_output)
+      
+      # Imports should come first, then the main file
+      expect(css_files).to eq([
+        "../css/reset.css",
+        "../css/fonts.css", 
+        "../css/base.css"
+      ])
     end
   end
 
