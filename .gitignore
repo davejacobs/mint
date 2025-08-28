@@ -1,8 +1,6 @@
 .sass-cache
-tmp/*
-config/templates/*/css
 .mint
 *.gem
 .gems
+tmp/*
 Gemfile.lock
-*.html
