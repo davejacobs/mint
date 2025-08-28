@@ -1,9 +1,8 @@
 @import '../reset.css';
-@import url('https://fonts.googleapis.com/css2?family=Alegreya+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap');
 
 :root {
-  --body-font-family: 'Georgia';
-  --header-font-family: 'Georgia';
+  --body-font-family: Georgia;
+  --header-font-family: Georgia;
   --screen-font-size: 16px;
   --screen-line-height: 1.45;
 }
