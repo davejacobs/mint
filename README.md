@@ -49,7 +49,7 @@ mint publish content/**/*.md --template garden --destination public
 | `-d, --destination DIR` | Output directory |
 | `-o, --output-file FORMAT` | Custom output filename format |
 | `--style-destination PATH` | Create external stylesheet and link it (rather than default of inlining style) |
-| `-r, --recursive` | Find all Markdown files in subdirectories |
+| `-r, --recursive` | Find all Markdown files in any directories specified |
 
 ### Built-in Templates
 
