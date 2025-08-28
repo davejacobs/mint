@@ -41,7 +41,7 @@ module Mint
           parsed_options[:destination] = d
         end
 
-        cli.on "--style-mode MODE", ["inline", "external"], "Specify how styles are included (inline, external)" do |mode|
+        cli.on "--style-mode MODE", ["inline", "external", "original"], "Specify how styles are included (inline, external, original)" do |mode|
           parsed_options[:style_mode] = mode.to_sym
         end
 

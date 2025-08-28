@@ -1,6 +1,7 @@
 require "mint/resource"
 require "mint/layout"
 require "mint/style"
+require "mint/css_parser"
 
 module Mint
   class Document < Resource
@@ -245,9 +246,26 @@ module Mint
       case @style_mode
       when :external
         "<link rel=\"stylesheet\" href=\"#{stylesheet}\">".html_safe
+      when :original
+        original_stylesheet_tags.html_safe
       else # :inline (default)
         "<style>#{self.style.render}</style>".html_safe
       end
+    end
+
+    # Links directly to original CSS files without processing; allows for live
+    # template modifications for template designers. Only works for CSS files;
+    # does support @import statements.
+    def original_stylesheet_tags
+      return "" unless self.style&.source
+      
+      main_css_path = self.style.source
+      html_output_path = self.destination_file
+      
+      return "" unless File.extname(main_css_path) == '.css'
+      
+      css_file_paths = CssParser.resolve_css_files(main_css_path, html_output_path)
+      CssParser.generate_link_tags(css_file_paths)
     end
 
     # Parses styles defined in YAML metadata in content, including it

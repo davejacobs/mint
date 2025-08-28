@@ -48,11 +48,21 @@ mint publish content/**/*.md --template garden --destination public
 | `-s, --style STYLE` | Specify only the style |
 | `-d, --destination DIR` | Output directory |
 | `-o, --output-file FORMAT` | Custom output filename format |
-| `--style-mode MODE` | How styles are included (inline, external) |
+| `--style-mode MODE` | How styles are included (inline, external, original) |
 | `--style-destination PATH` | Create external stylesheet and link it (sets mode to external) |
 | `-r, --recursive` | Find all Markdown files in any directories specified |
 
-### Built-in Templates
+### Style modes
+
+Mint offers three ways to include styles in your HTML output:
+
+- **`inline`** (default) – CSS is embedded directly in the HTML document as `<style>` tags
+- **`external`** – CSS is compiled and saved as separate files, linked with `<link>` tags
+- **`original`** – Links directly to original CSS template files without processing (for live editing)
+
+The `original` mode is particularly useful for template development, as it allows you to edit CSS files and see changes immediately without republishing. Only `.css` files are supported in this mode, and `@import` statements in CSS files will be included as additional `<link>` tags.
+
+### Built-in templates
 
 - `default` – Clean, minimal styling
 - `nord` – Clean, uses Nord color scheme
