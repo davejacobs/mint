@@ -2,8 +2,6 @@
 
 Transform your plain text documents into beautiful HTML documents with customizable styling and templates.
 
-Mint processes words so you don't have to.
-
 ## Installation
 
 ```bash
