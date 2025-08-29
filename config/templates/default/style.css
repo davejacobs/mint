@@ -208,6 +208,14 @@ hr {
   background-color: var(--background);
 }
 
+@media (max-width: 960px) {
+  #container {
+    background-color: transparent;
+    padding: calc(var(--screen-unit) * 2) calc(var(--screen-unit) * 1);
+    margin: 1rem auto;
+  }
+}
+
 @media print {
   :root {
     --screen-font-size: var(--print-font-size);

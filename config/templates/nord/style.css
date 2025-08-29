@@ -41,7 +41,7 @@
 body {
   font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   color: var(--nord-text);
-  line-height: 1.5;
+  line-height: var(--screen-line-height);
   background-color: var(--nord-background);
   font-weight: 400;
   letter-spacing: -0.005em;
@@ -213,9 +213,14 @@ hr {
   border-radius: 8px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 960px) {
+  body {
+    background-color: transparent;
+    margin: 0;
+  }
+  
   #container {
-    margin: calc(var(--screen-unit) * 1) calc(var(--screen-unit) * 0.5);
+    margin: 0;
     padding: calc(var(--screen-unit) * 2) calc(var(--screen-unit) * 2);
     border-radius: 0;
     box-shadow: none;
