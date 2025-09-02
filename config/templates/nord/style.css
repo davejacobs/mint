@@ -41,7 +41,7 @@ body {
 }
 
 #container {
-  max-width: 100ch;
+  max-width: 90ch;
   margin: calc(var(--screen-unit) * 3) auto;
   padding: calc(var(--screen-unit) * 3) calc(var(--screen-unit) * 4);
   border: 1px solid var(--nord4);
