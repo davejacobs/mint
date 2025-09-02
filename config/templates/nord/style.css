@@ -3,7 +3,7 @@
 
 :root {
   --screen-font-size: 16px;
-  --screen-line-height: 1.5;
+  --screen-line-height: 1.6;
   --screen-unit: calc(var(--screen-font-size) * var(--screen-line-height));
 
   --print-font-size: 11pt;
@@ -32,24 +32,23 @@ body {
   font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   font-size: var(--screen-font-size);
   color: var(--nord0);
-  background-color: var(--nord6);
+  /*background-color: var(--nord6);*/
   font-weight: 400;
   letter-spacing: -0.005em;
   font-feature-settings: "liga" 1, "kern" 1;
   overflow-x: hidden;
-  max-width: 100vw;
 }
 
 #container {
   max-width: 90ch;
   margin: calc(var(--screen-unit) * 3) auto;
-  padding: calc(var(--screen-unit) * 3) calc(var(--screen-unit) * 4);
-  border: 1px solid var(--nord4);
-  background-color: #ffffff;
-  box-shadow: 
+  /*padding: calc(var(--screen-unit) * 3) calc(var(--screen-unit) * 4);*/
+  /*border: 1px solid var(--nord4);*/
+  /*background-color: #ffffff;*/
+  /*box-shadow: 
     0 4px 6px rgba(46, 52, 64, 0.05),
     0 10px 20px rgba(46, 52, 64, 0.1);
-  border-radius: 8px;
+  border-radius: 8px;*/
 }
 
 h1, h2, h3, h4, h5, h6 {
