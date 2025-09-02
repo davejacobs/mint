@@ -5,79 +5,103 @@
   --nord-text: var(--nord6);           /* Light text */
   --nord-text-subtle: var(--nord4);   /* Subtle light text */
   --nord-background: var(--nord0);     /* Dark background */
-  --nord-surface: var(--nord1);       /* Dark surface */
+  --nord-surface: var(--nord2);       /* Slightly lighter dark surface */
   --nord-border: var(--nord3);        /* Dark borders */
   --nord-accent: var(--nord8);        /* Light blue accent */
   --nord-secondary: var(--nord7);     /* Teal secondary */
 }
 
-/* Override heading colors for dark theme contrast */
+/* Set body background to the old container color */
+body {
+  background-color: var(--nord1) !important; /* Use the previous container color */
+  color: var(--nord-text) !important; /* Ensure body text is light */
+}
+
+/* Override heading colors for dark theme contrast with Nord accent colors */
 h1, h2, h3, h4, h5, h6 {
   color: var(--nord-text); /* Use light text color for all headings */
-}
-
-h1 {
-  color: var(--nord6); /* Brightest for h1 */
-}
-
-h2 {
-  color: var(--nord5); /* Slightly dimmer for h2 */
-}
-
-h3 {
-  color: var(--nord4); /* Medium for h3 */
-}
-
-h4, h5, h6 {
-  color: var(--nord4); /* Same medium tone for smaller headings */
 }
 
 /* Override specific elements that need darker styling */
 blockquote {
   background-color: var(--nord2); /* Lighter dark background for better contrast */
-  color: var(--nord-text-subtle);
-  border-left-color: var(--nord8); /* Keep the accent border */
+  color: var(--nord4);
+  border-left-color: var(--nord14); /* Green accent border */
 }
 
 code {
-  background-color: var(--nord2);  /* Lighter dark background */
-  color: var(--nord6);             /* Light code text */
+  background-color: var(--nord3);  /* Lighter dark background */
+  color: var(--nord13);            /* Yellow code text for visibility */
+  border: 1px solid var(--nord10); /* Dark blue border */
 }
 
 pre {
   background-color: var(--nord2);  /* Lighter dark background */
-  border-color: var(--nord-border);
+  border: 1px solid var(--nord9);  /* Blue border */
 }
 
 pre code {
   color: var(--nord6);             /* Light pre code text */
+  border: none;                    /* Remove border from pre code */
 }
 
 strong {
-  color: var(--nord6);             /* Light strong text */
+  color: var(--nord-text);
 }
 
 em {
-  color: var(--nord5);             /* Light em text */
+  color: var(--nord-text);
+}
+
+/* Horizontal rule styling */
+hr {
+  background-color: var(--nord7);  /* Teal horizontal rule */
+  border: none;
+  height: 2px;
 }
 
 table {
   background-color: var(--nord-surface);  /* Dark table background */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);  /* Darker shadow */
+  /*border: 1px solid var(--nord10);  /* Dark blue border */*/
 }
 
 th {
-  background-color: var(--nord2);  /* Dark table header */
-  color: var(--nord6);             /* Light header text */
+  background-color: var(--nord3);  /* Slightly lighter header background */
+  color: var(--nord8);             /* Light blue header text */
+  border-bottom: 2px solid var(--nord7);  /* Teal bottom border for headers */
+}
+
+td {
+  border-bottom: 1px solid var(--nord3);  /* Use nord3 for cell borders */
 }
 
 tr:hover {
-  background-color: rgba(76, 86, 106, 0.2);  /* Dark row hover */
+  background-color: rgba(143, 188, 187, 0.1);  /* Teal-tinted row hover */
 }
 
 #container {
-  background-color: var(--nord-surface);  /* Dark container */
+  background-color: var(--nord-surface);  /* Lighter dark container */
   box-shadow: 
     0 4px 6px rgba(0, 0, 0, 0.2),
     0 10px 20px rgba(0, 0, 0, 0.3);  /* Darker shadows */
+}
+
+/* Ensure all text elements have proper light colors */
+p, li, td, dd, dt {
+  color: var(--nord-text) !important;
+}
+
+/* Links should be clearly visible */
+a {
+  color: var(--nord8) !important;
+}
+
+a:hover {
+  color: var(--nord7) !important;
+}
+
+/* Lists */
+ul, ol {
+  color: var(--nord-text);
 }
