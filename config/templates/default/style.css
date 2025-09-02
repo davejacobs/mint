@@ -1,9 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap');
-@import "../base/style.css";
 
 :root {
-  --screen-font-size: 18px;
-  --screen-line-height: 1.6;
+  --screen-font-size: 21px;
+  --screen-line-height: 1.4;
   --screen-unit: calc(var(--screen-font-size) * var(--screen-line-height));
 
   --print-font-size: 11pt;
@@ -18,6 +17,8 @@
   --quote-background: #fafafa;
 }
 
+@import "../base/style.css";
+
 body {
   font-family: "Alegreya", Georgia, Times, "Times New Roman", serif;
   font-size: var(--screen-font-size);
@@ -30,7 +31,7 @@ body {
 }
 
 #container {
-  max-width: 100ch;
+  max-width: 85ch;
   margin: 2rem auto;
   padding: calc(var(--screen-unit) * 3) calc(var(--screen-unit) * 2);
   background-color: var(--background);
@@ -45,7 +46,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 {
-  font-size: calc(var(--screen-font-size) * 2.5);
+  font-size: calc(var(--screen-font-size) * 2);
   margin-top: 0;
   margin-bottom: calc(var(--screen-unit) * 1);
   font-weight: 700;
@@ -53,21 +54,20 @@ h1 {
 }
 
 h2 {
-  font-size: calc(var(--screen-font-size) * 1.8);
+  font-size: calc(var(--screen-font-size) * 1.7);
   margin-top: calc(var(--screen-unit) * 2);
   border-bottom: 1px solid var(--border-color);
   padding-bottom: calc(var(--screen-unit) * 0.25);
 }
 
 h3 {
-  font-size: calc(var(--screen-font-size) * 1.4);
-  font-weight: 600;
+  font-size: calc(var(--screen-font-size) * 1.3);
+  font-weight: 400;
 }
 
 h4 {
-  font-size: calc(var(--screen-font-size) * 1.2);
+  font-size: calc(var(--screen-font-size) * 1.1);
   font-weight: 600;
-  color: var(--text-subtle);
 }
 
 h5, h6 {
