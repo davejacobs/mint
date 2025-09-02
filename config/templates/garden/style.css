@@ -1,34 +1,48 @@
 /* Garden Template - Digital Garden with Navigation */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import "../base/style.css";
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+:root {
+  --garden-text: #1a1a1a;
+  --garden-text-muted: #6b7280;
+  --garden-text-subtle: #4b5563;
+  --garden-heading-1: #111827;
+  --garden-heading-2: #1f2937;
+  --garden-heading-3: #374151;
+  --garden-heading-4: #4b5563;
+  --garden-accent: #2563eb;
+  --garden-accent-hover: #1d4ed8;
+  --garden-background: #fafafa;
+  --garden-surface: white;
+  --garden-border: #e5e7eb;
+  --garden-code-bg: #f3f4f6;
+  --garden-code-surface: #f9fafb;
+  --garden-quote-bg: #f9fafb;
 }
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  line-height: 1.6;
-  color: #1a1a1a;
-  background-color: #fafafa;
+  color: var(--garden-text);
+  background-color: var(--garden-background);
   font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+  padding: 0;
 }
 
 .garden-container {
   display: flex;
   min-height: 100vh;
   width: 100%;
-  background: white;
+  background: var(--garden-surface);
 }
 
 /* Navigation Sidebar */
 .garden-nav {
   width: 280px;
-  background: #fafafa;
-  border-right: 1px solid #e5e7eb;
+  background: var(--garden-background);
+  border-right: 1px solid var(--garden-border);
   flex-shrink: 0;
   overflow-y: auto;
   max-height: 100vh;
@@ -38,15 +52,16 @@ body {
 
 .garden-nav-header {
   padding: 1.5rem 1rem 1rem;
-  border-bottom: 1px solid #e5e7eb;
-  background: white;
+  border-bottom: 1px solid var(--garden-border);
+  background: var(--garden-surface);
 }
 
 .garden-nav-header h3 {
   font-size: 1.1rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--garden-heading-3);
   letter-spacing: -0.025em;
+  margin: 0;
 }
 
 .garden-nav-content {
@@ -56,6 +71,7 @@ body {
 .garden-toc {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
 
 .garden-toc li {
@@ -65,7 +81,7 @@ body {
 .garden-toc a {
   display: block;
   padding: 0.5rem 1rem;
-  color: #6b7280;
+  color: var(--garden-text-muted);
   text-decoration: none;
   border-left: 3px solid transparent;
   transition: all 0.15s ease;
@@ -74,15 +90,15 @@ body {
 }
 
 .garden-toc a:hover {
-  color: #374151;
-  background-color: #f3f4f6;
+  color: var(--garden-heading-3);
+  background-color: var(--garden-code-bg);
   border-left-color: #d1d5db;
 }
 
 .garden-toc a.current {
-  color: #2563eb;
+  color: var(--garden-accent);
   background-color: #eff6ff;
-  border-left-color: #2563eb;
+  border-left-color: var(--garden-accent);
   font-weight: 500;
 }
 
@@ -119,12 +135,12 @@ body {
   max-width: none;
 }
 
-/* Typography */
+/* Typography - Override base styles */
 .garden-content h1 {
   font-size: 2rem;
   font-weight: 700;
   margin-bottom: 1.5rem;
-  color: #111827;
+  color: var(--garden-heading-1);
   line-height: 1.2;
   letter-spacing: -0.025em;
 }
@@ -133,8 +149,8 @@ body {
   font-size: 1.5rem;
   font-weight: 600;
   margin: 2rem 0 1rem;
-  color: #1f2937;
-  border-bottom: 1px solid #e5e7eb;
+  color: var(--garden-heading-2);
+  border-bottom: 1px solid var(--garden-border);
   padding-bottom: 0.5rem;
   letter-spacing: -0.025em;
 }
@@ -143,7 +159,7 @@ body {
   font-size: 1.25rem;
   font-weight: 600;
   margin: 1.5rem 0 0.75rem;
-  color: #374151;
+  color: var(--garden-heading-3);
   letter-spacing: -0.025em;
 }
 
@@ -151,25 +167,25 @@ body {
   font-size: 1.125rem;
   font-weight: 600;
   margin: 1.25rem 0 0.5rem;
-  color: #4b5563;
+  color: var(--garden-heading-4);
   letter-spacing: -0.025em;
 }
 
 .garden-content p {
   margin-bottom: 1.25rem;
-  color: #374151;
+  color: var(--garden-heading-3);
   line-height: 1.7;
 }
 
 .garden-content a {
-  color: #2563eb;
+  color: var(--garden-accent);
   text-decoration: none;
   border-bottom: 1px solid transparent;
   transition: border-bottom 0.15s ease;
 }
 
 .garden-content a:hover {
-  border-bottom-color: #2563eb;
+  border-bottom-color: var(--garden-accent);
 }
 
 /* Lists */
@@ -181,13 +197,13 @@ body {
 
 .garden-content li {
   margin: 0.375rem 0;
-  color: #374151;
+  color: var(--garden-heading-3);
   line-height: 1.6;
 }
 
 /* Code */
 .garden-content code {
-  background: #f3f4f6;
+  background: var(--garden-code-bg);
   padding: 0.125rem 0.375rem;
   border-radius: 4px;
   font-family: 'SF Mono', 'Fira Code', 'Monaco', 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
@@ -197,43 +213,45 @@ body {
 }
 
 .garden-content pre {
-  background: #f9fafb;
+  background: var(--garden-code-surface);
   padding: 1.5rem;
   border-radius: 8px;
   overflow-x: auto;
   margin: 1.5rem 0;
-  border: 1px solid #e5e7eb;
-  border-left: 4px solid #2563eb;
+  border: 1px solid var(--garden-border);
+  border-left: 4px solid var(--garden-accent);
 }
 
 .garden-content pre code {
   background: none;
   padding: 0;
-  color: #374151;
+  color: var(--garden-heading-3);
   font-weight: 400;
 }
 
 /* Tables */
 .garden-content table {
   width: 100%;
-  border-collapse: collapse;
   margin: 1.5rem 0;
   border-radius: 6px;
   overflow: hidden;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--garden-border);
 }
 
 .garden-content th,
 .garden-content td {
   padding: 0.75rem 1rem;
   text-align: left;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--garden-border);
+  border-left: none;
+  border-right: none;
+  border-top: none;
 }
 
 .garden-content th {
-  background: #f9fafb;
+  background: var(--garden-code-surface);
   font-weight: 600;
-  color: #374151;
+  color: var(--garden-heading-3);
   font-size: 0.875rem;
 }
 
@@ -241,14 +259,14 @@ body {
 .garden-content blockquote {
   margin: 1.5rem 0;
   padding: 1rem 1.5rem;
-  background: #f9fafb;
-  border-left: 4px solid #6b7280;
+  background: var(--garden-quote-bg);
+  border-left: 4px solid var(--garden-text-muted);
   border-radius: 0 6px 6px 0;
 }
 
 .garden-content blockquote p {
   margin: 0;
-  color: #4b5563;
+  color: var(--garden-text-subtle);
   font-style: italic;
   line-height: 1.6;
 }

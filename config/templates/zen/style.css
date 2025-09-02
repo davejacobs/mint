@@ -1,26 +1,33 @@
+/*@import url('https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400..900;1,400..900&display=swap');*/
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,200..900;1,200..900&display=swap');
+
 :root {
-  --screen-font-size: 16px;
+  --line-height: 1.5;
+  --screen-font-size: 18px;
   --screen-line-height: calc(var(--screen-font-size) * 1.4);
   --screen-unit: var(--screen-line-height);
 
   --print-font-size: 10pt;
-  --print-line-height: calc(var(--print-font-size) * 1.618);
+  --print-line-height: caalc(var(--print-font-size) * 1.618);
   --print-unit: var(--print-line-height);
 
   --zen-text: #2c2c2c;
   --zen-subtle: #8a8a8a;
   --zen-accent: #007acc;
-  --zen-background: #fefefe;
-  --zen-border: #e8e8e8;
+  --zen-background: #fcfcfc;
+  --zen-border: #ccc;
   --link-color: var(--zen-accent);
 }
 
 @import "../base/style.css";
 
 body {
-  font-family: "Times New Roman", Times, Georgia, serif;
+  font-family: 'Crimson Text', serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  text-rendering: optimizeLegibility;
   color: var(--zen-text);
-  line-height: 1.4;
   background-color: var(--zen-background);
   font-weight: 350;
   letter-spacing: 0.01em;
@@ -33,7 +40,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 {
-  font-size: calc(var(--screen-font-size) * 2.618);
+  font-size: calc(var(--screen-font-size) * 2.2);
   margin-top: calc(var(--screen-unit) * 2);
   margin-bottom: calc(var(--screen-unit) * 1.5);
   line-height: 1.2;
@@ -53,26 +60,28 @@ p {
 
 blockquote {
   border-left: 2px solid var(--zen-border);
-  padding-left: calc(var(--screen-unit) * 0.618);
+  padding-top: 0.3rem;
+  padding-bottom: 0.3rem;
+  padding-left: var(--screen-unit);
   margin-left: 0;
   font-style: italic;
   color: var(--zen-subtle);
 }
 
 code {
-  font-family: "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas, "Courier New", monospace;
-  font-size: calc(var(--screen-font-size) * 0.9);
+  font-family: Monaco, "Roboto Mono", "Ubuntu Mono", Consolas, "Courier New", monospace;
+  font-size: calc(var(--screen-font-size) * 0.8);
   background-color: rgba(0, 0, 0, 0.04);
   padding: 0.1em 0.3em;
-  border-radius: 3px;
   font-weight: 400;
+  line-height: 1.7;
 }
 
 pre {
   background-color: rgba(0, 0, 0, 0.02);
   border: 1px solid var(--zen-border);
   border-radius: 6px;
-  padding: calc(var(--screen-unit) * 0.618);
+  padding: calc(var(--screen-unit) * 0.8);
   overflow-x: auto;
 }
 
@@ -80,7 +89,7 @@ pre code {
   background-color: transparent;
   padding: 0;
   border-radius: 0;
-  font-size: calc(var(--screen-font-size) * 0.85);
+  font-size: calc(var(--screen-font-size) * 0.8);
 }
 
 a:link, a:visited {
@@ -104,11 +113,25 @@ li {
   margin: calc(var(--screen-unit) * 0.25) 0;
 }
 
+table {
+  border-collapse: collapse;
+  margin: calc(var(--screen-unit) * 1) 0;
+  width: 100%;
+}
+
+th, td {
+  padding: calc(var(--screen-unit) * 0.4) calc(var(--screen-unit) * 0.6);
+  text-align: left;
+  border: none;
+}
+
+th {
+  border-bottom: 1px solid var(--zen-border);
+  font-weight: 400;
+  font-style: italic;
+}
+
 #container {
-  max-width: 120ch;
-  margin: calc(var(--screen-unit) * 2) auto;
-  padding: calc(var(--screen-unit) * 4) calc(var(--screen-unit) * 6);
-  border: 1px solid #999999;
-  background-color: var(--zen-background);
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  padding: 2rem 4rem;
+  max-width: 50rem;
 }

@@ -1,13 +1,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+@import "../base/style.css";
 
 :root {
   --screen-font-size: 16px;
-  --screen-line-height: calc(var(--screen-font-size) * 1.5);
-  --screen-unit: var(--screen-line-height);
+  --screen-line-height: 1.5;
+  --screen-unit: calc(var(--screen-font-size) * var(--screen-line-height));
 
   --print-font-size: 11pt;
   --print-line-height: 16pt;
-  --print-unit: var(--print-line-height);
 
   /* Nord color scheme */
   --nord0: #2e3440;    /* Polar Night - darkest */
@@ -26,21 +26,13 @@
   --nord13: #ebcb8b;   /* Aurora - yellow */
   --nord14: #a3be8c;   /* Aurora - green */
   --nord15: #b48ead;   /* Aurora - purple */
-
-  --nord-text: var(--nord0);
-  --nord-text-subtle: var(--nord3);
-  --nord-background: var(--nord6);
-  --nord-surface: #ffffff;
-  --nord-border: var(--nord4);
-  --nord-accent: var(--nord10);
-  --nord-secondary: var(--nord8);
 }
 
 body {
   font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  color: var(--nord-text);
-  line-height: var(--screen-line-height);
-  background-color: var(--nord-background);
+  font-size: var(--screen-font-size);
+  color: var(--nord0);
+  background-color: var(--nord6);
   font-weight: 400;
   letter-spacing: -0.005em;
   font-feature-settings: "liga" 1, "kern" 1;
@@ -52,8 +44,8 @@ body {
   max-width: 100ch;
   margin: calc(var(--screen-unit) * 3) auto;
   padding: calc(var(--screen-unit) * 3) calc(var(--screen-unit) * 4);
-  border: 1px solid var(--nord-border);
-  background-color: var(--nord-surface);
+  border: 1px solid var(--nord4);
+  background-color: #ffffff;
   box-shadow: 
     0 4px 6px rgba(46, 52, 64, 0.05),
     0 10px 20px rgba(46, 52, 64, 0.1);
@@ -62,61 +54,49 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
-  color: var(--nord-text);
   letter-spacing: -0.02em;
 }
 
 h1 {
   font-size: calc(var(--screen-font-size) * 1.8);
-  margin-top: calc(var(--screen-unit) * 2);
-  margin-bottom: calc(var(--screen-unit) * 1.5);
-  line-height: 1.3;
   color: var(--nord0);
 }
 
 h2 {
   font-size: calc(var(--screen-font-size) * 1.4);
-  margin-top: calc(var(--screen-unit) * 1.5);
-  margin-bottom: calc(var(--screen-unit) * 0.75);
-  line-height: 1.4;
   color: var(--nord1);
 }
 
 h3 {
   font-size: calc(var(--screen-font-size) * 1.2);
-  margin-top: calc(var(--screen-unit) * 1.25);
-  margin-bottom: calc(var(--screen-unit) * 0.5);
-  line-height: 1.4;
   color: var(--nord2);
 }
 
 h4, h5, h6 {
   font-size: calc(var(--screen-font-size) * 1.05);
-  margin-top: calc(var(--screen-unit) * 1);
-  margin-bottom: calc(var(--screen-unit) * 0.25);
-  line-height: 1.4;
   color: var(--nord3);
 }
 
-p {
-  margin: calc(var(--screen-unit) * 0.75) 0;
+a {
+  color: var(--nord10);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: all 0.2s ease;
 }
 
-blockquote, pre, code, table {
-  overflow-x: auto;
-  min-width: 0;
-  max-width: 100%;
+a:hover {
+  color: var(--nord8);
+  border-bottom-color: var(--nord8);
 }
 
 blockquote {
   border-left: 3px solid var(--nord8);
-  padding-left: calc(var(--screen-unit) * 1);
-  margin-left: 0;
   font-style: italic;
-  color: var(--nord-text-subtle);
+  color: var(--nord3);
   background-color: rgba(143, 188, 187, 0.05);
   padding: calc(var(--screen-unit) * 0.75) calc(var(--screen-unit) * 1);
   border-radius: 0 4px 4px 0;
+  margin-left: 0;
 }
 
 code {
@@ -132,10 +112,9 @@ code {
 
 pre {
   background-color: var(--nord6);
-  border: 1px solid var(--nord-border);
+  border: 1px solid var(--nord4);
   border-radius: 8px;
-  padding: calc(var(--screen-unit) * 1);
-  margin: calc(var(--screen-unit) * 1) 0;
+  overflow-x: auto;
 }
 
 pre code {
@@ -144,18 +123,7 @@ pre code {
   border-radius: 0;
   font-size: calc(var(--screen-font-size) * 0.85);
   color: var(--nord0);
-}
-
-a:link, a:visited {
-  color: var(--nord-accent);
-  text-decoration: none;
-  border-bottom: 1px solid transparent;
-  transition: all 0.2s ease;
-}
-
-a:hover {
-  color: var(--nord8);
-  border-bottom-color: var(--nord8);
+  font-weight: normal;
 }
 
 strong {
@@ -164,29 +132,27 @@ strong {
 }
 
 em {
-  font-style: italic;
   color: var(--nord1);
 }
 
 ul, ol {
-  margin: calc(var(--screen-unit) * 0.75) 0;
   padding-left: calc(var(--screen-unit) * 1.5);
 }
 
-li {
-  margin: calc(var(--screen-unit) * 0.25) 0;
-}
-
 table {
-  border-collapse: collapse;
-  /*min-width: max-content;*/
-  background-color: var(--nord-surface);
+  background-color: #ffffff;
+  width: 100%;
+  overflow-x: auto;
+  min-width: 0;
+  max-width: 100%;
 }
 
 th, td {
   padding: calc(var(--screen-unit) * 0.5) calc(var(--screen-unit) * 0.75);
-  text-align: left;
-  border-bottom: 1px solid var(--nord-border);
+  border-bottom: 1px solid var(--nord4);
+  border-left: none;
+  border-right: none;
+  border-top: none;
 }
 
 th {
@@ -209,7 +175,7 @@ tr:hover {
 hr {
   border: none;
   height: 1px;
-  background-color: var(--nord-border);
+  background-color: var(--nord4);
   margin: calc(var(--screen-unit) * 2) 0;
 }
 
@@ -229,17 +195,9 @@ hr {
 }
 
 @media print {
-  @page {
-    margin: 0.75in;
-    size: letter;
-  }
-  
   :root {
-    --print-font-size: 11pt;
-    --print-line-height: 16pt;
     --screen-font-size: var(--print-font-size);
     --screen-line-height: var(--print-line-height);
-    --screen-unit: var(--print-line-height);
   }
   
   body {
@@ -261,36 +219,6 @@ hr {
   
   h1, h2, h3, h4, h5, h6 {
     color: #000 !important;
-    page-break-after: avoid;
-  }
-  
-  h1 {
-    font-size: 18pt !important;
-    line-height: 22pt !important;
-  }
-  
-  h2 {
-    font-size: 14pt !important;
-    line-height: 18pt !important;
-  }
-  
-  h3 {
-    font-size: 12pt !important;
-    line-height: 16pt !important;
-  }
-  
-  h4, h5, h6 {
-    font-size: 11pt !important;
-    line-height: 16pt !important;
-  }
-  
-  p, li {
-    orphans: 3;
-    widows: 3;
-  }
-  
-  blockquote, pre {
-    page-break-inside: avoid;
   }
   
   a {
@@ -302,7 +230,6 @@ hr {
     background-color: #f5f5f5 !important;
     border-radius: 0 !important;
     color: #000 !important;
-    font-size: 9pt !important;
   }
   
   pre {
@@ -314,12 +241,9 @@ hr {
   
   pre code {
     background-color: transparent !important;
-    font-size: 9pt !important;
   }
   
   table {
-    border-collapse: collapse !important;
-    border-radius: 0 !important;
     background-color: white !important;
     box-shadow: none !important;
   }
@@ -333,12 +257,8 @@ hr {
     background-color: #f0f0f0 !important;
   }
   
-  table, table tr td, table tr th {
-    page-break-inside: avoid;
-  }
-  
-  img {
-    max-width: 100% !important;
-    page-break-inside: avoid;
+  @page {
+    margin: 0.75in;
+    size: letter;
   }
 }
