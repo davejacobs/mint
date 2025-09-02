@@ -64,8 +64,9 @@ The `original` mode is particularly useful for template development, as it allow
 
 ### Built-in templates
 
-- `default` – Clean, minimal styling
-- `nord` – Clean, uses Nord color scheme
+- `default` – Clean, centered, modern layout
+- `basic` – Clean, minimal styling
+- `nord` – Clean, uses Nord color scheme and sans text
 - `nord-dark` – Dark version of Nord
 - `garden` – For digital gardens; includes navigation
 

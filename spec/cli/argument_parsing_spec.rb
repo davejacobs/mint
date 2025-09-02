@@ -16,10 +16,10 @@ RSpec.describe "CLI Argument Parsing" do
 
     context "with template options" do
       it "parses --template option" do
-        result = Mint::CommandLine.parse(["--template", "zen", "file.md"])
+        result = Mint::CommandLine.parse(["--template", "basic", "file.md"])
         
         expect(result[:argv]).to eq(["file.md"])
-        expect(result[:options][:layout_or_style_or_template]).to eq([:template, "zen"])
+        expect(result[:options][:layout_or_style_or_template]).to eq([:template, "basic"])
       end
 
       it "parses --layout option" do
@@ -140,7 +140,7 @@ RSpec.describe "CLI Argument Parsing" do
     context "with mixed arguments" do
       it "parses complex argument combinations" do
         args = [
-          "--template", "zen",
+          "--template", "basic",
           "--root", "/custom",
           "--destination", "out", 
           "--recursive",
@@ -151,7 +151,7 @@ RSpec.describe "CLI Argument Parsing" do
         result = Mint::CommandLine.parse(args)
         
         expect(result[:argv]).to eq(["file1.md", "file2.md"])
-        expect(result[:options][:layout_or_style_or_template]).to eq([:template, "zen"])
+        expect(result[:options][:layout_or_style_or_template]).to eq([:template, "basic"])
         expect(result[:options][:root]).to eq("/custom")
         expect(result[:options][:destination]).to eq("out")
         expect(result[:options][:recursive]).to be true

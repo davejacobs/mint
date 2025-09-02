@@ -4,19 +4,19 @@
 
 :root {
   --screen-font-size: 21px;
-  --screen-line-height: 1.3;
+  --screen-line-height: 1.4;
   --screen-unit: calc(var(--screen-line-height) * var(--screen-font-size));
 
   --print-font-size: 10pt;
   --print-line-height: calc(var(--print-font-size) * 1.618);
   --print-unit: var(--print-line-height);
 
-  --zen-text: #2c2c2c;
-  --zen-subtle: #8a8a8a;
-  --zen-accent: #007acc;
-  --zen-background: #fcfcfc;
-  --zen-border: #ccc;
-  --link-color: var(--zen-accent);
+  --basic-text: #2c2c2c;
+  --basic-subtle: #8a8a8a;
+  --basic-accent: #007acc;
+  --basic-background: #fcfcfc;
+  --basic-border: #ccc;
+  --link-color: var(--basic-accent);
 }
 
 @import "../base/style.css";
@@ -29,15 +29,15 @@ body {
   font-size: var(--screen-font-size);
   line-height: var(--screen-line-height);
   text-rendering: optimizeLegibility;
-  color: var(--zen-text);
-  background-color: var(--zen-background);
+  color: var(--basic-text);
+  background-color: var(--basic-background);
   font-weight: 350;
   letter-spacing: 0.01em;
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-weight: 300;
-  color: var(--zen-text);
+  color: var(--basic-text);
   letter-spacing: -0.02em;
 }
 
@@ -56,18 +56,17 @@ h2 {
 
 p {
   margin: calc(var(--screen-unit) * 0.618) 0;
-  text-align: justify;
   hyphens: auto;
 }
 
 blockquote {
-  border-left: 2px solid var(--zen-border);
+  border-left: 2px solid var(--basic-border);
   padding-top: 0.3rem;
   padding-bottom: 0.3rem;
   padding-left: var(--screen-unit);
   margin-left: 0;
   font-style: italic;
-  color: var(--zen-subtle);
+  color: var(--basic-subtle);
 }
 
 code {
@@ -81,7 +80,7 @@ code {
 
 pre {
   background-color: rgba(0, 0, 0, 0.02);
-  border: 1px solid var(--zen-border);
+  border: 1px solid var(--basic-border);
   border-radius: 6px;
   padding: calc(var(--screen-unit) * 0.8);
   overflow-x: auto;
@@ -95,14 +94,14 @@ pre code {
 }
 
 a:link, a:visited {
-  color: var(--zen-accent);
+  color: var(--basic-accent);
   text-decoration: none;
   border-bottom: 1px solid transparent;
   transition: border-bottom-color 0.2s ease;
 }
 
 a:hover {
-  border-bottom-color: var(--zen-accent);
+  border-bottom-color: var(--basic-accent);
   text-decoration: none;
 }
 
@@ -128,7 +127,7 @@ th, td {
 }
 
 th {
-  border-bottom: 1px solid var(--zen-border);
+  border-bottom: 1px solid var(--basic-border);
   font-weight: 400;
   font-style: italic;
 }

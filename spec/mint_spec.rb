@@ -56,7 +56,7 @@ describe Mint do
       before do
         FileUtils.mkdir_p ".mint"
         File.open(".mint/config.yaml", "w") do |file|
-          file << "layout: zen"
+          file << "layout: basic"
         end
       end
 
@@ -65,7 +65,7 @@ describe Mint do
       end
 
       it "merges all specified options with precedence according to scope" do
-        expect(Mint.configuration[:layout]).to eq("zen")
+        expect(Mint.configuration[:layout]).to eq("basic")
       end
 
       it "can filter by scope (but always includes defaults)" do
