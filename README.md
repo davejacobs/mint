@@ -48,7 +48,7 @@ mint publish content/**/*.md --template garden --destination public
 | `-s, --style STYLE` | Specify only the style |
 | `-d, --destination DIR` | Output directory |
 | `-o, --output-file FORMAT` | Custom output filename format |
-| `--style-mode MODE` | How styles are included (inline, external, original) |
+| `-m, --style-mode MODE` | How styles are included (inline, external, original) |
 | `--style-destination PATH` | Create external stylesheet and link it (sets mode to external) |
 | `-r, --recursive` | Find all Markdown files in any directories specified |
 
