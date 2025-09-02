@@ -1,4 +1,5 @@
 require "pathname"
+require "set"
 
 module Mint
   # Parses CSS files to extract @import statements and calculate relative paths
@@ -27,42 +28,60 @@ module Mint
       imports
     end
     
+    # Recursively resolves a CSS file and its imports
+    #
+    # @param [Pathname] css_file absolute path to the CSS file as Pathname
+    # @param [Pathname] html_dir directory of the HTML output file as Pathname
+    # @param [Set] visited set of already processed files to prevent circular imports
+    # @return [Array<String>] array of relative paths from HTML to CSS files
+    def self.resolve_css_file_recursive(css_file, html_dir, visited = Set.new)
+      css_files = []
+      
+      # Prevent circular imports
+      return css_files if visited.include?(css_file.to_s)
+      visited.add(css_file.to_s)
+      
+      return css_files unless css_file.exist? && css_file.extname == '.css'
+      
+      begin
+        css_content = File.read(css_file)
+        imports = extract_imports(css_content)
+        
+        # Recursively process imported files first (they should load before the file that imports them)
+        imports.each do |import_path|
+          import_file = (css_file.dirname + import_path).expand_path
+          css_files.concat(resolve_css_file_recursive(import_file, html_dir, visited))
+        end
+        
+        # Add this file after its imports
+        relative_path = css_file.relative_path_from(html_dir).to_s
+        css_files << relative_path unless css_files.include?(relative_path)
+        
+      rescue => e
+        # If we can't read the CSS file, skip it
+        # This allows the system to gracefully handle missing or unreadable files
+      end
+      
+      css_files
+    end
+    
     # Resolves all CSS files (main + imports) and calculates their paths relative to HTML output
     #
     # @param [String] main_css_path absolute path to the main CSS file
     # @param [String] html_output_path absolute path to the HTML output file
     # @return [Array<String>] array of relative paths from HTML to CSS files
     def self.resolve_css_files(main_css_path, html_output_path)
-      css_files = []
       main_css_file = Pathname.new(main_css_path).expand_path
       html_file = Pathname.new(html_output_path).expand_path
-      main_css_relative = main_css_file.relative_path_from(html_file.dirname).to_s
+      html_dir = html_file.dirname
       
-      return [main_css_relative] unless main_css_file.exist? && main_css_file.extname == '.css'
-      
-      begin
-        css_content = File.read(main_css_path)
-        imports = extract_imports(css_content)
-        
-        # Add imported files first (they should load before the main file)
-        imports.each do |import_path|
-          import_file = (main_css_file.dirname + import_path).expand_path
-          if import_file.exist? && import_file.extname == '.css'
-            relative_import = import_file.relative_path_from(html_file.dirname).to_s
-            css_files << relative_import
-          end
-        end
-        
-        # Add main file last (after its imports)
-        css_files << main_css_relative
-        
-      rescue => e
-        # If we can't read the CSS file, just return the main file
-        # This allows the system to gracefully handle missing or unreadable files
-        css_files = [main_css_relative]
+      # If the file doesn't exist or isn't CSS, return just the relative path
+      unless main_css_file.exist? && main_css_file.extname == '.css'
+        return [main_css_file.relative_path_from(html_dir).to_s]
       end
       
-      css_files
+      # Use recursive resolution
+      resolve_css_file_recursive(main_css_file, html_dir)
     end
     
     # Generates HTML link tags for CSS files

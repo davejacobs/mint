@@ -186,8 +186,8 @@ module Mint
           doc.root              = "#{@tmp_dir}/alternative-root"
           doc.destination       = "destination"
           doc.style_destination = "styles"
-          doc.layout            = "zen"
-          doc.style             = "zen"
+          doc.layout            = "nord"
+          doc.style             = "nord"
         end
       end
 
@@ -213,11 +213,33 @@ module Mint
         is_expected.to eq(Pathname.new(document.style_destination_directory))
       end
 
-      its(:layout) { is_expected.to be_in_directory("zen") }
-      its(:style) { is_expected.to be_in_directory("zen") }
+      its(:layout) { is_expected.to be_in_directory("default") }
+      its(:style) { is_expected.to be_in_directory("nord") }
 
       it "has a stylesheet path relative to user tmp directory" do
         expect(document.stylesheet).to match(/\.config\/mint\/tmp\/style\.css$/)
+      end
+
+      it_should_behave_like "all documents"
+    end
+
+    context "when using a style-only template" do
+      let(:document) do
+        Document.new @content_file do |doc|
+          doc.template = "nord"  # nord template has only style.css, no layout
+        end
+      end
+
+      subject { document }
+      
+      it "falls back to default layout" do
+        expect(document.layout.source).to include("templates/default")
+        expect(document.layout.source).to end_with("layout.erb")
+      end
+      
+      it "uses the specified style" do
+        expect(document.style.source).to include("templates/nord")  
+        expect(document.style.source).to end_with("style.css")
       end
 
       it_should_behave_like "all documents"

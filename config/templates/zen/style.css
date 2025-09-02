@@ -1,14 +1,14 @@
 /*@import url('https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400..900;1,400..900&display=swap');*/
-@import url('https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,200..900;1,200..900&display=swap');
+/*@import url('https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,200..900;1,200..900&display=swap');*/
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&display=swap');
 
 :root {
-  --line-height: 1.5;
-  --screen-font-size: 18px;
-  --screen-line-height: calc(var(--screen-font-size) * 1.4);
-  --screen-unit: var(--screen-line-height);
+  --screen-font-size: 21px;
+  --screen-line-height: 1.3;
+  --screen-unit: calc(var(--screen-line-height) * var(--screen-font-size));
 
   --print-font-size: 10pt;
-  --print-line-height: caalc(var(--print-font-size) * 1.618);
+  --print-line-height: calc(var(--print-font-size) * 1.618);
   --print-unit: var(--print-line-height);
 
   --zen-text: #2c2c2c;
@@ -26,6 +26,8 @@ body {
   font-optical-sizing: auto;
   font-weight: 400;
   font-style: normal;
+  font-size: var(--screen-font-size);
+  line-height: var(--screen-line-height);
   text-rendering: optimizeLegibility;
   color: var(--zen-text);
   background-color: var(--zen-background);
@@ -70,11 +72,11 @@ blockquote {
 
 code {
   font-family: Monaco, "Roboto Mono", "Ubuntu Mono", Consolas, "Courier New", monospace;
-  font-size: calc(var(--screen-font-size) * 0.8);
+  font-size: calc(var(--screen-font-size) * 0.75);
   background-color: rgba(0, 0, 0, 0.04);
-  padding: 0.1em 0.3em;
+  padding: 0.1em 0.6em;
   font-weight: 400;
-  line-height: 1.7;
+  line-height: calc(var(--screen-line-height) * 1.1);
 }
 
 pre {
@@ -89,7 +91,7 @@ pre code {
   background-color: transparent;
   padding: 0;
   border-radius: 0;
-  font-size: calc(var(--screen-font-size) * 0.8);
+  font-size: calc(var(--screen-font-size) * 0.7);
 }
 
 a:link, a:visited {

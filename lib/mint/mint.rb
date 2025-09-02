@@ -254,6 +254,15 @@ module Mint
     unless template_file
       template_dirs = Mint.path.map {|p| p + Mint::TEMPLATES_DIRECTORY + name }.select(&:exist?)
       if template_dirs.any?
+        # If we're looking for a layout and the template directory exists but has no layout,
+        # fall back to the default template's layout
+        if type == :layout && name != 'default'
+          begin
+            return find_template('default', :layout)
+          rescue TemplateNotFoundException
+          end
+        end
+        
         expected_exts = case type
                         when :layout then formats.join(', ')
                         when :style then css_formats.join(', ')

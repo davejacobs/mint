@@ -174,6 +174,22 @@ describe Mint do
       expect(style_file).to end_with("style.css")
     end
 
+    it "falls back to default layout when template exists but has no layout" do
+      # Test with nord template which has only style.css, no layout
+      layout_file = Mint.find_template("nord", :layout)
+      
+      # Should return the default template's layout
+      expect(layout_file).to include("templates/default")
+      expect(layout_file).to end_with("layout.erb")
+    end
+
+    it "still finds style files for style-only templates" do
+      style_file = Mint.find_template("nord", :style)
+      
+      expect(style_file).to include("templates/nord")
+      expect(style_file).to end_with("style.css")
+    end
+
     it "determines if a file is a template file" do
       actual_template = Mint.lookup_layout("default")
       fake_template = "#{Mint::ROOT}/config/templates/default.css"
