@@ -60,21 +60,22 @@ processInts (x:y:xs) = "First two: " ++ show x ++ ", " ++ show y
 We can nest patterns for more complex data structures:
 
 1. **Tree structures** with recursive patterns:
-   ```haskell
-   data Tree a = Leaf a | Branch (Tree a) (Tree a)
-   
-   treeDepth :: Tree a -> Int
-   treeDepth (Leaf _) = 1
-   treeDepth (Branch left right) = 1 + max (treeDepth left) (treeDepth right)
-   ```
+
+        ```haskell
+        data Tree a = Leaf a | Branch (Tree a) (Tree a)
+        
+        treeDepth :: Tree a -> Int
+        treeDepth (Leaf _) = 1
+        treeDepth (Branch left right) = 1 + max (treeDepth left) (treeDepth right)
+        ```
 
 2. **Record patterns** for structured data:
-   ```haskell
-   data Person = Person { name :: String, age :: Int }
-   
-   greet :: Person -> String  
-   greet Person{name = n, age = a} = "Hello " ++ n ++ ", age " ++ show a
-   ```
+        ```haskell
+        data Person = Person { name :: String, age :: Int }
+        
+        greet :: Person -> String  
+        greet Person{name = n, age = a} = "Hello " ++ n ++ ", age " ++ show a
+        ```
 
 ### Higher-Order Functions
 
