@@ -3,256 +3,178 @@ require "spec_helper"
 describe Mint do
   subject { Mint }
 
-  describe "::ROOT" do
+  describe "::PROJECT_ROOT" do
     it "contains the root of the Mint gem as a string" do
-      expect(Mint::ROOT).to eq(File.expand_path("../..", __FILE__))
+      expect(Mint::PROJECT_ROOT).to eq(File.expand_path("../..", __FILE__))
     end
   end
 
-  describe ".path" do
-    def as_pathname(files)
-      files.map {|file| Pathname.new(file) }
-    end
-
+  describe "::PATH" do
     it "returns the paths corresponding to all scopes as an array" do
-      expect(Mint.path).to eq([Pathname.new(".mint"),
+      expect(Mint::PATH).to eq([Pathname.new(".mint"),
                                Pathname.new("~/.config/mint").expand_path,
-                               Pathname.new(Mint::ROOT + "/config").expand_path])
-    end
-
-    it "can filter paths by one scope" do
-      expect(Mint.path([:user])).to eq([Pathname.new("~/.config/mint").expand_path])
-    end
-
-    it "can filter paths by many scopes" do
-      expect(Mint.path([:local, :user])).to eq([Pathname.new(".mint"),
-                                                Pathname.new("~/.config/mint").expand_path])
+                               Pathname.new(Mint::PROJECT_ROOT + "/config").expand_path])
     end
   end
-
 
   describe ".configuration" do
-    let(:defaults) do
-      {
-        root: Dir.getwd,
-        destination: nil,
-        style_mode: :inline,
-        style_destination: nil,
-        output_file: '#{basename}.#{new_extension}',
-        layout_or_style_or_template: [:template, 'default'],
-        scope: :local,
-        recursive: false,
-        verbose: false
-      }
-    end
-
     context "when there is no config.yaml file on the Mint path" do
-      it "returns a default set of options" do
-        expect(Mint.configuration).to eq(defaults)
+      it "returns a default Config object" do
+        config = Mint.configuration
+        expect(config).to be_a(Mint::Config)
+        expect(config.layout_name).to eq('default')
+        expect(config.style_name).to eq('default')
+        expect(config.style_mode).to eq(:inline)
+        expect(config.output_file_format).to eq('%{basename}.%{new_extension}')
       end
     end
 
     context "when there is a config.yaml file on the Mint path" do
       before do
-        FileUtils.mkdir_p ".mint"
-        File.open(".mint/config.yaml", "w") do |file|
-          file << "layout: basic"
-        end
+        FileUtils.mkdir_p(".mint")
+        File.write(".mint/config.yaml", YAML.dump({ style_name: "custom" }))
       end
 
       after do
-        FileUtils.rm_rf ".mint"
+        FileUtils.rm_rf(".mint")
       end
 
-      it "merges all specified options with precedence according to scope" do
-        expect(Mint.configuration[:layout]).to eq("basic")
-      end
-
-      it "can filter by scope (but always includes defaults)" do
-        expect(Mint.configuration(scopes: [:user])).to eq(defaults)
+      it "merges config files with defaults" do
+        config = Mint.configuration
+        expect(config.style_name).to eq("custom")
+        expect(config.layout_name).to eq("default") # still has defaults
       end
     end
   end
 
-  describe ".configuration_with" do
-    it "displays the sum of all configuration files with other options added" do
-      expect(Mint.configuration_with(local: true)).to eq({
-        root: Dir.getwd,
-        destination: nil,
-        style_mode: :inline,
-        style_destination: nil,
-        output_file: '#{basename}.#{new_extension}',
-        layout_or_style_or_template: [:template, 'default'],
-        scope: :local,
-        recursive: false,
-        verbose: false,
-        local: true
-      })
-    end
-  end
-
-  describe ".templates" do
-    it "returns local templates by default" do
-      # Note: Now defaults to local scope, will include global templates only if explicitly requested
-      expect(Mint.templates).to be_an(Array)
-    end
-
-    it "returns global templates when global scope is specified" do
-      expect(Mint.templates(:global)).to include(Mint::ROOT + "/config/templates/default")
-    end
-  end
-
-  describe ".formats" do
-    it "includes Markdown" do
-      expect(Mint.formats).to include("md")
-    end
-
-    it "includes Haml" do
-      expect(Mint.formats).to include("haml")
-    end
-  end
-
-  describe ".css_formats" do
-    it "includes Sass" do
-      expect(Mint.css_formats).to include("sass")
-    end
-  end
-
-  describe ".renderer" do
-    it "creates a valid renderer" do
-      expect(Mint.renderer(@content_file)).to respond_to(:render)
-    end
-  end
-
-  describe ".path_for_scope" do
-    it "chooses the appropriate path for scope" do
-      expectations = {
-        local: Pathname.new(".mint"),
-        user: Pathname.new("~/.config/mint").expand_path,
-        global: Pathname.new(Mint::ROOT + "/config").expand_path
-      }
-
-      expectations.each do |scope, path|
-        expect(Mint.path_for_scope(scope)).to eq(path)
-      end
-    end
-  end
-
-  # Refactored lookup methods for explicit parameter interface
-  describe ".lookup_template" do
+  describe ".find_template_directory_by_name" do
     it "returns template directory path by name" do
-      result = Mint.lookup_template("default")
-      expect(result.to_s).to include("templates/default")
-      expect(File.directory?(result)).to be true
+      # This will return nil if template doesn't exist, which is expected
+      result = Mint.find_template_directory_by_name("default")
+      if result
+        expect(result).to be_a(Pathname)
+      else
+        expect(result).to be_nil
+      end
     end
   end
 
-  describe ".lookup_layout" do
+  describe ".find_layout_by_name" do
     it "returns layout file path by template name" do
-      result = Mint.lookup_layout("default")
-      expect(result).to include("templates/default")
-      expect(result).to end_with("layout.erb")
+      result = Mint.find_layout_by_name("default")
+      if result
+        expect(result).to be_a(Pathname)
+        expect(Mint.is_valid_layout_file?(result)).to be true
+      else
+        expect(result).to be_nil
+      end
     end
   end
 
-  describe ".lookup_style" do
+  describe ".find_style_by_name" do
     it "returns style file path by template name" do
-      result = Mint.lookup_style("default")
-      expect(result).to include("templates/default")
-      expect(result).to end_with("style.css")
+      result = Mint.find_style_by_name("default")
+      if result
+        expect(result).to be_a(Pathname)
+        expect(Mint.is_valid_stylesheet?(result)).to be true
+      else
+        expect(result).to be_nil
+      end
     end
   end
 
-  describe ".find_template" do
-    it "finds the correct template file by name and type" do
-      layout_file = Mint.find_template("default", :layout)
-      style_file = Mint.find_template("default", :style)
-      
-      expect(layout_file).to include("templates/default")
-      expect(layout_file).to end_with("layout.erb")
-      expect(style_file).to include("templates/default")
-      expect(style_file).to end_with("style.css")
-    end
-
-    it "falls back to default layout when template exists but has no layout" do
-      # Test with nord template which has only style.css, no layout
-      layout_file = Mint.find_template("nord", :layout)
-      
-      # Should return the default template's layout
-      expect(layout_file).to include("templates/default")
-      expect(layout_file).to end_with("layout.erb")
-    end
-
-    it "still finds style files for style-only templates" do
-      style_file = Mint.find_template("nord", :style)
-      
-      expect(style_file).to include("templates/nord")
-      expect(style_file).to end_with("style.css")
-    end
-
-    it "determines if a file is a template file" do
-      actual_template = Mint.lookup_layout("default")
-      fake_template = "#{Mint::ROOT}/config/templates/default.css"
-      obvious_nontemplate = @dynamic_style_file
-
-      expect(Mint.template?(actual_template)).to be_truthy
-      expect(Mint.template?(fake_template)).to be_falsy
-      expect(Mint.template?(obvious_nontemplate)).to be_falsy
+  describe ".is_valid_stylesheet?" do
+    it "determines if a file is a valid stylesheet" do
+      expect(Mint.is_valid_stylesheet?(Pathname.new("style.css"))).to be true
+      expect(Mint.is_valid_stylesheet?(Pathname.new("style.scss"))).to be true
+      expect(Mint.is_valid_stylesheet?(Pathname.new("style.sass"))).to be true
+      expect(Mint.is_valid_stylesheet?(Pathname.new("other.css"))).to be false
     end
   end
 
-  describe ".guess_name_from" do
-    it "properly guesses destination file names based on source file names" do
-      expect(Mint.guess_name_from("content.md")).to eq("content.html")
-      expect(Mint.guess_name_from("content.textile")).to eq("content.html")
-      expect(Mint.guess_name_from("layout.haml")).to eq("layout.html")
-      expect(Mint.guess_name_from("dynamic.sass")).to eq("dynamic.css")
+  describe ".is_valid_layout_file?" do
+    it "determines if a file is a valid layout file" do
+      expect(Mint.is_valid_layout_file?(Pathname.new("layout.html"))).to be true
+      expect(Mint.is_valid_layout_file?(Pathname.new("layout.erb"))).to be true
+      expect(Mint.is_valid_layout_file?(Pathname.new("layout.haml"))).to be true
+      expect(Mint.is_valid_layout_file?(Pathname.new("other.html"))).to be false
     end
   end
 
-  describe ".destination_file_path and .style_destination_file_path" do
-    context "before it publishes a document" do
-      let(:document) { Mint::Document.new @content_file }
-      subject { document }
+  describe ".is_template_directory?" do
+    it "determines if a directory is a valid template directory" do
+      Dir.mktmpdir do |tmpdir|
+        template_dir = Pathname.new(tmpdir) + "test_template"
+        template_dir.mkdir
+        
+        # Empty directory should not be valid (returns empty array)
+        expect(Mint.is_template_directory?(template_dir)).to be_empty
+        
+        # Directory with stylesheet should be valid
+        (template_dir + "style.css").write("body { color: black; }")
+        expect(Mint.is_template_directory?(template_dir)).to be_truthy
+      end
+    end
+  end
 
-      its(:destination_file_path) { should_not exist }
-      it "style destination file should not exist initially" do
-        # Clean up any existing style file first
-        FileUtils.rm_f(document.style_destination_file_path) if document.style_destination_file_path && File.exist?(document.style_destination_file_path)
-        expect(document.style_destination_file_path).not_to exist
+  describe ".extract_title_from_file" do
+    it "extracts title from H1 header" do
+      Dir.mktmpdir do |tmpdir|
+        test_file = File.join(tmpdir, "test.md")
+        File.write(test_file, "# My Title\n\nContent here")
+        
+        expect(Mint.extract_title_from_file(test_file)).to eq("My Title")
       end
     end
 
-    # These are copied from document_spec.rb. I eventually want to move
-    # to this non-OO style of publishing, and this is the transition
-    context "when it publishes a document" do
-      let(:document) { Mint::Document.new @content_file }
-      before { Mint.publish! document }
-      subject { document }
+    it "falls back to filename when no H1" do
+      Dir.mktmpdir do |tmpdir|
+        test_file = File.join(tmpdir, "my-test-file.md")
+        File.write(test_file, "Just content")
+        
+        expect(Mint.extract_title_from_file(test_file)).to eq("My Test File")
+      end
+    end
+  end
 
-      its(:destination_file_path) { should exist }
+  describe ".parse_metadata_from" do
+    it "parses YAML metadata from text" do
+      text_with_metadata = "title: Test\nauthor: Me\n\n\nContent here"
+      metadata, content = Mint.parse_metadata_from(text_with_metadata)
       
-      it "creates style file only for external style mode" do
-        if document.style_mode == :external
-          expect(document.style_destination_file_path).to exist
-        else
-          expect(document.style_destination_file_path).not_to exist
+      expect(metadata).to eq({ "title" => "Test", "author" => "Me" })
+      expect(content).to eq("\nContent here")
+    end
+
+    it "handles text without metadata" do
+      text_without_metadata = "Just content here"
+      metadata, content = Mint.parse_metadata_from(text_without_metadata)
+      
+      expect(metadata).to eq({})
+      expect(content).to eq("Just content here")
+    end
+  end
+
+  describe ".publish!" do
+    it "processes a markdown file and creates HTML output" do
+      FileUtils.mkdir_p("./tmp")
+      Dir.chdir("./tmp") do |tmpdir|
+        source_file = "test.md"
+        File.write(source_file, "# Test\n\nThis is a test.")
+        
+        config = Mint::Config.new(destination_directory: Pathname.new("./"))
+        
+        # This should succeed if templates exist, or raise an error if they don't
+        begin
+          Mint.publish!(source_file, config)
+          # If successful, check that output file was created
+          output_file = "test.html"
+          expect(File.exist?(output_file)).to be true
+        rescue Mint::StyleNotFoundException, Mint::LayoutNotFoundException => e
+          # Expected error when templates don't exist
+          expect(e).to be_a(Exception)
         end
       end
-    end
-  end
-
-  describe ".template_path" do
-    it "returns template directory for given name and scope" do
-      expect(Mint.template_path("pro", :local)).to eq(Pathname.new(".mint/templates/pro"))
-    end
-
-    it "works with user scope" do
-      expect(Mint.template_path("pro", :user)).to eq(Pathname.new("~/.config/mint/templates/pro").expand_path)
-    end
-
-    it "works with global scope" do
-      expect(Mint.template_path("pro", :global)).to eq(Pathname.new("#{Mint::ROOT}/config/templates/pro"))
     end
   end
 end

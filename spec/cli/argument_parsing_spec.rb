@@ -1,236 +1,131 @@
 require "spec_helper"
 
 RSpec.describe "CLI Argument Parsing" do
-  describe "Mint::CommandLine.parse" do
+  describe "Mint::Commandline.parse!" do
+    before do
+      # Ensure we don't think we're in a pipe for tests
+      allow(ENV).to receive(:[]).and_call_original
+      allow(ENV).to receive(:[]).with("MINT_NO_PIPE").and_return("1")
+      allow($stdin).to receive(:tty?).and_return(true)
+    end
     context "with no arguments" do
-      it "returns default options and empty argv" do
-        result = Mint::CommandLine.parse([])
+      it "returns help command and default config" do
+        command, help, config, files = Mint::Commandline.parse!([])
         
-        expect(result[:argv]).to eq([])
-        expect(result[:options][:root]).to eq(Dir.getwd)
-        expect(result[:options][:scope]).to eq(:local)
-        expect(result[:options][:layout_or_style_or_template]).to eq([:template, 'default'])
-        expect(result[:help]).to include("Usage: mint")
+        expect(command).to eq("help")
+        expect(config.working_directory).to be_a(Pathname)
+        expect(config.layout_name).to eq('default')
+        expect(config.style_name).to eq('default')
+        expect(help).to include("Usage: mint")
+        expect(files).to eq([])
       end
     end
 
     context "with template options" do
       it "parses --template option" do
-        result = Mint::CommandLine.parse(["--template", "basic", "file.md"])
+        command, help, config, files = Mint::Commandline.parse!(["publish", "--template", "basic", "file.md"])
         
-        expect(result[:argv]).to eq(["file.md"])
-        expect(result[:options][:layout_or_style_or_template]).to eq([:template, "basic"])
+        expect(command).to eq("publish")
+        expect(config.layout_name).to eq("basic")
+        expect(config.style_name).to eq("basic")
+        expect(files.map(&:basename).map(&:to_s)).to include("file.md")
       end
 
       it "parses --layout option" do
-        result = Mint::CommandLine.parse(["--layout", "custom", "file.md"])
+        command, help, config, files = Mint::Commandline.parse!(["publish", "--layout", "custom", "file.md"])
         
-        expect(result[:argv]).to eq(["file.md"])
-        expect(result[:options][:layout_or_style_or_template]).to eq([:layout, "custom"])
+        expect(command).to eq("publish")
+        expect(config.layout_name).to eq("custom")
+        expect(files.map(&:basename).map(&:to_s)).to include("file.md")
       end
 
       it "parses -l option for layout" do
-        result = Mint::CommandLine.parse(["-l", "custom", "file.md"])
+        command, help, config, files = Mint::Commandline.parse!(["publish", "-l", "custom", "file.md"])
         
-        expect(result[:argv]).to eq(["file.md"])
-        expect(result[:options][:layout_or_style_or_template]).to eq([:layout, "custom"])
+        expect(command).to eq("publish")
+        expect(config.layout_name).to eq("custom")
       end
 
       it "parses --style option" do
-        result = Mint::CommandLine.parse(["--style", "minimal", "file.md"])
+        command, help, config, files = Mint::Commandline.parse!(["publish", "--style", "minimal", "file.md"])
         
-        expect(result[:argv]).to eq(["file.md"])
-        expect(result[:options][:layout_or_style_or_template]).to eq([:style, "minimal"])
+        expect(command).to eq("publish")
+        expect(config.style_name).to eq("minimal")
       end
 
       it "handles short flags for templates" do
-        result = Mint::CommandLine.parse(["-t", "pro", "file.md"])
-        expect(result[:options][:layout_or_style_or_template]).to eq([:template, "pro"])
-
-        result = Mint::CommandLine.parse(["--layout", "custom", "file.md"])
-        expect(result[:options][:layout_or_style_or_template]).to eq([:layout, "custom"])
-
-        result = Mint::CommandLine.parse(["-s", "clean", "file.md"])
-        expect(result[:options][:layout_or_style_or_template]).to eq([:style, "clean"])
+        command, help, config, files = Mint::Commandline.parse!(["publish", "-t", "pro", "file.md"])
+        
+        expect(command).to eq("publish")
+        expect(config.layout_name).to eq("pro")
+        expect(config.style_name).to eq("pro")
       end
     end
 
     context "with path options" do
       it "parses --root option" do
-        result = Mint::CommandLine.parse(["--root", "/custom/path", "file.md"])
+        command, help, config, files = Mint::Commandline.parse!(["publish", "--root", "/custom/path", "file.md"])
         
-        expect(result[:options][:root]).to eq("/custom/path")
+        expect(config.working_directory).to eq(Pathname.new("/custom/path"))
       end
 
       it "parses --destination option" do
-        result = Mint::CommandLine.parse(["--destination", "output", "file.md"])
+        command, help, config, files = Mint::Commandline.parse!(["publish", "--destination", "output", "file.md"])
         
-        expect(result[:options][:destination]).to eq("output")
+        expect(config.destination_directory).to eq(Pathname.new("output"))
       end
 
       it "parses --style-destination option" do
-        result = Mint::CommandLine.parse(["--style-destination", "css", "file.md"])
+        command, help, config, files = Mint::Commandline.parse!(["publish", "--style-destination", "css", "file.md"])
         
-        expect(result[:options][:style_destination]).to eq("css")
+        expect(config.style_mode).to eq(:external)
+        expect(config.style_destination_directory).to eq("css")
       end
     end
 
     context "with output options" do
       it "parses --output-file option" do
-        result = Mint::CommandLine.parse(["--output-file", "custom.html", "file.md"])
+        command, help, config, files = Mint::Commandline.parse!(["publish", "--output-file", "%{basename}_custom.%{new_extension}", "file.md"])
         
-        expect(result[:options][:output_file]).to eq("custom.html")
+        expect(config.output_file_format).to eq("%{basename}_custom.%{new_extension}")
       end
 
       it "has default output file format" do
-        result = Mint::CommandLine.parse(["file.md"])
+        command, help, config, files = Mint::Commandline.parse!(["publish", "file.md"])
         
-        expect(result[:options][:output_file]).to eq('#{basename}.#{new_extension}')
-      end
-    end
-
-    context "with scope options" do
-      it "parses --global scope" do
-        result = Mint::CommandLine.parse(["--global", "file.md"])
-        
-        expect(result[:options][:scope]).to eq(:global)
-      end
-
-      it "parses --user scope" do
-        result = Mint::CommandLine.parse(["--user", "file.md"])
-        
-        expect(result[:options][:scope]).to eq(:user)
-      end
-
-      it "parses --local scope (default)" do
-        result = Mint::CommandLine.parse(["--local", "file.md"])
-        
-        expect(result[:options][:scope]).to eq(:local)
-      end
-
-      it "handles short scope flags" do
-        result = Mint::CommandLine.parse(["-g"])
-        expect(result[:options][:scope]).to eq(:global)
-
-        result = Mint::CommandLine.parse(["-u"])
-        expect(result[:options][:scope]).to eq(:user)
-      end
-    end
-
-    context "with boolean flags" do
-      it "parses --recursive flag" do
-        result = Mint::CommandLine.parse(["--recursive"])
-        
-        expect(result[:options][:recursive]).to be true
-      end
-
-      it "handles short recursive flag" do
-        result = Mint::CommandLine.parse(["-r"])
-        
-        expect(result[:options][:recursive]).to be true
-      end
-
-      it "defaults recursive to false" do
-        result = Mint::CommandLine.parse([])
-        
-        expect(result[:options][:recursive]).to be false
-      end
-    end
-
-    context "with mixed arguments" do
-      it "parses complex argument combinations" do
-        args = [
-          "--template", "basic",
-          "--root", "/custom",
-          "--destination", "out", 
-          "--recursive",
-          "--global",
-          "file1.md", "file2.md"
-        ]
-        
-        result = Mint::CommandLine.parse(args)
-        
-        expect(result[:argv]).to eq(["file1.md", "file2.md"])
-        expect(result[:options][:layout_or_style_or_template]).to eq([:template, "basic"])
-        expect(result[:options][:root]).to eq("/custom")
-        expect(result[:options][:destination]).to eq("out")
-        expect(result[:options][:recursive]).to be true
-        expect(result[:options][:scope]).to eq(:global)
-      end
-    end
-
-    context "argument processing utilities" do
-      describe ".process_output_format" do
-        it "processes basename substitution" do
-          result = Mint::CommandLine.process_output_format(
-            '#{basename}.html', 
-            'document.md'
-          )
-          
-          expect(result).to eq('document.html')
-        end
-
-        it "processes original_extension substitution" do
-          result = Mint::CommandLine.process_output_format(
-            '#{basename}.#{original_extension}.bak',
-            'document.md' 
-          )
-          
-          expect(result).to eq('document.md.bak')
-        end
-
-        it "processes new_extension substitution" do
-          result = Mint::CommandLine.process_output_format(
-            '#{basename}.#{new_extension}',
-            'document.md'
-          )
-          
-          expect(result).to eq('document.html')
-        end
-
-        it "processes complex format strings" do
-          result = Mint::CommandLine.process_output_format(
-            'output/#{basename}-converted.#{new_extension}',
-            'docs/readme.md'
-          )
-          
-          expect(result).to eq('output/readme-converted.html')
-        end
-
-        it "handles files without extensions" do
-          result = Mint::CommandLine.process_output_format(
-            '#{basename}.#{new_extension}',
-            'README'
-          )
-          
-          expect(result).to eq('README.html')
-        end
+        expect(config.output_file_format).to eq("%{basename}.%{new_extension}")
       end
     end
 
     context "with style mode options" do
       it "parses --style-mode inline" do
-        result = Mint::CommandLine.parse(["--style-mode", "inline", "file.md"])
+        command, help, config, files = Mint::Commandline.parse!(["publish", "--style-mode", "inline", "file.md"])
         
-        expect(result[:options][:style_mode]).to eq(:inline)
+        expect(config.style_mode).to eq(:inline)
       end
 
       it "parses --style-mode external" do
-        result = Mint::CommandLine.parse(["--style-mode", "external", "file.md"])
+        command, help, config, files = Mint::Commandline.parse!(["publish", "--style-mode", "external", "file.md"])
         
-        expect(result[:options][:style_mode]).to eq(:external)
+        expect(config.style_mode).to eq(:external)
       end
+    end
 
-      it "parses --style-mode original" do
-        result = Mint::CommandLine.parse(["--style-mode", "original", "file.md"])
+    context "with file handling" do
+      it "processes multiple files" do
+        command, help, config, files = Mint::Commandline.parse!(["publish", "file1.md", "file2.md", "file3.md"])
         
-        expect(result[:options][:style_mode]).to eq(:original)
+        expect(files.length).to eq(3)
+        expect(files.map(&:basename).map(&:to_s)).to eq(["file1.md", "file2.md", "file3.md"])
       end
+    end
 
-      it "defaults to inline style mode" do
-        result = Mint::CommandLine.parse(["file.md"])
+    context "style destination behavior" do
+      it "automatically sets external mode when style-destination is used" do
+        command, help, config, files = Mint::Commandline.parse!(["publish", "--style-destination", "css", "file.md"])
         
-        expect(result[:options][:style_mode]).to eq(:inline)
+        expect(config.style_mode).to eq(:external)
+        expect(config.style_destination_directory).to eq("css")
       end
     end
   end

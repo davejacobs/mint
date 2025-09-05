@@ -6,7 +6,11 @@
 - [x]: Link stylesheets in place for preview & template iteration
 - [x]: Allow easy default layout reuse
 - [ ]: Refresh templates
-- [ ]: Smart templates
+    - `make garden` command for easy comparison
+- [ ]: Bug: Fix output_file, which isn't used
+- [ ]: Tech debt: Move options parsing to top level
+- [ ]: Remove --recursive
+- [ ]: Smart quotes
 - [ ]: Allow local variables (from --var flag at CLI, plus a few provided by Mint, like @all_files)
 - [ ]: Create --navigation flag instead of garden template
 - [ ]: Code highlighting

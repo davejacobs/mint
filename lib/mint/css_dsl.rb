@@ -2,18 +2,17 @@ require "sass-embedded"
 
 module Mint
   module CSS
-    def self.container
-      "container"
-    end
+    CONTAINER = "container"
 
-    # Maps a "DSL" onto actual CSS. Translates this ...
+    # Allows for a human-readable DSL to be used to generate CSS. Translates the following:
     #
     # ---
     # Font: Helvetica
     # Margin: 1in
     # Orientation: Landscape
+    # ---
     #
-    # ... into something like:
+    # ... into something like this:
     #
     # #container {
     #   font-family: Helvetica;
@@ -43,13 +42,14 @@ module Mint
         indent: "p+p { text-indent: %s }",
         bullet: "li { list-style-type: %s }",
         bullet_image: "li { list-style-image: url(%s) }",
-        after_paragraph: "margin-bottom",
-        before_paragraph: "margin-top"
+        after_paragraph: "p { margin-bottom: %s }",
+        before_paragraph: "p { margin-top: %s }"
       }
     end
 
     def self.stylify(key, value)
-      selector = mappings[Helpers.symbolize key]
+      symbol_key = key.to_s.downcase.gsub(' ', '_').to_sym
+      selector = mappings[symbol_key]
 
       if selector.nil?
         ""
@@ -62,7 +62,7 @@ module Mint
 
     def self.parse(style)
       css = style.map {|k,v| stylify(k, v) }.join("\n  ")
-      container_scope = "##{container}\n  #{css.strip}\n"
+      container_scope = "##{CONTAINER}\n  #{css.strip}\n"
       
       # Suppress warnings by capturing $stderr
       original_stderr = $stderr

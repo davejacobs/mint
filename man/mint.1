@@ -28,32 +28,23 @@ Create stylesheet at specified directory or file path and link it. This sets sty
 Specify a template to use for both layout and styling
 .TP
 .BR \-l ", " \-\-layout " " \fILAYOUT\fR
-Specify a specific layout template
+Specify a specific layout template by name
 .TP
 .BR \-\-style " " \fISTYLE\fR
-Specify a specific style template
+Specify a specific style template by name
 .TP
-.BR \-g ", " \-\-global
-Specify config changes on a global level
+.BR \-w ", " \-\-working\-dir " " \fIWORKING_DIR\fR
+Specify a working directory outside the current directory
 .TP
-.BR \-u ", " \-\-user
-Specify config changes on a user-wide level
+.BR \-o ", " \-\-output\-file " " \fIFORMAT\fR
+Specify output filename format with substitutions (%{basename}, %{original_extension}, %{new_extension})
 .TP
-.BR \-\-local
-Specify config changes on a local level (default)
-.TP
-.BR \-r ", " \-\-recursive
-Recursively find all Markdown files in subdirectories
-.TP
-.BR \-v ", " \-\-verbose
-Enable verbose output
-.TP
-.BR \-h ", " \-\-help
-Display help information
+.BR \-\-preserve\-structure
+Preserve source directory structure (e.g., nesting) in destination
 .SH STYLE OPTIONS
 Mint offers flexible control over how stylesheets are incorporated into your documents:
 
-.SS Inline Styles (Default)
+.SS Inline styles (Default)
 By default, Mint inlines CSS directly into your HTML documents, creating self-contained files:
 .RS
 .nf
@@ -61,7 +52,7 @@ mint publish document.md
 .fi
 .RE
 
-.SS External Stylesheets
+.SS External stylesheets
 Create external stylesheets that are linked from your HTML documents:
 .RS
 .nf
@@ -92,11 +83,6 @@ Create external stylesheet:
 .nf
 mint publish document.md --style-destination css
 .fi
-.TP
-Recursively process all Markdown files:
-.nf
-mint publish --recursive
-.fi
 .SH TEMPLATES
 Mint comes with several built-in templates:
 .IP \(bu 2
@@ -104,31 +90,22 @@ Mint comes with several built-in templates:
 \- Clean, professional styling
 .IP \(bu 2
 .B basic
-\- Minimalist design
+\- Minimalist design focused on the text
 .IP \(bu 2
-.B protocol
-\- Technical documentation style
-.IP \(bu 2
-.B newspaper
-\- Multi-column layout
+.B garden
+\- For digital gardens with navigation
 .IP \(bu 2
 .B nord/nord-dark
-\- Modern color schemes
+\- Modern color schemes using the Nord color scheme
 .PP
-Templates can be written in any format accepted by the Tilt template interface library (ERB, Haml, etc.).
+Templates use ERB for layouts and support CSS, SCSS, or SASS for styling.
 .SH FILES
 .TP
 .I ~/.config/mint/
-User-specific configuration and templates
+User-level configuration and templates ('user' scope)
 .TP
 .I .mint/
-Project-specific configuration and templates
-.TP
-.I config.yaml
-Configuration file (can exist at global, user, or local levels)
-.SH SEE ALSO
-.BR markdown (1),
-.BR tilt (1)
+Project-level configuration and templates ('local' scope)
 .SH AUTHOR
 David Jacobs <david@wit.io>
 .SH HOMEPAGE

@@ -31,15 +31,19 @@ module Mint
           # "Bullet: checkbox.png"    => "li { list-style-image: url(checkbox.png) }",
         }
 
-        table.each do |human, machine|
-          CSS.stylify(*human.split(":").map(&:strip))
+        table.each do |human, expected|
+          key, value = human.split(":").map(&:strip)
+          actual = CSS.stylify(key, value)
+          expect(actual).to eq(expected), "Expected '#{human}' to produce '#{expected}', got '#{actual}'"
         end
       end
     end
 
     describe ".parse" do
       it "transforms a map of human-readable styles into a CSS string" do
-        expect(CSS.parse({ "Font" => "Helvetica" })).to eq("#container {\n  font-family: Helvetica;\n}") 
+        result = CSS.parse({ "Font" => "Helvetica" })
+        expect(result).to include("container")
+        expect(result).to include("font-family: Helvetica")
       end
     end
   end

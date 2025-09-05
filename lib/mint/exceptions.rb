@@ -1,5 +1,4 @@
 module Mint
-  # Indicates that a named template is not located anywhere
-  # in the Mint path.
-  class TemplateNotFoundException < Exception; end
+  class LayoutNotFoundException < Exception; end
+  class StyleNotFoundException < Exception; end
 end

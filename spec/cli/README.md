@@ -60,7 +60,7 @@ end
 
 # Output capture
 stdout, stderr = capture_output do
-  Mint::CommandLine.some_method
+  Mint::Commandline.some_method
 end
 
 # File creation

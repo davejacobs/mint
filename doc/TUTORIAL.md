@@ -41,6 +41,12 @@ Use different layouts and stylesheets:
 
     mint publish Document.md --layout default --style nord
 
+### Preserve directory structure
+
+Keep your source directory structure in the output:
+
+    mint publish docs/**/*.md --destination public --preserve-structure
+
 For all available options, see `man mint`.
 
 ## Digital gardens
@@ -61,60 +67,12 @@ You can also use the `--recursive` option to automatically include subdirectorie
 
 ## Configuration
 
-Set defaults to avoid repeating command-line options.
-
-### Configuration files
-
-Mint looks for config files in this order:
+Mint looks for configuration files in this order:
 
 1. `./mint.yml` (local directory)
 2. `~/.config/mint/config.yml` (user home)
 
-### Setting defaults
-
-Set a default template for the current directory:
-
-    mint set template=serif-professional
-
-Set user-wide defaults:
-
-    mint set --user template=professional  
-
-Set system-wide defaults:
-
-    mint set --global template=normal
-
-### Configuration hierarchy
-
-More specific settings override general ones:
-
-1. Command-line options (highest priority)
-2. Local config file
-3. User config file
-4. Global config file (lowest priority)
-
-### View active settings
-
-See what configuration is currently active:
-
-    mint config
-
-### Command options
-
-- `--verbose, -v` – show detailed output
-- `--simulation, -s` – preview changes without executing
-
-### Editing templates
-
-Edit templates directly from the command line:
-
-    mint edit --layout my-layout
-    mint edit --style my-style
-
-Mint opens the file in your `$EDITOR`. Short forms work too:
-
-    mint edit -l normal
-    mint edit -s normal
+Command-line options override configuration file settings.
 
 ## Template paths
 

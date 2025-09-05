@@ -46,10 +46,12 @@ mint publish content/**/*.md --template garden --destination public
 | `-t, --template TEMPLATE` | Use a built-in template (combines layout + style) |
 | `-l, --layout LAYOUT` | Specify only the layout |
 | `-s, --style STYLE` | Specify only the style |
+| `-w, --working-dir WORKING_DIR` | Specify a working directory outside the current directory |
 | `-d, --destination DIR` | Output directory |
-| `-o, --output-file FORMAT` | Custom output filename format |
+| `-o, --output-file FORMAT` | Custom output filename format with substitutions |
 | `-m, --style-mode MODE` | How styles are included (inline, external, original) |
 | `--style-destination PATH` | Create external stylesheet and link it (sets mode to external) |
+| `--preserve-structure` | Preserve source directory structure (e.g., nesting) in destination |
 | `-r, --recursive` | Find all Markdown files in any directories specified |
 
 ### Style modes
@@ -65,7 +67,7 @@ The `original` mode is particularly useful for template development, as it allow
 ### Built-in templates
 
 - `default` – Clean, centered, modern layout
-- `basic` – Clean, minimal styling
+- `basic` – Clean, minimal styling, focuses on text
 - `nord` – Clean, uses Nord color scheme and sans text
 - `nord-dark` – Dark version of Nord
 - `garden` – For digital gardens; includes navigation
@@ -86,7 +88,7 @@ The `original` mode is particularly useful for template development, as it allow
 
 ## Templates and customization
 
-Mint supports layouts written in HAML or ERB and stylesheets can be written in CSS, SCSS, or SASS.
+Mint supports layouts written in ERB and stylesheets can be written in CSS, SCSS, or SASS.
 
 ## Contributing
 

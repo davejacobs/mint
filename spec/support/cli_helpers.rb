@@ -114,7 +114,7 @@ module CLIHelpers
     config_dir = case scope
                  when :local then ".mint"
                  when :user then File.expand_path("~/.config/mint") 
-                 when :global then "#{Mint::ROOT}/config"
+                 when :global then "#{Mint::PROJECT_ROOT}/config"
                  end
     
     FileUtils.mkdir_p(config_dir)

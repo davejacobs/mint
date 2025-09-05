@@ -36,12 +36,5 @@ RSpec.configure do |config|
     ["content.html", ".mint/defaults.yaml"].map {|file| Pathname.new file }.
       select(&:exist?).
       each {|file| FileUtils.rm_rf file }
-
-    Mint.templates.
-      map {|template| Pathname.new(template) + "css" }.
-      select(&:exist?).
-      map(&:children).
-      flatten.
-      each {|cache| File.delete(cache) }
   end
 end

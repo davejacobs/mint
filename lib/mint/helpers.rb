@@ -5,189 +5,129 @@ require "active_support/core_ext/string/inflections"
 
 module Mint
   module Helpers
-    def self.underscore(obj, opts={})
-      namespaces = obj.to_s.split("::").map do |namespace|
-        if opts[:ignore_prefix]
-          namespace[0..1].downcase + namespace[2..-1]
+    # Preserves relative path to root
+    #
+    # @param [Pathname] root the root directory
+    # @param [Pathname] source the source file path
+    # @param [Pathname] destination the destination directory
+    # @return [Pathname] the relative path to the destination
+    def reorient_relative_path(root, source, destination)
+      source_path = Pathname.new(source).expand_path
+      root_path = Pathname.new(root).expand_path
+      relative_path = source_path.relative_path_from(root_path)
+      relative_dir = relative_path.dirname
+      
+      if relative_dir.to_s != "."
+        base_destination = destination || ""
+        if base_destination.empty?
+          destination = relative_dir.to_s
         else
-          namespace
+          destination = File.join(base_destination, relative_dir.to_s)
         end
       end
-
-      string = opts[:namespaces] ? namespaces.join("::") : namespaces.last
-      string.underscore
-    end
-
-    # Transforms a String into a URL-ready slug. Properly handles
-    # ampersands, non-alphanumeric characters, extra hyphens and spaces.
-    #
-    # @param [String, #to_s] obj an object to be turned into a slug
-    # @return [String] a URL-ready slug
-    def self.slugize(obj)
-      obj.to_s.downcase.
-        gsub(/&/, "and").
-        gsub(/[\s-]+/, "-").
-        gsub(/[^a-z0-9-]/, "").
-        gsub(/[-]+/, "-")
-    end
-
-    # Transforms a potentially hyphenated String into a symbol name.
-    #
-    # @param [String, #to_s] obj an object to be turned into a symbol name
-    # @return [Symbol] a symbol representation of obj
-    def self.symbolize(obj)
-      slugize(obj).gsub(/-/, "_").to_sym
-    end
-
-    # Transforms a String or Pathname into a fully expanded Pathname.
-    #
-    # @param [String, Pathname] str_or_path a path to be expanded
-    # @return [Pathname] an expanded representation of str_or_path
-    def self.pathize(str_or_path)
-      case str_or_path
-      when String
-        Pathname.new str_or_path
-      when Pathname
-        str_or_path
-      end.expand_path
-    end
-
-    # Recursively transforms all keys in a Hash into Symbols.
-    #
-    # @param [Hash, #[]] map a potentially nested Hash containing symbolizable keys
-    # @return [Hash] a version of map where all keys are symbols
-    def self.symbolize_keys(map, opts={})
-      transform = lambda {|x| opts[:downcase] ? x.downcase : x }
-
-      map.reduce(Hash.new) do |syms,(k,v)|
-        syms[transform[k].to_sym] =
-          case v
-          when Hash
-            self.symbolize_keys(v, opts)
-          else
-            v
-          end
-        syms
-      end
-    end
-
-    def self.listify(list)
-      if list.length > 2
-        list[0..-2].join(", ") + " & " + list.last
-      else
-        list.join(" & ")
-      end
-    end
-
-    def self.standardize(metadata, opts={})
-      table = opts[:table] || {}
-      metadata.reduce({}) do |hash, (key,value)|
-        if table[key] && table[key].length == 2
-          standard_key, standard_type = table[key]
-          standard_value =
-            case standard_type
-            when :array
-              [*value]
-            when :string
-              value
-            else
-              # If key/type were not in table
-              value
-            end
-
-          hash[standard_key] = standard_value
-        else
-          hash[key] = value
-        end
-        hash
-      end
-    end
-
-    def self.hashify(list1, list2)
-      Hash[*list1.zip(list2).flatten]
+      
+      destination
     end
 
     # Returns the relative path to to_directory from from_directory.
     # If to_directory and from_directory have no parents in common besides
     # /, returns the absolute directory of to_directory. Assumes no symlinks.
     #
-    # @param [String, Pathname] to_directory the target directory
-    # @param [String, Pathname] from_directory the starting directory
+    # @param [Pathname] to_directory the target directory
+    # @param [Pathname] from_directory the starting directory
     # @return [Pathname] the relative path to to_directory from
     #   from_directory, or an absolute path if they have no parents in common
     #   other than /
     def self.normalize_path(to_directory, from_directory)
-      to_path, from_path = [to_directory, from_directory].map {|d| pathize d }
+      to_path, from_path = [to_directory, from_directory].map {|d| d.expand_path }
       to_root, from_root = [to_path, from_path].map {|p| p.each_filename.first }
       to_root == from_root ?
         to_path.relative_path_from(from_path) :
         to_path
     end
 
-    # Reads Yaml options from file. Updates values with new_opts. Writes
-    # merged data back to the same file, overwriting previous data.
-    #
-    # @param [Hash, #[]] new_opts a set of options to add to the Yaml file
-    # @param [Pathname, #exist] file a file to read from and write to
-    # @return [void]
-    def self.update_yaml!(file, opts={})
-      curr_opts = if File.exist?(file)
-                    begin
-                      YAML.load_file(file) || {}
-                    rescue Psych::SyntaxError, StandardError
-                      # Handle corrupted YAML gracefully by treating it as empty
-                      {}
-                    end
-                  else
-                    {}
-                  end
-
-      File.open file, "w" do |f|
-        YAML.dump(curr_opts.merge(opts), f)
-      end
-    end
-
-    def self.create_temp_file!(basename, extension=nil, &block)
-      tmp_args = basename && extension ? [basename, extension] : basename
-      tempfile = Tempfile.new(tmp_args)
-      block.call(tempfile)
-      tempfile.flush
-      tempfile.close
-      tempfile.path
-    end
-
-    def self.generate_temp_file!(file)
-      basename  = File.basename file
-      extension = File.extname file
-      content   = File.read file
-
-      tempfile = Tempfile.new([basename, extension])
-      tempfile << content
-      tempfile.flush
-      tempfile.close
-      tempfile.path
-    end
-
-    # Transforms markdown links from .md extensions to .html for digital gardens
+    # Transforms Markdown links from .md extensions to .html for cross-linking between documents.
     #
     # @param [String] text the markdown text containing links
     # @return [String] the text with transformed links
-    def self.transform_markdown_links(text)
-      # Transform relative markdown links like [text](path/file.md) to [text](path/file.html)
-      text.gsub(/(\[([^\]]*)\]\()([^)]*\.md)(\))/) do |match|
-        link_start = $1
+    def self.transform_markdown_links(text, output_file_format: "%{basename}.%{new_extension}", new_extension: "html")
+      text.gsub(/(\[([^\]]*)\]\(([^)]*\.md)\))/) do |match|
         link_text = $2
         link_url = $3
-        link_end = $4
         
         # Only transform relative links (not absolute URLs)
         if link_url !~ /^https?:\/\//
-          new_url = link_url.gsub(/\.md$/, '.html')
-          "#{link_start}#{new_url}#{link_end}"
+          # Preserve directory structure in links
+          dirname = File.dirname(link_url)
+          basename = File.basename(link_url, ".*")
+          
+          new_filename = output_file_format % {
+            basename: basename,
+            original_extension: "md",
+            new_extension: new_extension
+          }
+          
+          new_url = if dirname == "."
+            new_filename
+          else
+            File.join(dirname, new_filename)
+          end
+          
+          "[#{link_text}](#{new_url})"
         else
           match
         end
       end
+    end
+
+    def self.format_output_file(file, new_extension: "html", format_string: "%{basename}.%{new_extension}")
+      basename = File.basename(file, ".*")
+      original_extension = File.extname(file)[1..-1] || ""
+      format_string % {
+        basename: basename,
+        original_extension: original_extension,
+        new_extension: new_extension
+      }
+    end
+
+    # Resolves the output file path for a source file, handling preserve_structure logic
+    #
+    # @param [Pathname, String] source_file the source file path
+    # @param [Config] config the configuration object containing preserve_structure and other options
+    # @return [String] the relative path from destination_directory to the output file
+    def self.resolve_output_file_path(source_file, config)
+      source_path = Pathname.new(source_file)
+      
+      if config.preserve_structure
+        relative_path = source_path.relative_path_from(config.working_directory) rescue source_path
+        destination_file_basename = format_output_file(relative_path.basename.to_s, new_extension: "html", format_string: config.output_file_format)
+        
+        if relative_path.dirname.to_s == "."
+          destination_file_basename
+        else
+          File.join(relative_path.dirname.to_s, destination_file_basename)
+        end
+      else
+        format_output_file(source_path.basename.to_s, new_extension: "html", format_string: config.output_file_format)
+      end
+    end
+
+    # Creates relative navigation links from one file to another
+    #
+    # @param [String] from_file_path the path to the file that will contain the link
+    # @param [String] to_file_path the path to the file being linked to  
+    # @param [Config] config the configuration object
+    # @return [Pathname] relative path from from_file to to_file
+    def self.relative_link_between_files(from_file_path, to_file_path, config)
+      from_output_path = resolve_output_file_path(from_file_path, config)
+      to_output_path = resolve_output_file_path(to_file_path, config)
+      
+      from_pathname = Pathname.new(from_output_path)
+      to_pathname = Pathname.new(to_output_path)
+      
+      # Calculate relative path from the directory containing from_file to to_file
+      from_dir = from_pathname.dirname
+      to_pathname.relative_path_from(from_dir)
     end
   end
 end
