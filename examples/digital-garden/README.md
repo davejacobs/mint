@@ -31,16 +31,16 @@ The garden explores the intersection of home decor and personal style, with cros
 
 ## Testing Commands
 
-Test with preserve-structure and index generation:
+Test with preserve-structure and navigation:
 
 ```bash
 cd examples/digital-garden
-mint publish --working-dir . --destination output --preserve-structure --index **/*.md
+mint publish --working-dir . --destination output --preserve-structure --navigation --navigation-title "My Style Garden" **/*.md
 ```
 
 Test without preserve-structure:
 
 ```bash
 cd examples/digital-garden
-mint publish --working-dir . --destination output --index **/*.md
+mint publish --working-dir . --destination output --navigation --navigation-title "My Style Garden" **/*.md
 ```

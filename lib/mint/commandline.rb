@@ -77,10 +77,6 @@ module Mint
           commandline_options[:preserve_structure] = true
         end
         
-        cli.on "--index", "Create an index page (index.html) which lists and links to all files published (default: false)" do
-          commandline_options[:create_index] = true
-        end
-        
         cli.on "--navigation", "Make navigation information available to layout, so layout can show a navigation panel (default: false)" do
           commandline_options[:navigation] = true
         end
@@ -158,31 +154,10 @@ module Mint
       # Build tree structure for navigation if navigation is enabled
       if config.navigation
         # Auto-detect common path depth if navigation_drop is not explicitly set
-        auto_drop = config.navigation_drop == 0 ? calculate_common_path_depth(files_data, config.working_directory) : config.navigation_drop
-        tree_files_data = build_file_tree(files_data, config.working_directory, config.navigation_depth, auto_drop)
+        auto_drop = config.navigation_drop == 0 ? Navigation.calculate_common_path_depth(files_data, config.working_directory) : config.navigation_drop
+        tree_files_data = Navigation.build_file_tree(files_data, config.working_directory, config.navigation_depth, auto_drop)
       else
         tree_files_data = files_data
-      end
-      
-      if config.create_index
-        # Check if any of the source files is already an index file
-        index_exists = source_files.any? do |source_file|
-          basename = File.basename(source_file, '.*').downcase
-          basename == 'index'
-        end
-        
-        unless index_exists
-          Tempfile.create(["index", ".md"]) do |tempfile|
-            index_content = files_data.map do |file_data|
-              "- [#{file_data[:title]}](#{file_data[:html_path]})"
-            end.join("\n")
-            
-            tempfile.write(index_content)
-            tempfile.close
-            
-            Mint.publish!(tempfile, config, variables: { files: files_data }, output_file_format: "index.html")
-          end
-        end
       end
       
       source_files.each_with_index do |source_file, idx|
