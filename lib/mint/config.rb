@@ -11,6 +11,8 @@ module Mint
     attr_accessor :preserve_structure
     attr_accessor :create_index
     attr_accessor :navigation
+    attr_accessor :navigation_drop
+    attr_accessor :navigation_depth
     
     DEFAULT_LAYOUT_NAME                 = "default"
     DEFAULT_STYLE_NAME                  = "default"
@@ -21,6 +23,8 @@ module Mint
     DEFAULT_PRESERVE_STRUCTURE          = false
     DEFAULT_CREATE_INDEX                = false
     DEFAULT_NAVIGATION                  = false
+    DEFAULT_NAVIGATION_DROP             = 0
+    DEFAULT_NAVIGATION_DEPTH            = 3
     
     def initialize(options = {})
       @layout_name = options[:layout_name] || options[:template_name] || DEFAULT_LAYOUT_NAME
@@ -33,6 +37,8 @@ module Mint
       @preserve_structure = options.key?(:preserve_structure) ? options[:preserve_structure] : DEFAULT_PRESERVE_STRUCTURE
       @create_index = options.key?(:create_index) ? options[:create_index] : DEFAULT_CREATE_INDEX
       @navigation = options.key?(:navigation) ? options[:navigation] : DEFAULT_NAVIGATION
+      @navigation_drop = options.key?(:navigation_drop) ? options[:navigation_drop] : DEFAULT_NAVIGATION_DROP
+      @navigation_depth = options.key?(:navigation_depth) ? options[:navigation_depth] : DEFAULT_NAVIGATION_DEPTH
     end
     
     def to_h
@@ -46,7 +52,9 @@ module Mint
         style_destination_directory: @style_destination_directory,
         preserve_structure: @preserve_structure,
         create_index: @create_index,
-        navigation: @navigation
+        navigation: @navigation,
+        navigation_drop: @navigation_drop,
+        navigation_depth: @navigation_depth
       }
     end
     

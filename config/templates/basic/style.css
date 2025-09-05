@@ -165,6 +165,13 @@ th {
   font-weight: 500;
 }
 
+#navigation .directory-name {
+  color: var(--basic-text);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: calc(var(--screen-font-size) * 0.75);
+}
+
 /* Container adjustments specific to this template */
 body:has(#navigation) #container {
   padding: 2rem 4rem;

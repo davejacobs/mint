@@ -211,6 +211,14 @@ hr {
   font-weight: 500;
 }
 
+#navigation .directory-name {
+  color: var(--nord1);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: calc(var(--screen-font-size) * 0.8);
+  font-weight: 600;
+}
+
 /* Container adjustments specific to this template */
 body:has(#navigation) #container {
   max-width: calc(90ch - 280px);

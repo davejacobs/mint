@@ -63,6 +63,13 @@ body {
   font-weight: 500;
 }
 
+#navigation .directory-name {
+  color: var(--text-color);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: calc(var(--screen-font-size) * 0.8);
+}
+
 /* Container adjustments specific to this template */
 body:has(#navigation) #container {
   max-width: calc(85ch - 280px);

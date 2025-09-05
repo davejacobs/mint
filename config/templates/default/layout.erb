@@ -12,12 +12,18 @@
         <h3>Navigation</h3>
         <ul>
           <% files.each do |file| %>
-            <li>
-              <a href="<%= file[:html_path] %>" 
-                 class="<%= file[:source_path] == Pathname.new(source_file).relative_path_from(Pathname.new(working_directory)).to_s ? 'current' : '' %>">
-                <%= file[:title] %>
-              </a>
-            </li>
+            <% if file[:is_directory] %>
+              <li class="depth-<%= file[:depth] || 0 %> directory">
+                <span class="directory-name"><%= file[:title] %></span>
+              </li>
+            <% else %>
+              <li class="depth-<%= file[:depth] || 0 %>">
+                <a href="<%= file[:html_path] %>" 
+                   class="<%= file[:source_path] == source_file ? 'current' : '' %>">
+                  <%= file[:title] %>
+                </a>
+              </li>
+            <% end %>
           <% end %>
         </ul>
       </nav>

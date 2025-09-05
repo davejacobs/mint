@@ -42,6 +42,34 @@
   font-weight: 400;
 }
 
+/* Directory names (non-clickable) */
+#navigation .directory-name {
+  display: block;
+  padding: 0.5rem 1.5rem;
+  font-weight: 600;
+}
+
+/* Depth-based indentation */
+#navigation .depth-0 a,
+#navigation .depth-0 .directory-name {
+  padding-left: 1.5rem;
+}
+
+#navigation .depth-1 a,
+#navigation .depth-1 .directory-name {
+  padding-left: 2.5rem;
+}
+
+#navigation .depth-2 a,
+#navigation .depth-2 .directory-name {
+  padding-left: 3.5rem;
+}
+
+#navigation .depth-3 a,
+#navigation .depth-3 .directory-name {
+  padding-left: 4.5rem;
+}
+
 /* Container adjustments when navigation is present */
 body:has(#navigation) #container {
   margin-left: 280px;

@@ -123,6 +123,33 @@ body {
   font-size: 0.75rem;
 }
 
+/* Directory styling for garden template */
+.garden-toc .directory-name {
+  display: block;
+  padding: 0.5rem 1rem;
+  color: var(--garden-heading-3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.garden-toc .depth-0 .directory-name {
+  padding-left: 1rem;
+}
+
+.garden-toc .depth-1 .directory-name {
+  padding-left: 1.75rem;
+}
+
+.garden-toc .depth-2 .directory-name {
+  padding-left: 2.5rem;
+}
+
+.garden-toc .depth-3 .directory-name {
+  padding-left: 3.25rem;
+}
+
 /* Main Content Area */
 .garden-main {
   flex: 1;
