@@ -44,8 +44,8 @@ body {
 
 #container {
   max-width: 90ch;
-  margin: calc(var(--screen-unit) * 3) auto;
-  padding: calc(var(--screen-unit) * 3) calc(var(--screen-unit) * 4);
+  margin: calc(var(--screen-unit) * 1) auto;
+  padding: calc(var(--screen-unit) * 1) calc(var(--screen-unit) * 4);
   /*border: 1px solid var(--nord4);*/
   /*background-color: #ffffff;*/
   /*box-shadow: 
@@ -213,7 +213,6 @@ hr {
 
 #navigation .directory-name {
   color: var(--nord1);
-  text-transform: uppercase;
   letter-spacing: 0.1em;
   font-size: calc(var(--screen-font-size) * 0.8);
   font-weight: 600;
@@ -223,9 +222,9 @@ hr {
 body:has(#navigation) #container {
   max-width: calc(90ch - 280px);
   margin-right: auto;
-  margin-top: calc(var(--screen-unit) * 3);
-  margin-bottom: calc(var(--screen-unit) * 3);
-  padding: calc(var(--screen-unit) * 3) calc(var(--screen-unit) * 4);
+  margin-top: calc(var(--screen-unit) * 1);
+  margin-bottom: calc(var(--screen-unit) * 1);
+  padding: calc(var(--screen-unit) * 1) calc(var(--screen-unit) * 4);
 }
 
 /* Fallback for browsers that don't support :has() */
@@ -233,7 +232,7 @@ body:has(#navigation) #container {
   body.has-navigation #container {
     max-width: calc(90ch - 280px);
     margin-right: auto;
-    padding: calc(var(--screen-unit) * 3) calc(var(--screen-unit) * 4);
+    padding: calc(var(--screen-unit) * 1) calc(var(--screen-unit) * 4);
   }
 }
 

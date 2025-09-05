@@ -65,7 +65,6 @@ body {
 
 #navigation .directory-name {
   color: var(--text-color);
-  text-transform: uppercase;
   letter-spacing: 0.05em;
   font-size: calc(var(--screen-font-size) * 0.8);
 }
@@ -76,7 +75,7 @@ body:has(#navigation) #container {
   margin-right: auto;
   margin-top: 2rem;
   margin-bottom: 2rem;
-  padding: calc(var(--screen-unit) * 3) calc(var(--screen-unit) * 2);
+  padding: calc(var(--screen-unit) * 1) calc(var(--screen-unit) * 2);
   background-color: var(--background);
 }
 
@@ -94,7 +93,7 @@ body:has(#navigation) #container {
 #container {
   max-width: 85ch;
   margin: 2rem auto;
-  padding: calc(var(--screen-unit) * 3) calc(var(--screen-unit) * 2);
+  padding: calc(var(--screen-unit) * 1) calc(var(--screen-unit) * 2);
   background-color: var(--background);
 }
 

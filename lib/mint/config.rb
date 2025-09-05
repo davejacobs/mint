@@ -13,6 +13,7 @@ module Mint
     attr_accessor :navigation
     attr_accessor :navigation_drop
     attr_accessor :navigation_depth
+    attr_accessor :navigation_title
     
     DEFAULT_LAYOUT_NAME                 = "default"
     DEFAULT_STYLE_NAME                  = "default"
@@ -39,6 +40,7 @@ module Mint
       @navigation = options.key?(:navigation) ? options[:navigation] : DEFAULT_NAVIGATION
       @navigation_drop = options.key?(:navigation_drop) ? options[:navigation_drop] : DEFAULT_NAVIGATION_DROP
       @navigation_depth = options.key?(:navigation_depth) ? options[:navigation_depth] : DEFAULT_NAVIGATION_DEPTH
+      @navigation_title = options[:navigation_title]
     end
     
     def to_h
@@ -54,7 +56,8 @@ module Mint
         create_index: @create_index,
         navigation: @navigation,
         navigation_drop: @navigation_drop,
-        navigation_depth: @navigation_depth
+        navigation_depth: @navigation_depth,
+        navigation_title: @navigation_title
       }
     end
     

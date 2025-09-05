@@ -5,6 +5,7 @@ require "active_support/core_ext/string/output_safety"
 
 require_relative "./config"
 require_relative "./helpers"
+require_relative "./css_parser"
 require_relative "./renderers/css_renderer"
 require_relative "./renderers/markdown_renderer"
 require_relative "./renderers/erb_renderer"
@@ -120,6 +121,23 @@ module Mint
         end
       end
       stylesheet_tag = "<link rel=\"stylesheet\" href=\"#{style_output_file}\">"
+    elsif config.style_mode == :original
+      # Calculate the destination HTML file path for relative path calculation
+      source_path = Pathname.new(source_file)
+      destination_directory = config.destination_directory.expand_path(config.working_directory)
+      
+      if config.preserve_structure
+        relative_path = source_path.relative_path_from(config.working_directory) rescue source_path
+        destination_file_basename = Helpers.format_output_file(relative_path.basename.to_s, new_extension: "html", format_string: config.output_file_format)
+        destination_file_path = destination_directory + relative_path.dirname + destination_file_basename
+      else
+        destination_file_basename = Helpers.format_output_file(source_path.basename.to_s, new_extension: "html", format_string: config.output_file_format)
+        destination_file_path = destination_directory + destination_file_basename
+      end
+      
+      # Use CssParser to resolve all imports and generate link tags
+      css_file_paths = CssParser.resolve_css_files(style_source_file.to_s, destination_file_path.to_s)
+      stylesheet_tag = CssParser.generate_link_tags(css_file_paths)
     else
       style_content = Mint::Renderers::Css.render_file(style_source_file)
       stylesheet_tag = "<style>#{style_content}</style>"

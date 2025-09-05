@@ -9,7 +9,9 @@
   <body>
     <% if config.navigation && files && files.any? %>
       <nav id="navigation">
-        <h3>Navigation</h3>
+        <% if config.navigation_title %>
+          <h3><%= config.navigation_title %></h3>
+        <% end %>
         <ul>
           <% files.each do |file| %>
             <% if file[:is_directory] %>

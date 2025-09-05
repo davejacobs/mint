@@ -12,6 +12,7 @@
   --print-unit: var(--print-line-height);
 
   --basic-text: #2c2c2c;
+  --basic-medium-subtle: #666666;
   --basic-subtle: #8a8a8a;
   --basic-accent: #007acc;
   --basic-background: #fcfcfc;
@@ -33,7 +34,6 @@ body {
   color: var(--basic-text);
   background-color: var(--basic-background);
   font-weight: 350;
-  letter-spacing: 0.01em;
   margin: 0;
   padding: 0;
 }
@@ -41,7 +41,6 @@ body {
 h1, h2, h3, h4, h5, h6 {
   font-weight: 300;
   color: var(--basic-text);
-  letter-spacing: -0.02em;
 }
 
 h1 {
@@ -104,7 +103,6 @@ a:link, a:visited {
 }
 
 a:hover {
-  border-bottom-color: var(--basic-accent);
   text-decoration: none;
 }
 
@@ -142,14 +140,14 @@ th {
 }
 
 #navigation h3 {
-  font-size: calc(var(--screen-font-size) * 0.8);
+  font-size: calc(var(--screen-font-size) * 1.2);
   font-weight: 600;
-  color: var(--basic-subtle);
+  color: var(--basic-medium-subtle);
 }
 
 #navigation a {
-  color: var(--basic-subtle);
-  font-size: calc(var(--screen-font-size) * 0.85);
+  color: var(--basic-text);
+  font-size: calc(var(--screen-font-size) * 0.7);
 }
 
 #navigation a:hover {
@@ -166,16 +164,14 @@ th {
 }
 
 #navigation .directory-name {
-  color: var(--basic-text);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
+  color: var(--basic-medium-subtle);
   font-size: calc(var(--screen-font-size) * 0.75);
 }
 
 /* Container adjustments specific to this template */
 body:has(#navigation) #container {
-  padding: 2rem 4rem;
-  max-width: calc(50rem - 280px);
+  padding: 1rem 4rem;
+  max-width: 50rem;
   margin-right: auto;
   margin-top: 0;
   margin-bottom: 0;
@@ -191,7 +187,7 @@ body:has(#navigation) #container {
 
 /* Default container when no navigation */
 #container {
-  padding: 2rem 4rem;
+  padding: 1rem 4rem;
   max-width: 50rem;
   margin: 0 auto;
 }

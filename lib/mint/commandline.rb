@@ -92,6 +92,10 @@ module Mint
         cli.on "--navigation-depth DEPTH", Integer, "Maximum depth to show in navigation after dropping levels (default: 3)" do |depth|
           commandline_options[:navigation_depth] = depth
         end
+        
+        cli.on "--navigation-title TITLE", "Set the title for the navigation panel" do |title|
+          commandline_options[:navigation_title] = title
+        end
       end
 
       parser.parse! argv
