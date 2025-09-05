@@ -123,10 +123,10 @@ RSpec.describe "Full CLI Workflow Integration" do
         it "can recover from and fix common mistakes" do
           create_markdown_file("test.md", "# Test")
 
-          # Test error when nonexistent layout is specified
+          # Test error when nonexistent style is specified
           expect {
-            Mint::Commandline.publish!(["test.md"], Mint::Config.new(layout_name: "nonexistent"))
-          }.to raise_error(Mint::LayoutNotFoundException)
+            Mint::Commandline.publish!(["test.md"], Mint::Config.new(style_name: "nonexistent"))
+          }.to raise_error(Mint::StyleNotFoundException)
 
           # Recovery: Use existing layout
           expect {

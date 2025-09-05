@@ -63,8 +63,8 @@ RSpec.describe "CLI Argument Parsing" do
     end
 
     context "with path options" do
-      it "parses --root option" do
-        command, help, config, files = Mint::Commandline.parse!(["publish", "--root", "/custom/path", "file.md"])
+      it "parses --working-dir option" do
+        command, help, config, files = Mint::Commandline.parse!(["publish", "--working-dir", "/custom/path", "file.md"])
         
         expect(config.working_directory).to eq(Pathname.new("/custom/path"))
       end

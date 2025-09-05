@@ -239,10 +239,10 @@ RSpec.describe "CLI Publishing Workflow" do
         it "handles invalid templates by throwing error" do
           markdown_file = create_markdown_file("test.md", "# Test")
           
-          # Should throw error when user specifies nonexistent layout
+          # Should throw error when user specifies nonexistent style
           expect {
-            Mint::Commandline.publish!([markdown_file], Mint::Config.new(layout_name: "nonexistent"))
-          }.to raise_error(Mint::LayoutNotFoundException)
+            Mint::Commandline.publish!([markdown_file], Mint::Config.new(style_name: "nonexistent"))
+          }.to raise_error(Mint::StyleNotFoundException)
         end
       end
 
