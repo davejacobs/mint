@@ -87,6 +87,10 @@ Mint.publish! "document.md", style_mode: :original
 - `:output_file_format` – Custom filename format with substitutions
 - `:preserve_structure` – Preserve source directory structure
 - `:working_directory` – Root directory for relative paths
+- `:navigation` – Enable navigation panel (default: false)
+- `:navigation_title` – Title for navigation panel
+- `:navigation_drop` – Drop first N directory levels from navigation (default: 0)
+- `:navigation_depth` – Maximum depth to show in navigation (default: 3)
 
 ## Publishing multiple files
 
@@ -112,7 +116,8 @@ files_data = [
 ]
 
 Mint.publish! "document.md", 
-  template_name: "garden",
+  navigation: true,
+  navigation_title: "Documentation",
   variables: { files: files_data }
 ```
 
@@ -122,8 +127,7 @@ Available templates:
 - `default` – Clean, centered layout
 - `basic` – Minimal styling
 - `nord` – Nord color scheme
-- `nord-dark` – Dark Nord theme  
-- `garden` – Digital garden with navigation
+- `nord-dark` – Dark Nord theme
 
 ## Template resolution
 

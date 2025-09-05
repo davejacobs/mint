@@ -41,6 +41,18 @@ Specify output filename format with substitutions (%{basename}, %{original_exten
 .TP
 .BR \-\-preserve\-structure
 Preserve source directory structure (e.g., nesting) in destination
+.TP
+.BR \-\-navigation
+Enable navigation panel showing all files
+.TP
+.BR \-\-navigation\-title " " \fITITLE\fR
+Set title for navigation panel
+.TP
+.BR \-\-navigation\-drop " " \fILEVELS\fR
+Drop first N directory levels from navigation (default: 0)
+.TP
+.BR \-\-navigation\-depth " " \fIDEPTH\fR
+Maximum depth to show in navigation (default: 3)
 .SH STYLE OPTIONS
 Mint offers flexible control over how stylesheets are incorporated into your documents:
 
@@ -91,9 +103,6 @@ Mint comes with several built-in templates:
 .IP \(bu 2
 .B basic
 \- Minimalist design focused on the text
-.IP \(bu 2
-.B garden
-\- For digital gardens with navigation
 .IP \(bu 2
 .B nord/nord-dark
 \- Modern color schemes using the Nord color scheme

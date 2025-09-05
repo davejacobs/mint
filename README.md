@@ -35,8 +35,8 @@ mint publish Document.md --destination public
 # Publish multiple files
 mint publish *.md --destination final-drafts
 
-# Publish a digital garden, with linked navigation
-mint publish content/**/*.md --template garden --destination public
+# Publish with navigation panel
+mint publish content/**/*.md --navigation --navigation-title "My Documentation" --destination public
 ```
 
 ### Common Options
@@ -53,6 +53,10 @@ mint publish content/**/*.md --template garden --destination public
 | `--style-destination PATH` | Create external stylesheet and link it (sets mode to external) |
 | `--preserve-structure` | Preserve source directory structure (e.g., nesting) in destination |
 | `-r, --recursive` | Find all Markdown files in any directories specified |
+| `--navigation` | Enable navigation panel showing all files |
+| `--navigation-title TITLE` | Set title for navigation panel |
+| `--navigation-drop LEVELS` | Drop first N directory levels from navigation |
+| `--navigation-depth DEPTH` | Maximum depth to show in navigation (default: 3) |
 
 ### Style modes
 
@@ -70,7 +74,6 @@ The `original` mode is particularly useful for template development, as it allow
 - `basic` – Clean, minimal styling, focuses on text
 - `nord` – Clean, uses Nord color scheme and sans text
 - `nord-dark` – Dark version of Nord
-- `garden` – For digital gardens; includes navigation
 
 ## Documentation
 
