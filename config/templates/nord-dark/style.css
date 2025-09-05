@@ -105,3 +105,29 @@ a:hover {
 ul, ol {
   color: var(--nord-text);
 }
+
+/* Navigation dark theme overrides */
+#navigation {
+  background-color: var(--nord0);
+  border-right-color: var(--nord3);
+}
+
+#navigation h3 {
+  color: var(--nord4);
+}
+
+#navigation a {
+  color: var(--nord4);
+}
+
+#navigation a:hover {
+  color: var(--nord6);
+  background-color: var(--nord2);
+  border-left-color: var(--nord7);
+}
+
+#navigation a.current {
+  color: var(--nord8);
+  background-color: rgba(136, 192, 208, 0.15);
+  border-left-color: var(--nord8);
+}

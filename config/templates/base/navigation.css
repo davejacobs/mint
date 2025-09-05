@@ -1,0 +1,85 @@
+/* Base Navigation Layout - Structural styles only */
+/* Colors, fonts, and borders should be overridden in individual templates */
+
+/* Navigation container positioning and dimensions */
+#navigation {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 280px;
+  height: 100vh;
+  overflow-y: auto;
+  padding: 2rem 0;
+  z-index: 100;
+}
+
+/* Navigation header */
+#navigation h3 {
+  margin: 0 0 1rem 0;
+  padding: 0 1.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* Navigation list structure */
+#navigation ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#navigation li {
+  margin: 0;
+}
+
+/* Navigation links layout */
+#navigation a {
+  display: block;
+  padding: 0.5rem 1.5rem;
+  text-decoration: none;
+  border-left: 3px solid transparent;
+  transition: all 0.15s ease;
+  font-weight: 400;
+}
+
+/* Container adjustments when navigation is present */
+body:has(#navigation) #container {
+  margin-left: 280px;
+  padding-left: 2rem; /* Default padding between nav and content */
+}
+
+/* Fallback for browsers that don't support :has() */
+@supports not selector(:has(#navigation)) {
+  body.has-navigation #container {
+    margin-left: 280px;
+    padding-left: 2rem; /* Default padding between nav and content */
+  }
+}
+
+/* Responsive navigation */
+@media (max-width: 960px) {
+  #navigation {
+    position: static;
+    width: 100%;
+    height: auto;
+    border-right: none;
+    padding: 1rem 0;
+  }
+  
+  body:has(#navigation) #container,
+  body.has-navigation #container {
+    margin-left: auto;
+  }
+}
+
+/* Hide navigation in print */
+@media print {
+  #navigation {
+    display: none !important;
+  }
+  
+  body:has(#navigation) #container,
+  body.has-navigation #container {
+    margin-left: auto !important;
+  }
+}

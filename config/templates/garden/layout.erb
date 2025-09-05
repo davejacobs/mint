@@ -5,29 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><%= (metadata.is_a?(Hash) && metadata['title']) || File.basename(source_file, '.*').tr('_-', ' ').split.map(&:capitalize).join(' ') %></title>
     <%= stylesheet_tag %>
-    <style type="text/css"><%= inline_styles %></style>
   </head>
   <body>
     <div class="garden-container">
-      <nav class="garden-nav">
-        <div class="garden-nav-header">
-          <h3>Garden</h3>
-        </div>
-        <div class="garden-nav-content">
-          <% if files.any? %>
+      <% if config.navigation && files && files.any? %>
+        <nav class="garden-nav">
+          <div class="garden-nav-header">
+            <h3>Garden</h3>
+          </div>
+          <div class="garden-nav-content">
             <ul class="garden-toc">
               <% files.each do |file| %>
-                <li class="depth-<%= file[:depth] %>">
+                <li class="depth-<%= file[:depth] || 0 %>">
                   <a href="<%= file[:html_path] %>" 
-                     class="<%= file[:source_path] == Pathname.new(source_file).relative_path_from(Pathname.new(root_directory)).to_s ? 'current' : '' %>">
+                     class="<%= file[:source_path] == Pathname.new(source_file).relative_path_from(Pathname.new(working_directory)).to_s ? 'current' : '' %>">
                     <%= file[:title] %>
                   </a>
                 </li>
               <% end %>
             </ul>
-          <% end %>
-        </div>
-      </nav>
+          </div>
+        </nav>
+      <% end %>
       <main class="garden-main">
         <div class="garden-content">
           <%= content %>

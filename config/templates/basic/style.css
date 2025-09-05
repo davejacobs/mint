@@ -20,6 +20,7 @@
 }
 
 @import "../base/style.css";
+@import "../base/navigation.css";
 
 body {
   font-family: 'Crimson Text', serif;
@@ -33,6 +34,8 @@ body {
   background-color: var(--basic-background);
   font-weight: 350;
   letter-spacing: 0.01em;
+  margin: 0;
+  padding: 0;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -132,7 +135,70 @@ th {
   font-style: italic;
 }
 
+/* Navigation visual styling - layout imported from base */
+#navigation {
+  background-color: #f8f9fa;
+  border-right: 1px solid var(--basic-border);
+}
+
+#navigation h3 {
+  font-size: calc(var(--screen-font-size) * 0.8);
+  font-weight: 600;
+  color: var(--basic-subtle);
+}
+
+#navigation a {
+  color: var(--basic-subtle);
+  font-size: calc(var(--screen-font-size) * 0.85);
+}
+
+#navigation a:hover {
+  color: var(--basic-text);
+  background-color: #f0f0f0;
+  border-left-color: var(--basic-border);
+}
+
+#navigation a.current {
+  color: var(--basic-accent);
+  background-color: #f0f8ff;
+  border-left-color: var(--basic-accent);
+  font-weight: 500;
+}
+
+/* Container adjustments specific to this template */
+body:has(#navigation) #container {
+  padding: 2rem 4rem;
+  max-width: calc(50rem - 280px);
+  margin-right: auto;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/* Fallback for browsers that don't support :has() */
+@supports not selector(:has(#navigation)) {
+  body.has-navigation #container {
+    max-width: calc(50rem - 280px);
+    margin-right: auto;
+  }
+}
+
+/* Default container when no navigation */
 #container {
   padding: 2rem 4rem;
   max-width: 50rem;
+  margin: 0 auto;
+}
+
+/* Responsive navigation */
+@media (max-width: 960px) {
+  #navigation {
+    border-bottom: 1px solid var(--basic-border);
+  }
+  
+  body:has(#navigation) #container,
+  body.has-navigation #container,
+  #container {
+    max-width: 50rem;
+    padding: 2rem 2rem;
+  }
 }

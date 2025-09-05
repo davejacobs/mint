@@ -3,9 +3,25 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><%= (metadata.is_a?(Hash) && metadata['title']) || File.basename(source_file, '.*').tr('_-', ' ').split.map(&:capitalize).join(' ') %></title>
     <%= stylesheet_tag %>
   </head>
   <body>
+    <% if config.navigation && files && files.any? %>
+      <nav id="navigation">
+        <h3>Navigation</h3>
+        <ul>
+          <% files.each do |file| %>
+            <li>
+              <a href="<%= file[:html_path] %>" 
+                 class="<%= file[:source_path] == Pathname.new(source_file).relative_path_from(Pathname.new(working_directory)).to_s ? 'current' : '' %>">
+                <%= file[:title] %>
+              </a>
+            </li>
+          <% end %>
+        </ul>
+      </nav>
+    <% end %>
     <main id="container"><%= content %></main>
   </body>
 </html>
