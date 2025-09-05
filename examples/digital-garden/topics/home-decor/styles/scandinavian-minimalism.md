@@ -23,7 +23,7 @@ Clean lines, functional furniture, and neutral color palettes define this timele
 - **Lighting**: Natural light maximized, warm artificial lighting
 - **Furniture**: Simple, functional pieces with clean lines
 
-![Minimalist bedroom with natural textures](https://images.unsplash.com/photo-1631889993959-41b4e9c0035e?w=600&q=80)
+![Minimalist bedroom with natural textures](https://images.unsplash.com/photo-1600494448655-ae58f58bb945?q=80&w=1035)
 
 ## Inspiration
 
