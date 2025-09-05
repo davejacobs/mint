@@ -1,8 +1,10 @@
+.byebug*
 .sass-cache
 .mint
 *.gem
 .gems
-.html
+*.html
 examples/**/*.html
 tmp/*
 Gemfile.lock
+NOTES.md
