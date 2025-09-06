@@ -28,7 +28,7 @@ test:
 
 gallery:
 	@echo "Generating gallery with all templates..."
-	@for template in config/templates/*/; do \
+	@for template in $(shell ls -d config/templates/*/ | grep -v '/base/'); do \
 		template_name=$$(basename "$$template"); \
 		echo "Processing template: $$template_name"; \
 		find examples -name "*.md" -type f | while read -r md_file; do \
