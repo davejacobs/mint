@@ -80,12 +80,12 @@ tr:hover {
   background-color: rgba(143, 188, 187, 0.1);  /* Teal-tinted row hover */
 }
 
-#container {
+/*#container {
   background-color: var(--nord-surface);  /* Lighter dark container */
   box-shadow: 
     0 4px 6px rgba(0, 0, 0, 0.2),
     0 10px 20px rgba(0, 0, 0, 0.3);  /* Darker shadows */
-}
+}*/
 
 /* Ensure all text elements have proper light colors */
 p, li, td, dd, dt {

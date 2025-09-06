@@ -65,7 +65,6 @@ body {
 
 #navigation .directory-name {
   color: var(--text-color);
-  letter-spacing: 0.05em;
   font-size: calc(var(--screen-font-size) * 0.8);
 }
 
@@ -101,7 +100,6 @@ h1, h2, h3, h4, h5, h6 {
   font-family: "Alegreya", Georgia, Times, serif;
   font-weight: 600;
   color: var(--text-color);
-  letter-spacing: -0.02em;
   text-rendering: optimizeLegibility;
 }
 
@@ -110,7 +108,6 @@ h1 {
   margin-top: 0;
   margin-bottom: calc(var(--screen-unit) * 1);
   font-weight: 700;
-  letter-spacing: -0.03em;
 }
 
 h2 {
@@ -135,7 +132,6 @@ h5, h6 {
   font-weight: 600;
   color: var(--text-subtle);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
 }
 
 p {

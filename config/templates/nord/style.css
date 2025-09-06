@@ -35,7 +35,6 @@ body {
   color: var(--nord0);
   /*background-color: var(--nord6);*/
   font-weight: 400;
-  letter-spacing: -0.005em;
   font-feature-settings: "liga" 1, "kern" 1;
   overflow-x: hidden;
   margin: 0;
@@ -56,7 +55,6 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
-  letter-spacing: -0.02em;
 }
 
 h1 {
@@ -109,7 +107,6 @@ code {
   padding: 0.15em 0.4em;
   border-radius: 4px;
   font-weight: 500;
-  letter-spacing: 0;
 }
 
 pre {
@@ -163,7 +160,6 @@ th {
   color: var(--nord0);
   font-size: calc(var(--screen-font-size) * 0.9);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
 }
 
 tr:last-child td {
@@ -213,7 +209,6 @@ hr {
 
 #navigation .directory-name {
   color: var(--nord1);
-  letter-spacing: 0.1em;
   font-size: calc(var(--screen-font-size) * 0.8);
   font-weight: 600;
 }
