@@ -46,6 +46,7 @@ mint publish my-document.md --file-title
 
 | Flag | Description |
 |------|-------------|
+| `-h, --help` | Show help message |
 | `-t, --template TEMPLATE` | Use a built-in template (combines layout + style) |
 | `-l, --layout LAYOUT` | Specify only the layout |
 | `-s, --style STYLE` | Specify only the style |

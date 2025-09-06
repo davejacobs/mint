@@ -11,19 +11,16 @@ require_relative "./navigation_processor"
 module Mint
   module Commandline
     def self.run!(argv)
-      command, help_message, config, files = Mint::Commandline.parse! argv
+      command, config, files = Mint::Commandline.parse! argv
       case command.to_sym
       when :publish
         Mint::Commandline.publish!(files, config)
-      when :help
-        Mint::Commandline.help(help_message)
       else
         possible_binary = "mint-#{command}"
         if File.executable? possible_binary
           system "#{possible_binary} #{argv[1..-1].join ' '}"
         else
           $stderr.puts "Error: Unknown command '#{command}'"
-          Mint::Commandline.help(help_message)
           exit 1
         end
       end
@@ -40,16 +37,21 @@ module Mint
       parser = OptionParser.new do |cli|
         cli.banner = "Usage: mint [command] files [options]"
 
-        cli.on "-t", "--template TEMPLATE", "Specify a template, which consists of a layout and a style (default: default)" do |t|
+        cli.on "-h", "--help", "Show this help message" do
+          puts cli.help
+          exit 0
+        end
+
+        cli.on "-t", "--template TEMPLATE", "Specify a template by name (default: default)" do |t|
           commandline_options[:layout_name] = t
           commandline_options[:style_name] = t
         end
 
-        cli.on "-l", "--layout LAYOUT", "Specify a layout (default: default)" do |l|
+        cli.on "-l", "--layout LAYOUT", "Specify a layout by name (default: default)" do |l|
           commandline_options[:layout_name] = l
         end
 
-        cli.on "-s", "--style STYLE", "Specify a style (default: default)" do |s|
+        cli.on "-s", "--style STYLE", "Specify a style by name (default: default)" do |s|
           commandline_options[:style_name] = s
         end
 
@@ -100,8 +102,7 @@ module Mint
       end
 
       parser.parse! argv
-      command = argv.shift || "help"
-      
+      command = argv.shift
       
       # MINT_NO_PIPE is used for testing, to convince Mint
       # that STDIN isn't being used
@@ -122,17 +123,9 @@ module Mint
       commandline_config = Config.new(commandline_options)
       config = Mint.configuration.merge(commandline_config)
 
-      [command, parser.help, config, files]
+      [command, config, files]
     end
 
-    # Prints a help banner
-    #
-    # @param [String, #to_s] message a message to output
-    # @return [void]
-    def self.help(message)
-      puts message
-    end
-    
     # For each file specified, publishes a new file based on configuration.
     #
     # @param [Array] source_files files a group of filenames
