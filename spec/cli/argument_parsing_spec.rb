@@ -128,5 +128,45 @@ RSpec.describe "CLI Argument Parsing" do
         expect(config.style_destination_directory).to eq("css")
       end
     end
+
+    context "boolean flags" do
+      it "parses --preserve-structure flag" do
+        command, config, files, help = Mint::Commandline.parse!(["publish", "--preserve-structure", "file.md"])
+        
+        expect(config.preserve_structure).to be true
+      end
+
+      it "parses --navigation flag" do
+        command, config, files, help = Mint::Commandline.parse!(["publish", "--navigation", "file.md"])
+        
+        expect(config.navigation).to be true
+      end
+
+      it "parses --file-title flag" do
+        command, config, files, help = Mint::Commandline.parse!(["publish", "--file-title", "file.md"])
+        
+        expect(config.file_title).to be true
+      end
+    end
+
+    context "negative boolean flags" do
+      it "parses --no-preserve-structure flag" do
+        command, config, files, help = Mint::Commandline.parse!(["publish", "--no-preserve-structure", "file.md"])
+        
+        expect(config.preserve_structure).to be false
+      end
+
+      it "parses --no-navigation flag" do
+        command, config, files, help = Mint::Commandline.parse!(["publish", "--no-navigation", "file.md"])
+        
+        expect(config.navigation).to be false
+      end
+
+      it "parses --no-file-title flag" do
+        command, config, files, help = Mint::Commandline.parse!(["publish", "--no-file-title", "file.md"])
+        
+        expect(config.file_title).to be false
+      end
+    end
   end
 end

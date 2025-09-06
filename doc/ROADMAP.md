@@ -8,7 +8,8 @@
 - [x]: Refresh templates
 - [x]: --navigation flags instead of garden template
 - [x]: --file-title for pulling document title from file name
-- [ ]: Bug: Fix output_file, which isn't used
+- [ ]: Config file -- isn't quite working yet
+- [ ]: --include-files should transfer any non-md files (JPEGs, PNGs, SVGs, PDFs)
 - [ ]: --var for local variables
 - [ ] Proper metadata, local variables
 - [ ] Add --style-output-format to control output name; update docs that --style-destination only affects directory

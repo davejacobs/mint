@@ -262,6 +262,56 @@ RSpec.describe "Config File Integration" do
         end
       end
 
+      context "--no- flags override config file boolean values" do
+        before do
+          File.write(".mint/config.toml", <<~TOML)
+            preserve-structure = true
+            navigation = true
+            file-title = true
+          TOML
+        end
+
+        it "--no-preserve-structure overrides config file preserve-structure=true" do
+          command, config, files, help = Mint::Commandline.parse!(["publish", "--no-preserve-structure", "test.md"])
+          
+          expect(config.preserve_structure).to be false
+        end
+
+        it "--no-navigation overrides config file navigation=true" do
+          command, config, files, help = Mint::Commandline.parse!(["publish", "--no-navigation", "test.md"])
+          
+          expect(config.navigation).to be false
+        end
+
+        it "--no-file-title overrides config file file-title=true" do
+          command, config, files, help = Mint::Commandline.parse!(["publish", "--no-file-title", "test.md"])
+          
+          expect(config.file_title).to be false
+        end
+
+        it "positive flags still work to override config file false values" do
+          File.write(".mint/config.toml", <<~TOML)
+            preserve-structure = false
+            navigation = false
+            file-title = false
+          TOML
+
+          command, config, files, help = Mint::Commandline.parse!(["publish", "--preserve-structure", "--navigation", "--file-title", "test.md"])
+          
+          expect(config.preserve_structure).to be true
+          expect(config.navigation).to be true
+          expect(config.file_title).to be true
+        end
+
+        it "combines positive and negative flags" do
+          command, config, files, help = Mint::Commandline.parse!(["publish", "--preserve-structure", "--no-navigation", "test.md"])
+          
+          expect(config.preserve_structure).to be true  # overridden by CLI flag
+          expect(config.navigation).to be false         # overridden by --no- flag
+          expect(config.file_title).to be true          # from config file
+        end
+      end
+
       it "handles boolean values correctly" do
         File.write(".mint/config.toml", <<~TOML)
           preserve-structure = false

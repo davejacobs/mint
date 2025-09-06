@@ -138,6 +138,23 @@ file-title = true
 working-dir = "/path/to/source"
 ```
 
+### Overriding config file settings
+
+You can override boolean settings from config files using `--no-` flags:
+
+```bash
+# If your config.toml has navigation = true and file-title = true
+mint publish docs.md --no-navigation --no-file-title
+
+# Mix positive and negative flags
+mint publish docs.md --preserve-structure --no-navigation
+```
+
+Available `--no-` flags:
+- `--no-preserve-structure` - Don't preserve directory structure 
+- `--no-navigation` - Disable navigation panel
+- `--no-file-title` - Don't extract titles from filenames
+
 ## Contributing
 
 1. Fork the repository

@@ -117,7 +117,23 @@ You can still override any config setting from the command line:
 ```bash
 # Use a different destination despite config file
 mint publish docs/**/*.md --destination staging
+
+# Override boolean settings from config using --no- flags
+mint publish docs/**/*.md --no-navigation --no-file-title
+
+# Mix positive and negative overrides
+mint publish docs/**/*.md --preserve-structure --no-navigation
 ```
+
+### Overriding boolean config settings
+
+For boolean options set to `true` in your config file, you can disable them using `--no-` flags:
+
+- `--no-preserve-structure` - Don't preserve directory structure
+- `--no-navigation` - Disable navigation panel  
+- `--no-file-title` - Don't extract titles from filenames
+
+This is particularly useful when you have defaults in your config file but want to selectively disable features for specific builds.
 
 ### Config file locations
 

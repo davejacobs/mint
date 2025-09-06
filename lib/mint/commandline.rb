@@ -80,9 +80,17 @@ module Mint
         cli.on "--preserve-structure", "Preserve source directory structure in destination (default: false)" do
           commandline_options[:preserve_structure] = true
         end
+
+        cli.on "--no-preserve-structure", "Don't preserve source directory structure in destination" do
+          commandline_options[:preserve_structure] = false
+        end
         
         cli.on "--navigation", "Make navigation information available to layout, so layout can show a navigation panel (default: false)" do
           commandline_options[:navigation] = true
+        end
+
+        cli.on "--no-navigation", "Don't make navigation information available to layout" do
+          commandline_options[:navigation] = false
         end
         
         cli.on "--navigation-drop LEVELS", Integer, "Drop the first N levels of the directory hierarchy from navigation (default: 0)" do |levels|
@@ -99,6 +107,10 @@ module Mint
         
         cli.on "--file-title", "Extract title from filename (removes .md extension) and inject into template" do
           commandline_options[:file_title] = true
+        end
+
+        cli.on "--no-file-title", "Don't extract title from filename" do
+          commandline_options[:file_title] = false
         end
       end
 

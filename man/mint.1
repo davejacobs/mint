@@ -45,8 +45,14 @@ Specify output filename format with substitutions (%{basename}, %{original_exten
 .BR \-\-preserve\-structure
 Preserve source directory structure (e.g., nesting) in destination
 .TP
+.BR \-\-no\-preserve\-structure
+Don't preserve source directory structure in destination
+.TP
 .BR \-\-navigation
 Enable navigation panel showing all files
+.TP
+.BR \-\-no\-navigation
+Disable navigation panel
 .TP
 .BR \-\-navigation\-title " " \fITITLE\fR
 Set title for navigation panel
@@ -59,6 +65,9 @@ Maximum depth to show in navigation (default: 3)
 .TP
 .BR \-\-file\-title
 Extract title from filename (removes .md extension) and inject into template
+.TP
+.BR \-\-no\-file\-title
+Don't extract title from filename
 .SH STYLE OPTIONS
 Mint offers flexible control over how stylesheets are incorporated into your documents:
 
@@ -80,6 +89,24 @@ mint publish document.md --style-destination styles/main.css
 .RE
 
 External stylesheets are useful when you want to share stylesheets across multiple documents, keep HTML files smaller, or allow separate caching of styles.
+.SH CONFIGURATION
+Mint can be configured using TOML configuration files in the following order of precedence:
+.IP 1. 2
+Command-line arguments (highest priority)
+.IP 2. 2
+Local config file: .mint/config.toml
+.IP 3. 2
+User config file: ~/.config/mint/config.toml  
+.IP 4. 2
+Built-in defaults (lowest priority)
+
+Boolean options set to true in configuration files can be overridden using --no- flags:
+.RS
+.nf
+# If config.toml has: navigation = true
+mint publish docs.md --no-navigation
+.fi
+.RE
 .SH EXAMPLES
 .TP
 Transform a single Markdown file:
@@ -105,6 +132,11 @@ mint publish resume.md --template resume
 Create external stylesheet:
 .nf
 mint publish document.md --style-destination css
+.fi
+.TP
+Override config file settings:
+.nf
+mint publish docs.md --no-navigation --no-file-title
 .fi
 .SH TEMPLATES
 Mint comes with several built-in templates:
