@@ -2,11 +2,25 @@
 
 Transform your plain text documents into beautiful HTML documents with customizable styling and templates.
 
+## Why Mint?
+
+- **Focus on writing** – Keep documents as plain text
+- **Version control friendly** – Text files work great with Git
+- **Scriptable** – Automate document processing
+- **Beautiful output** – Professional-looking HTML ready for print or web
+- **Highly customizable** – Create your own templates and styles
+
 ## Installation
 
 ```bash
 gem install mint
 ```
+
+## Documentation
+
+- **Complete usage guide:** [TUTORIAL.md](doc/TUTORIAL.md)
+- **Man page:** `man mint` (after installation)
+- **API documentation:** [RubyDoc](http://www.rubydoc.info/github/davejacobs/mint)
 
 ## Get started
 
@@ -35,10 +49,10 @@ mint publish Document.md --destination public
 # Publish multiple files
 mint publish *.md --destination final-drafts
 
-# Publish with navigation panel
-mint publish content/**/*.md --navigation --navigation-title "My Documentation" --destination public
+# Publish with navigation panel; use globs to recursively include nested files
+mint publish content/**/*.md --preserve-structure --navigation --navigation-title "Documentation" --destination public
 
-# Extract titles from filenames
+# Guess document title (and h1 header) from filename
 mint publish my-document.md --file-title
 ```
 
@@ -46,7 +60,6 @@ mint publish my-document.md --file-title
 
 | Flag | Description |
 |------|-------------|
-| `-h, --help` | Show help message |
 | `-t, --template TEMPLATE` | Use a built-in template (combines layout + style) |
 | `-l, --layout LAYOUT` | Specify only the layout |
 | `-s, --style STYLE` | Specify only the style |
@@ -54,22 +67,18 @@ mint publish my-document.md --file-title
 | `-d, --destination DIR` | Output directory |
 | `-o, --output-file FORMAT` | Custom output filename format with substitutions |
 | `-m, --style-mode MODE` | How styles are included (inline, external, original) |
-| `--style-destination PATH` | Create external stylesheet and link it (sets mode to external) |
+| `--file-title` | Extract title from filename (removes .md extension) and inject into template |
 | `--preserve-structure` | Preserve source directory structure (e.g., nesting) in destination |
-| `-r, --recursive` | Find all Markdown files in any directories specified |
 | `--navigation` | Enable navigation panel showing all files |
 | `--navigation-title TITLE` | Set title for navigation panel |
-| `--navigation-drop LEVELS` | Drop first N directory levels from navigation |
-| `--navigation-depth DEPTH` | Maximum depth to show in navigation (default: 3) |
-| `--file-title` | Extract title from filename (removes .md extension) and inject into template |
 
 ### Style modes
 
 Mint offers three ways to include styles in your HTML output:
 
-- **`inline`** (default) – CSS is embedded directly in the HTML document as `<style>` tags
-- **`external`** – CSS is compiled and saved as separate files, linked with `<link>` tags
-- **`original`** – Links directly to original CSS template files without processing (for live editing)
+- `inline` (default) – CSS is embedded directly in the HTML document as `<style>` tags
+- `external` – CSS is compiled and saved as separate files, linked with `<link>` tags
+- `original` – Links directly to original CSS template files without processing (for live editing)
 
 The `original` mode is particularly useful for template development, as it allows you to edit CSS files and see changes immediately without republishing. Only `.css` files are supported in this mode, and `@import` statements in CSS files will be included as additional `<link>` tags.
 
@@ -79,6 +88,7 @@ The `original` mode is particularly useful for template development, as it allow
 - `basic` – Clean, minimal styling, focuses on text
 - `nord` – Clean, uses Nord color scheme and sans text
 - `nord-dark` – Dark version of Nord
+- `magazine` – Refined & easy to adapt for publications
 
 ### Custom templates
 
@@ -88,20 +98,6 @@ to include variables like the document title and body). If you opt not to create
 layout from the default template will be used.
 
 Mint layouts are written in ERB-flavored HTML, and stylesheets are written in CSS.
-
-## Documentation
-
-- **Complete usage guide:** [TUTORIAL.md](doc/TUTORIAL.md)
-- **Man page:** `man mint` (after installation)
-- **API documentation:** [RubyDoc](http://www.rubydoc.info/github/davejacobs/mint)
-
-## Why Mint?
-
-- **Focus on writing** – Keep documents as plain text
-- **Version control friendly** – Text files work great with Git
-- **Scriptable** – Automate document processing
-- **Beautiful output** – Professional-looking HTML ready for print or web
-- **Highly customizable** – Create your own templates and styles
 
 ## Configuration
 
