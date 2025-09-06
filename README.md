@@ -80,6 +80,15 @@ The `original` mode is particularly useful for template development, as it allow
 - `nord` – Clean, uses Nord color scheme and sans text
 - `nord-dark` – Dark version of Nord
 
+### Custom templates
+
+It's easy to write a custom template: simply create a directory in `~/.config/mint/templates` or `./mint/templates`
+with the name of your new template. Create a `style.css` file and an optional `layout.html` file (which uses ERB
+to include variables like the document title and body). If you opt not to create a new `layout.html`, the 
+layout from the default template will be used.
+
+Mint layouts are written in ERB-flavored HTML, and stylesheets are written in CSS.
+
 ## Documentation
 
 - **Complete usage guide:** [TUTORIAL.md](doc/TUTORIAL.md)
