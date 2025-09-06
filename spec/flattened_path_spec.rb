@@ -16,7 +16,7 @@ RSpec.describe "Flattened Path Handling (default behavior)" do
         create_markdown_file("docs/guides/setup.md", "# Setup Guide")
         
         config = Mint::Config.new(destination_directory: Pathname.new("output"))
-        Mint.publish!("docs/guides/setup.md", config)
+        Mint.publish!("docs/guides/setup.md", config: config)
         
         # File should be flattened to output directory
         expect(File.exist?("output/setup.html")).to be true
@@ -38,7 +38,7 @@ RSpec.describe "Flattened Path Handling (default behavior)" do
         
         config = Mint::Config.new(destination_directory: Pathname.new("build"))
         
-        files.each {|file| Mint.publish!(file, config) }
+        files.each {|file| Mint.publish!(file, config: config) }
         
         # All files should be flattened to build directory
         expect(File.exist?("build/readme.html")).to be true
@@ -60,8 +60,8 @@ RSpec.describe "Flattened Path Handling (default behavior)" do
         config = Mint::Config.new(destination_directory: Pathname.new("output"))
         
         # Process files separately to see collision behavior
-        Mint.publish!("docs/v1/index.md", config)
-        Mint.publish!("docs/v2/index.md", config)
+        Mint.publish!("docs/v1/index.md", config: config)
+        Mint.publish!("docs/v2/index.md", config: config)
         
         # Only one index.html should exist (last one wins)
         expect(File.exist?("output/index.html")).to be true
@@ -85,7 +85,7 @@ RSpec.describe "Flattened Path Handling (default behavior)" do
         ]
         
         config = Mint::Config.new(destination_directory: Pathname.new("site"))
-        Mint::Commandline.publish!(files, config)
+        Mint::Commandline.publish!(files, config: config)
         
         # All files flattened to site directory
         expect(File.exist?("site/article1.html")).to be true
@@ -107,7 +107,7 @@ RSpec.describe "Flattened Path Handling (default behavior)" do
           destination_directory: Pathname.new("../public")
         )
         
-        Mint.publish!("source/docs/guide.md", config)
+        Mint.publish!("source/docs/guide.md", config: config)
         
         # File should be flattened in public directory
         expect(File.exist?("public/guide.html")).to be true
@@ -119,7 +119,7 @@ RSpec.describe "Flattened Path Handling (default behavior)" do
         create_markdown_file("index.md", "# Home Page")
         
         config = Mint::Config.new(destination_directory: Pathname.new("output"))
-        Mint.publish!("index.md", config)
+        Mint.publish!("index.md", config: config)
         
         expect(File.exist?("output/index.html")).to be true
       end
@@ -133,7 +133,7 @@ RSpec.describe "Flattened Path Handling (default behavior)" do
           style_mode: :external
         )
         
-        Mint::Commandline.publish!(["docs/manual.md"], config)
+        Mint::Commandline.publish!(["docs/manual.md"], config: config)
         
         expect(File.exist?("site/manual.html")).to be true  # Flattened
         expect(File.exist?("site/style.css")).to be true    # Style in destination

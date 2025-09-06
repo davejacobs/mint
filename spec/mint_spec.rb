@@ -166,7 +166,7 @@ describe Mint do
         
         # This should succeed if templates exist, or raise an error if they don't
         begin
-          Mint.publish!(source_file, config)
+          Mint.publish!(source_file, config: config)
           # If successful, check that output file was created
           output_file = "test.html"
           expect(File.exist?(output_file)).to be true

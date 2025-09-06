@@ -23,7 +23,7 @@ describe "Original style mode integration" do
           )
 
           expect {
-            Mint::Commandline.publish!(["test.md"], config)
+            Mint::Commandline.publish!(["test.md"], config: config)
           }.not_to raise_error
 
           expect(File.exist?("test.html")).to be true
@@ -47,7 +47,7 @@ describe "Original style mode integration" do
 
           # Should work with any template that exists, or fall back gracefully
           expect {
-            Mint::Commandline.publish!(["test.md"], config)
+            Mint::Commandline.publish!(["test.md"], config: config)
           }.not_to raise_error
 
           expect(File.exist?("test.html")).to be true

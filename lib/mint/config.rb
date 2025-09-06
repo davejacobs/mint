@@ -1,5 +1,6 @@
 module Mint
   class Config
+    attr_accessor :help
     attr_accessor :files
     attr_accessor :layout_name
     attr_accessor :style_name
@@ -28,6 +29,7 @@ module Mint
     DEFAULT_FILE_TITLE                  = false
     
     def initialize(options = {})
+      @help = options[:help]
       @layout_name = options[:layout_name] || options[:template_name] || DEFAULT_LAYOUT_NAME
       @style_name = options[:style_name] || options[:template_name] || DEFAULT_STYLE_NAME
       @style_mode = options[:style_mode] || DEFAULT_STYLE_MODE
@@ -45,6 +47,7 @@ module Mint
     
     def to_h
       {
+        help: @help,
         layout_name: @layout_name,
         style_name: @style_name,
         style_mode: @style_mode,

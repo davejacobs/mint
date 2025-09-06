@@ -75,22 +75,18 @@ module Mint
   # Publishes a Document object according to its internal specifications.
   #
   # @param [Pathname] pathname linking to a Markdown file to be used as document content
-  # @param [Config] config a Config object with all configuration options; Config options can also
-  #   be specified with keyword args
+  # @param [Config, Hash] config a Config object or Hash with configuration options
+  # @param [Hash] variables template variables to pass to the layout
   # @param [Boolean] render_style whether to render the style, ideal for only rendering 
   #   a style for the first file in a group of files
-  def self.publish!(source_file, config_or_options = Config.new, variables: {}, render_style: true, **options)
-    config = case config_or_options
+  def self.publish!(source_file, config: Config.new, variables: {}, render_style: true)
+    config = case config
              when Config
-               if options.any?
-                 config_or_options.merge(Config.new(options))
-               else
-                 config_or_options
-               end
+               config
              when Hash
-               Config.new(config_or_options.merge(options))
+               Config.new(config)
              else
-               raise ArgumentError, "Second argument must be a Config object or Hash"
+               raise ArgumentError, "config must be a Config object or Hash"
              end
     
     original_source_content = File.read source_file

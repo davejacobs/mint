@@ -40,7 +40,7 @@ RSpec.describe "Full CLI Workflow Integration" do
           config = Mint::Config.new(destination_directory: Pathname.new("output"))
           
           expect {
-            Mint::Commandline.publish!(["index.md", "about.md"], config)
+            Mint::Commandline.publish!(["index.md", "about.md"], config: config)
           }.not_to raise_error
 
           # 4. Verify output
@@ -75,7 +75,7 @@ RSpec.describe "Full CLI Workflow Integration" do
           # Publish all documentation
           md_files = Dir.glob("source/**/*.md")
           expect {
-            Mint::Commandline.publish!(md_files, config)
+            Mint::Commandline.publish!(md_files, config: config)
           }.not_to raise_error
 
           # Verify structure is maintained
@@ -109,7 +109,7 @@ RSpec.describe "Full CLI Workflow Integration" do
           # Publish blog
           blog_files = ["index.md"] + Dir.glob("posts/*.md")
           expect {
-            Mint::Commandline.publish!(blog_files, config)
+            Mint::Commandline.publish!(blog_files, config: config)
           }.not_to raise_error
 
           # Verify blog structure
@@ -125,12 +125,12 @@ RSpec.describe "Full CLI Workflow Integration" do
 
           # Test error when nonexistent style is specified
           expect {
-            Mint::Commandline.publish!(["test.md"], Mint::Config.new(style_name: "nonexistent"))
+            Mint::Commandline.publish!(["test.md"], config: Mint::Config.new(style_name: "nonexistent"))
           }.to raise_error(Mint::StyleNotFoundException)
 
           # Recovery: Use existing layout
           expect {
-            Mint::Commandline.publish!(["test.md"], Mint::Config.new(layout_name: "default"))
+            Mint::Commandline.publish!(["test.md"], config: Mint::Config.new(layout_name: "default"))
           }.not_to raise_error
 
           expect(File.exist?("test.html")).to be true
@@ -145,7 +145,7 @@ RSpec.describe "Full CLI Workflow Integration" do
 
           # Should still work with explicit config
           expect {
-            Mint::Commandline.publish!(["test.md"], Mint::Config.new)
+            Mint::Commandline.publish!(["test.md"], config: Mint::Config.new)
           }.not_to raise_error
 
           expect(File.exist?("test.html")).to be true
@@ -167,7 +167,7 @@ RSpec.describe "Full CLI Workflow Integration" do
           # Measure performance
           start_time = Time.now
           expect {
-            Mint::Commandline.publish!(files, config)
+            Mint::Commandline.publish!(files, config: config)
           }.not_to raise_error
           end_time = Time.now
 

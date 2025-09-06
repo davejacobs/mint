@@ -26,7 +26,7 @@ RSpec.describe "Mint::Commandline.publish! Path Integration" do
         end
         
         config = Mint::Config.new(destination_directory: Pathname.new("output"), preserve_structure: true)
-        Mint::Commandline.publish!(files, config)
+        Mint::Commandline.publish!(files, config: config)
         
         expect(File.exist?("output/readme.html")).to be true
         expect(File.exist?("output/docs/installation.html")).to be true
@@ -45,7 +45,7 @@ RSpec.describe "Mint::Commandline.publish! Path Integration" do
         files = Dir.glob("**/*.md")
         config = Mint::Config.new(destination_directory: Pathname.new("site"), preserve_structure: true)
         
-        Mint::Commandline.publish!(files, config)
+        Mint::Commandline.publish!(files, config: config)
         
         expect(File.exist?("site/guides/beginner/basics.html")).to be true
         expect(File.exist?("site/guides/beginner/setup.html")).to be true
@@ -74,7 +74,7 @@ RSpec.describe "Mint::Commandline.publish! Path Integration" do
           preserve_structure: true
         )
         
-        Mint::Commandline.publish!(files, config)
+        Mint::Commandline.publish!(files, config: config)
         
         # Should strip 'source/' prefix due to root directory
         expect(File.exist?("build/pages/home.html")).to be true
@@ -97,7 +97,7 @@ RSpec.describe "Mint::Commandline.publish! Path Integration" do
           preserve_structure: true
         )
         
-        Mint::Commandline.publish!(["content/article.md"], config)
+        Mint::Commandline.publish!(["content/article.md"], config: config)
         
         expect(File.exist?("public/content/article.html")).to be true
         expect(File.exist?("public/style.css")).to be true
@@ -114,7 +114,7 @@ RSpec.describe "Mint::Commandline.publish! Path Integration" do
           preserve_structure: true
         )
         
-        Mint::Commandline.publish!(["src/docs/guide.md"], config)
+        Mint::Commandline.publish!(["src/docs/guide.md"], config: config)
         
         expect(File.exist?("web/pages/src/docs/guide.html")).to be true
         expect(File.exist?("web/assets/style.css")).to be true
@@ -126,7 +126,7 @@ RSpec.describe "Mint::Commandline.publish! Path Integration" do
         config = Mint::Config.new(destination_directory: Pathname.new("output"), preserve_structure: true)
         
         expect {
-          Mint::Commandline.publish!(["nonexistent/file.md"], config)
+          Mint::Commandline.publish!(["nonexistent/file.md"], config: config)
         }.to raise_error(Errno::ENOENT)
       end
 
@@ -138,7 +138,7 @@ RSpec.describe "Mint::Commandline.publish! Path Integration" do
         )
         
         expect {
-          Mint::Commandline.publish!(["test.md"], config)
+          Mint::Commandline.publish!(["test.md"], config: config)
         }.not_to raise_error
         
         expect(File.exist?("very/deeply/nested/output/directory/test.html")).to be true
@@ -158,7 +158,7 @@ RSpec.describe "Mint::Commandline.publish! Path Integration" do
         files = ["docs/guides/intro.md", "docs/api/reference.md"]
         config = Mint::Config.new(destination_directory: Pathname.new("site"), preserve_structure: true)
         
-        Mint::Commandline.publish!(files, config)
+        Mint::Commandline.publish!(files, config: config)
         
         # Check that links were transformed
         intro_content = File.read("site/docs/guides/intro.html")
@@ -191,7 +191,7 @@ RSpec.describe "Mint::Commandline.publish! Path Integration" do
         end
         
         config = Mint::Config.new(destination_directory: Pathname.new("public"), preserve_structure: true)
-        Mint::Commandline.publish!(files, config)
+        Mint::Commandline.publish!(files, config: config)
         
         expect(File.exist?("public/content/posts/2023/welcome.html")).to be true
         expect(File.exist?("public/content/docs/v1.0/getting-started.html")).to be true
@@ -219,7 +219,7 @@ RSpec.describe "Mint::Commandline.publish! Path Integration" do
         end
         
         config = Mint::Config.new(destination_directory: Pathname.new("docs-site"), preserve_structure: true)
-        Mint::Commandline.publish!(files, config)
+        Mint::Commandline.publish!(files, config: config)
         
         expect(File.exist?("docs-site/packages/core/docs/api.html")).to be true
         expect(File.exist?("docs-site/packages/ui/docs/components.html")).to be true

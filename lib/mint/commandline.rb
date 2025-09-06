@@ -11,10 +11,13 @@ require_relative "./navigation_processor"
 module Mint
   module Commandline
     def self.run!(argv)
-      command, config, files = Mint::Commandline.parse! argv
-      case command.to_sym
-      when :publish
-        Mint::Commandline.publish!(files, config)
+      command, config, files, help = Mint::Commandline.parse! argv
+
+      if config.help || command.nil?
+        puts help
+        exit 0
+      elsif command.to_sym == :publish
+        Mint::Commandline.publish!(files, config: config)
       else
         possible_binary = "mint-#{command}"
         if File.executable? possible_binary
@@ -38,8 +41,7 @@ module Mint
         cli.banner = "Usage: mint [command] files [options]"
 
         cli.on "-h", "--help", "Show this help message" do
-          puts cli.help
-          exit 0
+          commandline_options[:help] = true
         end
 
         cli.on "-t", "--template TEMPLATE", "Specify a template by name (default: default)" do |t|
@@ -123,20 +125,21 @@ module Mint
       commandline_config = Config.new(commandline_options)
       config = Mint.configuration.merge(commandline_config)
 
-      [command, config, files]
+      [command, config, files, parser.help]
     end
 
     # For each file specified, publishes a new file based on configuration.
     #
     # @param [Array] source_files files a group of filenames
-    # @param [Config] config a Config object with all configuration options
-    def self.publish!(source_files, config)
+    # @param [Config, Hash] config a Config object or Hash with configuration options
+    def self.publish!(source_files, config: Config.new)
+      config = config.is_a?(Config) ? config : Config.new(config)
       navigation_data = NavigationProcessor.process_navigation_data(source_files, config)
       source_files.each_with_index do |source_file, idx|
         current_file_navigation_data = NavigationProcessor.process_navigation_for_current_file(
           source_file, navigation_data, config
         )
-        Mint.publish!(source_file, config, variables: { files: current_file_navigation_data }, render_style: idx == 0)
+        Mint.publish!(source_file, config: config, variables: { files: current_file_navigation_data }, render_style: idx == 0)
       end
     end
   end

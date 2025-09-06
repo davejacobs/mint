@@ -17,7 +17,7 @@ RSpec.describe "CLI Publishing Workflow" do
           markdown_file = create_markdown_file("test.md", "# Hello World\n\nThis is a test.")
           
           expect {
-            Mint::Commandline.publish!([markdown_file], Mint::Config.new)
+            Mint::Commandline.publish!([markdown_file], config: Mint::Config.new)
           }.not_to raise_error
           
           verify_file_content("test.html") do |content|
@@ -31,7 +31,7 @@ RSpec.describe "CLI Publishing Workflow" do
           file2 = create_markdown_file("doc2.md", "# Document 2")
           
           expect {
-            Mint::Commandline.publish!([file1, file2], Mint::Config.new)
+            Mint::Commandline.publish!([file1, file2], config: Mint::Config.new)
           }.not_to raise_error
           
           verify_file_content("doc1.html") do |content|
@@ -46,7 +46,7 @@ RSpec.describe "CLI Publishing Workflow" do
         it "uses default template when none specified" do
           markdown_file = create_markdown_file("test.md", "# Test")
           
-          Mint::Commandline.publish!([markdown_file], Mint::Config.new)
+          Mint::Commandline.publish!([markdown_file], config: Mint::Config.new)
           
           verify_file_content("test.html") do |content|
             expect(content).to include("<!DOCTYPE html>")
@@ -61,7 +61,7 @@ RSpec.describe "CLI Publishing Workflow" do
           markdown_file = create_markdown_file("test.md", "# Test")
           FileUtils.mkdir_p("output")
           
-          Mint::Commandline.publish!([markdown_file], Mint::Config.new(destination_directory: Pathname.new("output")))
+          Mint::Commandline.publish!([markdown_file], config: Mint::Config.new(destination_directory: Pathname.new("output")))
           
           expect(File.exist?("output/test.html")).to be true
           expect(File.exist?("test.html")).to be false
@@ -75,7 +75,7 @@ RSpec.describe "CLI Publishing Workflow" do
           end
           
           # Publish from parent directory with current directory as root
-          Mint::Commandline.publish!(["docs/readme.md"], Mint::Config.new(working_directory: Pathname.getwd, preserve_structure: true))
+          Mint::Commandline.publish!(["docs/readme.md"], config: Mint::Config.new(working_directory: Pathname.getwd, preserve_structure: true))
           
           expect(File.exist?("docs/readme.html")).to be true
         end
@@ -87,7 +87,7 @@ RSpec.describe "CLI Publishing Workflow" do
           
           markdown_file = create_markdown_file("test.md", "# Test")
           
-          Mint::Commandline.publish!([markdown_file], Mint::Config.new(layout_name: "custom"))
+          Mint::Commandline.publish!([markdown_file], config: Mint::Config.new(layout_name: "custom"))
           
           verify_file_content("test.html") do |content|
             expect(content).to include("class='custom'")
@@ -101,7 +101,7 @@ RSpec.describe "CLI Publishing Workflow" do
           
           markdown_file = create_markdown_file("test.md", "# Test")
           
-          Mint::Commandline.publish!([markdown_file], Mint::Config.new(style_name: "styled"))
+          Mint::Commandline.publish!([markdown_file], config: Mint::Config.new(style_name: "styled"))
           
           # Check if style file was created and linked
           expect(File.exist?("test.html")).to be true
@@ -125,7 +125,7 @@ RSpec.describe "CLI Publishing Workflow" do
           
           # Find all markdown files and process them explicitly since recursive option was removed
           md_files = Dir.glob("docs/**/*.md") 
-          Mint::Commandline.publish!(md_files, Mint::Config.new(preserve_structure: true))
+          Mint::Commandline.publish!(md_files, config: Mint::Config.new(preserve_structure: true))
           
           expect(File.exist?("docs/index.html")).to be true
           expect(File.exist?("docs/section1/intro.html")).to be true
@@ -142,7 +142,7 @@ RSpec.describe "CLI Publishing Workflow" do
           expect {
             # Process empty directory - should just not process anything
             md_files = Dir.glob("empty/**/*.md")
-            Mint::Commandline.publish!(md_files, Mint::Config.new(preserve_structure: true))
+            Mint::Commandline.publish!(md_files, config: Mint::Config.new(preserve_structure: true))
           }.not_to raise_error
         end
 
@@ -153,7 +153,7 @@ RSpec.describe "CLI Publishing Workflow" do
           
           # Process all markdown files in current directory and subdirectories
           md_files = Dir.glob("**/*.md")
-          Mint::Commandline.publish!(md_files, Mint::Config.new(preserve_structure: true))
+          Mint::Commandline.publish!(md_files, config: Mint::Config.new(preserve_structure: true))
           
           expect(File.exist?("current.html")).to be true
           expect(File.exist?("sub/nested.html")).to be true
@@ -169,7 +169,7 @@ RSpec.describe "CLI Publishing Workflow" do
           end
           
           files = extensions.map.with_index {|ext, i| "test#{i}.#{ext}" }
-          Mint::Commandline.publish!(files, Mint::Config.new)
+          Mint::Commandline.publish!(files, config: Mint::Config.new)
           
           extensions.each_with_index do |ext, i|
             expect(File.exist?("test#{i}.html")).to be true
@@ -204,7 +204,7 @@ RSpec.describe "CLI Publishing Workflow" do
           
           create_markdown_file("complex.md", complex_content)
           
-          Mint::Commandline.publish!(["complex.md"], Mint::Config.new)
+          Mint::Commandline.publish!(["complex.md"], config: Mint::Config.new)
           
           verify_file_content("complex.html") do |content|
             expect(content).to include("<h1>Main Title</h1>")
@@ -221,7 +221,7 @@ RSpec.describe "CLI Publishing Workflow" do
       describe "error handling" do
         it "handles missing source files gracefully" do
           expect {
-            Mint::Commandline.publish!(["nonexistent.md"], Mint::Config.new)
+            Mint::Commandline.publish!(["nonexistent.md"], config: Mint::Config.new)
           }.to raise_error(Errno::ENOENT) # Should raise an error for missing file
         end
 
@@ -232,7 +232,7 @@ RSpec.describe "CLI Publishing Workflow" do
           # Try to publish to a non-writable location
           # This test might be platform-specific
           expect {
-            Mint::Commandline.publish!([markdown_file], Mint::Config.new(destination_directory: Pathname.new("/root")))
+            Mint::Commandline.publish!([markdown_file], config: Mint::Config.new(destination_directory: Pathname.new("/root")))
           }.to raise_error(Errno::EROFS) # Should fail due to permissions
         end
 
@@ -241,7 +241,7 @@ RSpec.describe "CLI Publishing Workflow" do
           
           # Should throw error when user specifies nonexistent style
           expect {
-            Mint::Commandline.publish!([markdown_file], Mint::Config.new(style_name: "nonexistent"))
+            Mint::Commandline.publish!([markdown_file], config: Mint::Config.new(style_name: "nonexistent"))
           }.to raise_error(Mint::StyleNotFoundException)
         end
       end
@@ -251,7 +251,7 @@ RSpec.describe "CLI Publishing Workflow" do
           FileUtils.mkdir_p("input/subdir")
           create_markdown_file("input/subdir/doc.md", "# Nested Document")
           
-          Mint::Commandline.publish!(["input/subdir/doc.md"], Mint::Config.new(preserve_structure: true))
+          Mint::Commandline.publish!(["input/subdir/doc.md"], config: Mint::Config.new(preserve_structure: true))
           
           expect(File.exist?("input/subdir/doc.html")).to be true
         end
@@ -267,7 +267,7 @@ RSpec.describe "CLI Publishing Workflow" do
           markdown_file = create_markdown_file("test.md", "# Version 1")
           File.write("test.html", "<html>Old content</html>")
           
-          Mint::Commandline.publish!([markdown_file], Mint::Config.new)
+          Mint::Commandline.publish!([markdown_file], config: Mint::Config.new)
           
           verify_file_content("test.html") do |content|
             expect(content).to include("Version 1")
@@ -301,7 +301,7 @@ RSpec.describe "CLI Publishing Workflow" do
             destination_directory: Pathname.new(loaded_config.destination_directory.to_s)
           )
           
-          Mint::Commandline.publish!([markdown_file], config_with_pathnames)
+          Mint::Commandline.publish!([markdown_file], config: config_with_pathnames)
           
           expect(File.exist?("build/test.html")).to be true
         end
@@ -315,7 +315,7 @@ RSpec.describe "CLI Publishing Workflow" do
           markdown_file = create_markdown_file("test.md", "# Test")
           
           # Override with CLI option
-          Mint::Commandline.publish!([markdown_file], Mint::Config.new(destination_directory: Pathname.new("cli_output")))
+          Mint::Commandline.publish!([markdown_file], config: Mint::Config.new(destination_directory: Pathname.new("cli_output")))
           
           expect(File.exist?("cli_output/test.html")).to be true
           expect(File.exist?("config_output/test.html")).to be false
@@ -330,7 +330,7 @@ RSpec.describe "CLI Publishing Workflow" do
           end
           
           start_time = Time.now
-          Mint::Commandline.publish!(files, Mint::Config.new)
+          Mint::Commandline.publish!(files, config: Mint::Config.new)
           end_time = Time.now
           
           # All files should be processed
@@ -368,7 +368,7 @@ RSpec.describe "CLI Publishing Workflow" do
           FileUtils.mkdir_p(".mint/templates/nav")
           File.write(".mint/templates/nav/layout.erb", nav_template)
           
-          Mint::Commandline.publish!(files, Mint::Config.new(layout_name: "nav"))
+          Mint::Commandline.publish!(files, config: Mint::Config.new(layout_name: "nav"))
           
           # Check that navigation was included
           verify_file_content("page0.html") do |content|

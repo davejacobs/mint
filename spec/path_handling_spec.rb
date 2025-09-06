@@ -16,7 +16,7 @@ RSpec.describe "Path Handling in Mint.publish!" do
         create_markdown_file("docs/readme.md", "# Documentation")
         
         config = Mint::Config.new(destination_directory: Pathname.new("output"), preserve_structure: true)
-        Mint.publish!("docs/readme.md", config)
+        Mint.publish!("docs/readme.md", config: config)
         
         expect(File.exist?("output/docs/readme.html")).to be true
         expect(File.exist?("output/readme.html")).to be false
@@ -27,7 +27,7 @@ RSpec.describe "Path Handling in Mint.publish!" do
         create_markdown_file("src/guides/advanced/config.md", "# Advanced Configuration")
         
         config = Mint::Config.new(destination_directory: Pathname.new("build"), preserve_structure: true)
-        Mint.publish!("src/guides/advanced/config.md", config)
+        Mint.publish!("src/guides/advanced/config.md", config: config)
         
         expect(File.exist?("build/src/guides/advanced/config.html")).to be true
         expect(File.exist?("build/config.html")).to be false
@@ -37,7 +37,7 @@ RSpec.describe "Path Handling in Mint.publish!" do
         create_markdown_file("index.md", "# Home Page")
         
         config = Mint::Config.new(destination_directory: Pathname.new("site"), preserve_structure: true)
-        Mint.publish!("index.md", config)
+        Mint.publish!("index.md", config: config)
         
         expect(File.exist?("site/index.html")).to be true
       end
@@ -47,7 +47,7 @@ RSpec.describe "Path Handling in Mint.publish!" do
         create_markdown_file("content/about.md", "# About Us")
         
         config = Mint::Config.new(destination_directory: Pathname.new("public/website"), preserve_structure: true)
-        Mint.publish!("content/about.md", config)
+        Mint.publish!("content/about.md", config: config)
         
         expect(File.exist?("public/website/content/about.html")).to be true
         expect(Dir.exist?("public/website/content")).to be true
@@ -64,7 +64,7 @@ RSpec.describe "Path Handling in Mint.publish!" do
           destination_directory: Pathname.new("../dist"),  # Relative to root directory
           preserve_structure: true
         )
-        Mint.publish!("source/pages/home.md", config)
+        Mint.publish!("source/pages/home.md", config: config)
         
         expect(File.exist?("dist/pages/home.html")).to be true
         expect(File.exist?("dist/source/pages/home.html")).to be false
@@ -79,7 +79,7 @@ RSpec.describe "Path Handling in Mint.publish!" do
           destination_directory: Pathname.new("../../output"),  # Relative to root directory
           preserve_structure: true
         )
-        Mint.publish!("content/posts/article.md", config)
+        Mint.publish!("content/posts/article.md", config: config)
         
         expect(File.exist?("output/article.html")).to be true
         expect(File.exist?("output/posts/article.html")).to be false
@@ -91,7 +91,7 @@ RSpec.describe "Path Handling in Mint.publish!" do
         create_markdown_file("documents/guide.md", "# User Guide")
         
         config = Mint::Config.new(destination_directory: Pathname.new("website"), preserve_structure: true)
-        Mint.publish!(doc_file, config)
+        Mint.publish!(doc_file, config: config)
         
         expect(File.exist?("website/documents/guide.html")).to be true
       end
@@ -103,7 +103,7 @@ RSpec.describe "Path Handling in Mint.publish!" do
         create_markdown_file("project/src/docs/api/v1/users.md", "# Users API")
         
         config = Mint::Config.new(destination_directory: Pathname.new("api-docs"), preserve_structure: true)
-        Mint.publish!("project/src/docs/api/v1/users.md", config)
+        Mint.publish!("project/src/docs/api/v1/users.md", config: config)
         
         expect(File.exist?("api-docs/project/src/docs/api/v1/users.html")).to be true
       end
@@ -123,7 +123,7 @@ RSpec.describe "Path Handling in Mint.publish!" do
         
         config = Mint::Config.new(destination_directory: Pathname.new("build"), preserve_structure: true)
         
-        files.each {|file| Mint.publish!(file, config) }
+        files.each {|file| Mint.publish!(file, config: config) }
         
         expect(File.exist?("build/src/readme.html")).to be true
         expect(File.exist?("build/src/components/button.html")).to be true
@@ -137,7 +137,7 @@ RSpec.describe "Path Handling in Mint.publish!" do
         create_markdown_file("v1.0/docs/changelog.md", "# Changelog")
         
         config = Mint::Config.new(destination_directory: Pathname.new("output"), preserve_structure: true)
-        Mint.publish!("v1.0/docs/changelog.md", config)
+        Mint.publish!("v1.0/docs/changelog.md", config: config)
         
         expect(File.exist?("output/v1.0/docs/changelog.html")).to be true
       end
@@ -147,7 +147,7 @@ RSpec.describe "Path Handling in Mint.publish!" do
         create_markdown_file("My Documents/Notes/ideas.md", "# Ideas")
         
         config = Mint::Config.new(destination_directory: Pathname.new("website"), preserve_structure: true)
-        Mint.publish!("My Documents/Notes/ideas.md", config)
+        Mint.publish!("My Documents/Notes/ideas.md", config: config)
         
         expect(File.exist?("website/My Documents/Notes/ideas.html")).to be true
       end
@@ -161,7 +161,7 @@ RSpec.describe "Path Handling in Mint.publish!" do
           File.symlink("real-content", "linked-content")
           
           config = Mint::Config.new(destination_directory: Pathname.new("output"), preserve_structure: true)
-          Mint.publish!("linked-content/page.md", config)
+          Mint.publish!("linked-content/page.md", config: config)
           
           expect(File.exist?("output/linked-content/page.html")).to be true
         rescue NotImplementedError
@@ -174,7 +174,7 @@ RSpec.describe "Path Handling in Mint.publish!" do
         create_markdown_file("docs/manual.md", "# Manual")
         
         config = Mint::Config.new(destination_directory: Pathname.new("./site"), preserve_structure: true)
-        Mint.publish!("./docs/manual.md", config)
+        Mint.publish!("./docs/manual.md", config: config)
         
         expect(File.exist?("site/docs/manual.html")).to be true
       end
@@ -185,7 +185,7 @@ RSpec.describe "Path Handling in Mint.publish!" do
         
         Dir.chdir("project") do
           config = Mint::Config.new(destination_directory: Pathname.new("../output"), preserve_structure: true)
-          Mint.publish!("content/info.md", config)
+          Mint.publish!("content/info.md", config: config)
         end
         
         expect(File.exist?("output/content/info.html")).to be true
@@ -197,7 +197,7 @@ RSpec.describe "Path Handling in Mint.publish!" do
         create_markdown_file("test.md", "# Test")
         
         config = Mint::Config.new(destination_directory: Pathname.new("deeply/nested/output/dir"))
-        Mint.publish!("test.md", config)
+        Mint.publish!("test.md", config: config)
         
         expect(File.exist?("deeply/nested/output/dir/test.html")).to be true
         expect(Dir.exist?("deeply/nested/output/dir")).to be true
@@ -208,7 +208,7 @@ RSpec.describe "Path Handling in Mint.publish!" do
         create_markdown_file("src/a/b/c/deep.md", "# Deep File")
         
         config = Mint::Config.new(destination_directory: Pathname.new("output"), preserve_structure: true)
-        Mint.publish!("src/a/b/c/deep.md", config)
+        Mint.publish!("src/a/b/c/deep.md", config: config)
         
         expect(File.exist?("output/src/a/b/c/deep.html")).to be true
         expect(Dir.exist?("output/src/a/b/c")).to be true
@@ -221,7 +221,7 @@ RSpec.describe "Path Handling in Mint.publish!" do
         create_markdown_file("docs-2023/v1.0_final.md", "# Version 1.0")
         
         config = Mint::Config.new(destination_directory: Pathname.new("output"), preserve_structure: true)
-        Mint.publish!("docs-2023/v1.0_final.md", config)
+        Mint.publish!("docs-2023/v1.0_final.md", config: config)
         
         expect(File.exist?("output/docs-2023/v1.0_final.html")).to be true
       end
@@ -251,7 +251,7 @@ RSpec.describe "Path Handling in Mint.publish!" do
         
         config = Mint::Config.new(destination_directory: Pathname.new("public"), preserve_structure: true)
         
-        files.each {|file| Mint.publish!(file, config) }
+        files.each {|file| Mint.publish!(file, config: config) }
         
         # Verify all files maintain their structure
         expect(File.exist?("public/content/blog/2023/hello-world.html")).to be true
