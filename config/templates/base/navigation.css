@@ -8,19 +8,24 @@
   position: fixed;
   left: 0;
   top: 0;
-  width: 280px;
+  width: var(--navigation-width);
   height: 100vh;
   overflow-y: auto;
-  padding: 2rem 0;
-  z-index: 100;
+  padding: var(--space-xl) 0;
+  z-index: var(--z-navigation);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-weight: 400;
+  background-color: var(--color-nav-bg);
+  border-right: 1px solid var(--color-nav-border);
 }
 
 /* Navigation header */
 #navigation h3 {
-  margin: 0 0 1rem 0;
-  padding: 0 1.5rem;
+  margin: 0 0 var(--space-base) 0;
+  padding: 0 var(--space-lg);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-nav-text);
 }
 
 /* Navigation list structure */
@@ -37,52 +42,69 @@
 /* Navigation links layout */
 #navigation a {
   display: block;
-  padding: 0.5rem 1.5rem;
+  padding: var(--space-sm) var(--space-lg);
   text-decoration: none;
   border-left: 3px solid transparent;
-  transition: all 0.15s ease;
+  transition: var(--transition-fast);
   font-weight: 400;
+  color: var(--color-nav-text);
+  font-size: var(--font-size-sm);
+}
+
+#navigation a:hover {
+  color: var(--color-nav-text-hover);
+  background-color: var(--color-nav-bg-hover);
+  border-left-color: var(--color-nav-border);
+}
+
+#navigation a.current {
+  color: var(--color-nav-text-active);
+  background-color: var(--color-nav-bg-active);
+  border-left-color: var(--color-nav-border-active);
+  font-weight: 500;
 }
 
 /* Directory names (non-clickable) */
 #navigation .directory-name {
   display: block;
-  padding: 0.5rem 1.5rem;
+  padding: var(--space-sm) var(--space-lg);
   font-weight: 600;
+  color: var(--color-nav-text-hover);
+  font-size: var(--font-size-xs);
 }
 
 /* Depth-based indentation */
 #navigation .depth-0 a,
 #navigation .depth-0 .directory-name {
-  padding-left: 1.5rem;
+  padding-left: var(--space-lg);
 }
 
 #navigation .depth-1 a,
 #navigation .depth-1 .directory-name {
-  padding-left: 2.5rem;
+  padding-left: calc(var(--space-lg) + var(--space-base));
 }
 
 #navigation .depth-2 a,
 #navigation .depth-2 .directory-name {
-  padding-left: 3.5rem;
+  padding-left: calc(var(--space-lg) + var(--space-base) * 2);
 }
 
 #navigation .depth-3 a,
 #navigation .depth-3 .directory-name {
-  padding-left: 4.5rem;
+  padding-left: calc(var(--space-lg) + var(--space-base) * 3);
 }
 
 /* Container adjustments when navigation is present */
 body:has(#navigation) #container {
-  margin-left: 280px;
-  padding-left: 2rem; /* Default padding between nav and content */
+  margin-left: var(--navigation-width);
+  padding-left: var(--navigation-gap);
 }
 
 /* Fallback for browsers that don't support :has() */
 @supports not selector(:has(#navigation)) {
   body.has-navigation #container {
-    margin-left: 280px;
-    padding-left: 2rem; /* Default padding between nav and content */
+    margin-left: var(--navigation-width);
+    padding-left: var(--navigation-gap);
   }
 }
 

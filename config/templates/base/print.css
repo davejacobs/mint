@@ -1,0 +1,152 @@
+/* Print Styles
+ * Shared print styles that all templates inherit
+ * Templates can override specific aspects while maintaining consistency
+ */
+
+@media print {
+  /* Reset font sizes to print-optimized values */
+  :root {
+    --base-font-size: var(--print-font-size);
+    --base-line-height: var(--print-line-height);
+    --base-unit: calc(var(--print-font-size) * var(--print-line-height));
+  }
+
+  /* Force print-friendly colors */
+  body {
+    background-color: white !important;
+    color: #000 !important;
+    font-size: var(--print-font-size) !important;
+    line-height: var(--print-line-height) !important;
+  }
+
+  /* Hide navigation completely */
+  #navigation {
+    display: none !important;
+  }
+
+  /* Reset container for print */
+  #container,
+  body:has(#navigation) #container,
+  body.has-navigation #container {
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: none !important;
+    background-color: white !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+  }
+
+  /* Page break control */
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+    page-break-inside: avoid;
+    color: #000 !important;
+  }
+
+  /* Keep content together */
+  pre, blockquote, img, table, figure {
+    page-break-inside: avoid;
+  }
+
+  /* Orphans and widows control */
+  p, li, td, th {
+    widows: 3;
+    orphans: 3;
+  }
+
+  /* Links should be readable in print */
+  a {
+    color: #000 !important;
+    text-decoration: underline !important;
+    border-bottom: none !important;
+  }
+
+  /* Show URL after links (optional - can be overridden) */
+  a[href^="http"]:after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    color: #666;
+  }
+
+  /* Code blocks */
+  code {
+    background-color: #f5f5f5 !important;
+    border: 1px solid #ddd !important;
+    border-radius: 0 !important;
+    color: #000 !important;
+    padding: 0.1em 0.3em !important;
+  }
+
+  pre {
+    background-color: #f8f8f8 !important;
+    border: 1px solid #ddd !important;
+    border-radius: 0 !important;
+    color: #000 !important;
+    white-space: pre-wrap !important;
+    word-wrap: break-word !important;
+  }
+
+  pre code {
+    background-color: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+  }
+
+  /* Tables */
+  table {
+    background-color: white !important;
+    border-collapse: collapse !important;
+    width: 100% !important;
+  }
+
+  th, td {
+    border: 1px solid #000 !important;
+    padding: 0.3em 0.5em !important;
+    color: #000 !important;
+    background-color: transparent !important;
+  }
+
+  th {
+    background-color: #f0f0f0 !important;
+    font-weight: bold !important;
+  }
+
+  /* Blockquotes */
+  blockquote {
+    border-left: 3px solid #000 !important;
+    background-color: transparent !important;
+    color: #333 !important;
+    font-style: italic !important;
+    margin: 1em 0 !important;
+    padding: 0.5em 0 0.5em 1em !important;
+  }
+
+  /* Images */
+  img {
+    max-width: 100% !important;
+    height: auto !important;
+    display: block !important;
+    margin: 0.5em 0 !important;
+  }
+
+  /* Page margins and size */
+  @page {
+    margin: var(--print-margin);
+    size: letter;
+  }
+
+  /* First page special handling */
+  @page :first {
+    margin-top: calc(var(--print-margin) * 1.5);
+  }
+
+  /* Footnotes area if needed */
+  @page {
+    @bottom-right {
+      content: counter(page);
+      font-size: 0.8em;
+      color: #666;
+    }
+  }
+}

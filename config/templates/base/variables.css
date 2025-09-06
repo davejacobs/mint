@@ -1,0 +1,122 @@
+/* Base Design System Variables
+ * All templates inherit from this foundation
+ * Templates should override these variables to create their visual identity
+ */
+
+:root {
+  /* Typography Foundation */
+  --base-font-size: 16px;
+  --base-line-height: 1.6;
+  --base-unit: calc(var(--base-font-size) * var(--base-line-height));
+  
+  /* Typographic Scale - Templates can override --scale-ratio */
+  --scale-ratio: 1.25; /* Minor third by default */
+  --font-size-xs: calc(var(--base-font-size) * 0.75);
+  --font-size-sm: calc(var(--base-font-size) * 0.875);
+  --font-size-base: var(--base-font-size);
+  --font-size-lg: calc(var(--base-font-size) * var(--scale-ratio));
+  --font-size-xl: calc(var(--font-size-lg) * var(--scale-ratio));
+  --font-size-2xl: calc(var(--font-size-xl) * var(--scale-ratio));
+  --font-size-3xl: calc(var(--font-size-2xl) * var(--scale-ratio));
+  
+  /* Spacing Scale - Based on typographic rhythm */
+  --space-xs: calc(var(--base-unit) * 0.25);
+  --space-sm: calc(var(--base-unit) * 0.5);
+  --space-base: var(--base-unit);
+  --space-lg: calc(var(--base-unit) * 1.5);
+  --space-xl: calc(var(--base-unit) * 2);
+  --space-2xl: calc(var(--base-unit) * 3);
+  
+  /* Semantic Colors - Templates override these for theming */
+  --color-text: #1a1a1a;
+  --color-text-subtle: #666666;
+  --color-text-muted: #8a8a8a;
+  --color-background: #ffffff;
+  --color-surface: #ffffff;
+  --color-surface-subtle: #f8f9fa;
+  --color-border: #e5e5e5;
+  --color-border-subtle: #f0f0f0;
+  --color-accent: #007acc;
+  --color-accent-hover: #005fa3;
+  --color-accent-subtle: rgba(0, 122, 204, 0.1);
+  
+  /* Component-Specific Colors */
+  --color-code-bg: #f8f8f8;
+  --color-code-text: #d14;
+  --color-code-border: var(--color-border);
+  --color-pre-bg: #f8f8f8;
+  --color-pre-text: var(--color-text);
+  --color-pre-border: var(--color-border);
+  --color-quote-bg: #fafafa;
+  --color-quote-text: var(--color-text-subtle);
+  --color-quote-border: var(--color-accent);
+  --color-nav-bg: #f8f9fa;
+  --color-nav-text: var(--color-text-subtle);
+  --color-nav-text-hover: var(--color-text);
+  --color-nav-text-active: var(--color-accent);
+  --color-nav-bg-hover: var(--color-surface-subtle);
+  --color-nav-bg-active: var(--color-accent-subtle);
+  --color-nav-border: var(--color-border);
+  --color-nav-border-active: var(--color-accent);
+  
+  /* Table Colors */
+  --color-table-bg: var(--color-surface);
+  --color-table-header-bg: var(--color-surface-subtle);
+  --color-table-header-text: var(--color-text);
+  --color-table-border: var(--color-border);
+  --color-table-stripe: rgba(0, 0, 0, 0.02);
+  --color-table-hover: rgba(0, 0, 0, 0.04);
+  
+  /* Container & Layout */
+  --container-max-width: 85ch;
+  --container-padding: var(--space-xl);
+  --navigation-width: 280px;
+  --navigation-gap: 2rem;
+  
+  /* Border Radius */
+  --radius-sm: 3px;
+  --radius-base: 6px;
+  --radius-lg: 8px;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-base: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 4px 6px rgba(0, 0, 0, 0.05), 0 10px 20px rgba(0, 0, 0, 0.1);
+  
+  /* Print Styles */
+  --print-font-size: 11pt;
+  --print-line-height: 1.4;
+  --print-margin: 0.75in;
+  
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.2s ease;
+  
+  /* Z-Index Scale */
+  --z-navigation: 100;
+  --z-dropdown: 200;
+  --z-modal: 300;
+}
+
+/* Screen-specific overrides for responsive typography */
+@media (max-width: 960px) {
+  :root {
+    --base-font-size: 16px;
+    --container-padding: var(--space-base);
+  }
+}
+
+@media (max-width: 640px) {
+  :root {
+    --base-font-size: 15px;
+    --container-padding: var(--space-sm);
+  }
+}
+
+/* Print overrides */
+@media print {
+  :root {
+    --base-font-size: var(--print-font-size);
+    --base-line-height: var(--print-line-height);
+  }
+}

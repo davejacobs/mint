@@ -1,16 +1,22 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
+/* Import base system */
 @import "../base/style.css";
 @import "../base/navigation.css";
+@import "../base/utilities.css";
 
+/* Nord template theme variables */
 :root {
-  --screen-font-size: 16px;
-  --screen-line-height: 1.6;
-  --screen-unit: calc(var(--screen-font-size) * var(--screen-line-height));
-
+  /* Typography settings */
+  --base-font-size: 16px;
+  --base-line-height: 1.6;
+  --scale-ratio: 1.2;
+  
+  /* Print settings */
   --print-font-size: 11pt;
   --print-line-height: 16pt;
-
-  /* Nord color scheme */
+  
+  /* Nord color palette */
   --nord0: #2e3440;    /* Polar Night - darkest */
   --nord1: #3b4252;    /* Polar Night */
   --nord2: #434c5e;    /* Polar Night */
@@ -27,30 +33,58 @@
   --nord13: #ebcb8b;   /* Aurora - yellow */
   --nord14: #a3be8c;   /* Aurora - green */
   --nord15: #b48ead;   /* Aurora - purple */
+  
+  /* Semantic colors using Nord palette */
+  --color-text: var(--nord0);
+  --color-text-subtle: var(--nord3);
+  --color-text-muted: var(--nord2);
+  --color-background: #ffffff;
+  --color-surface: #ffffff;
+  --color-surface-subtle: var(--nord6);
+  --color-border: var(--nord4);
+  --color-accent: var(--nord10);
+  --color-accent-hover: var(--nord8);
+  --color-accent-subtle: rgba(94, 129, 172, 0.1);
+  
+  /* Component colors */
+  --color-code-bg: var(--nord5);
+  --color-code-text: var(--nord0);
+  --color-pre-bg: var(--nord6);
+  --color-pre-text: var(--nord0);
+  --color-quote-bg: rgba(143, 188, 187, 0.05);
+  --color-quote-text: var(--nord3);
+  --color-quote-border: var(--nord8);
+  
+  /* Navigation colors */
+  --color-nav-bg: var(--nord6);
+  --color-nav-text: var(--nord2);
+  --color-nav-text-hover: var(--nord0);
+  --color-nav-text-active: var(--nord10);
+  --color-nav-bg-hover: var(--nord5);
+  --color-nav-bg-active: rgba(94, 129, 172, 0.1);
+  --color-nav-border: var(--nord4);
+  --color-nav-border-active: var(--nord10);
+  
+  /* Table colors */
+  --color-table-bg: #ffffff;
+  --color-table-header-bg: var(--nord5);
+  --color-table-header-text: var(--nord0);
+  --color-table-border: var(--nord4);
+  --color-table-stripe: transparent;
+  --color-table-hover: rgba(143, 188, 187, 0.03);
+  
+  /* Layout */
+  --container-max-width: 90ch;
 }
 
+/* Typography */
 body {
   font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  font-size: var(--screen-font-size);
-  color: var(--nord0);
-  /*background-color: var(--nord6);*/
+  background-color: var(--color-background);
+  color: var(--color-text);
   font-weight: 400;
   font-feature-settings: "liga" 1, "kern" 1;
   overflow-x: hidden;
-  margin: 0;
-  padding: 0;
-}
-
-#container {
-  max-width: 90ch;
-  margin: calc(var(--screen-unit) * 1) auto;
-  padding: calc(var(--screen-unit) * 1) calc(var(--screen-unit) * 4);
-  /*border: 1px solid var(--nord4);*/
-  /*background-color: #ffffff;*/
-  /*box-shadow: 
-    0 4px 6px rgba(46, 52, 64, 0.05),
-    0 10px 20px rgba(46, 52, 64, 0.1);
-  border-radius: 8px;*/
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -58,107 +92,61 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 {
-  font-size: calc(var(--screen-font-size) * 1.8);
   color: var(--nord0);
 }
 
 h2 {
-  font-size: calc(var(--screen-font-size) * 1.4);
   color: var(--nord1);
 }
 
 h3 {
-  font-size: calc(var(--screen-font-size) * 1.2);
   color: var(--nord2);
 }
 
 h4, h5, h6 {
-  font-size: calc(var(--screen-font-size) * 1.05);
   color: var(--nord3);
 }
 
-a {
-  color: var(--nord10);
-  text-decoration: none;
-  border-bottom: 1px solid transparent;
-  transition: all 0.2s ease;
+/* Container layouts */
+#container {
+  max-width: var(--container-max-width);
+  margin: var(--space-base) auto;
+  padding: var(--space-base) var(--space-2xl);
 }
 
-a:hover {
-  color: var(--nord8);
-  border-bottom-color: var(--nord8);
+/* Container adjustments when navigation is present */
+body:has(#navigation) #container,
+body.has-navigation #container {
+  max-width: calc(var(--container-max-width) - var(--navigation-width));
+  margin-right: auto;
+  margin-top: var(--space-base);
+  margin-bottom: var(--space-base);
+  padding: var(--space-base) var(--space-2xl);
 }
 
-blockquote {
-  border-left: 3px solid var(--nord8);
-  font-style: italic;
-  color: var(--nord3);
-  background-color: rgba(143, 188, 187, 0.05);
-  padding: calc(var(--screen-unit) * 0.75) calc(var(--screen-unit) * 1);
-  border-radius: 0 4px 4px 0;
-  margin-left: 0;
-}
-
+/* Enhanced code styling */
 code {
   font-family: "SF Mono", "JetBrains Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas, monospace;
-  font-size: calc(var(--screen-font-size) * 0.9);
-  background-color: var(--nord5);
-  color: var(--nord0);
-  padding: 0.15em 0.4em;
-  border-radius: 4px;
   font-weight: 500;
 }
 
-pre {
-  background-color: var(--nord6);
-  border: 1px solid var(--nord4);
-  border-radius: 8px;
-  overflow-x: auto;
-}
-
 pre code {
-  background-color: transparent;
-  padding: 0;
-  border-radius: 0;
-  font-size: calc(var(--screen-font-size) * 0.85);
-  color: var(--nord0);
+  color: var(--color-text);
   font-weight: normal;
 }
 
+/* Enhanced styling */
 strong {
   font-weight: 600;
-  color: var(--nord0);
+  color: var(--color-text);
 }
 
 em {
   color: var(--nord1);
 }
 
-ul, ol {
-  padding-left: calc(var(--screen-unit) * 1.5);
-}
-
-table {
-  background-color: #ffffff;
-  width: 100%;
-  overflow-x: auto;
-  min-width: 0;
-  max-width: 100%;
-}
-
-th, td {
-  padding: calc(var(--screen-unit) * 0.5) calc(var(--screen-unit) * 0.75);
-  border-bottom: 1px solid var(--nord4);
-  border-left: none;
-  border-right: none;
-  border-top: none;
-}
-
+/* Table enhancements */
 th {
-  background-color: var(--nord5);
-  font-weight: 600;
-  color: var(--nord0);
-  font-size: calc(var(--screen-font-size) * 0.9);
   text-transform: uppercase;
 }
 
@@ -166,71 +154,18 @@ tr:last-child td {
   border-bottom: none;
 }
 
-tr:hover {
-  background-color: rgba(143, 188, 187, 0.03);
-}
-
-hr {
-  border: none;
-  height: 1px;
-  background-color: var(--nord4);
-  margin: calc(var(--screen-unit) * 2) 0;
-}
-
-/* Navigation visual styling - layout imported from base */
-#navigation {
-  background-color: var(--nord6);
-  border-right: 1px solid var(--nord4);
-}
-
+/* Navigation font size adjustments */
 #navigation h3 {
-  font-size: calc(var(--screen-font-size) * 0.85);
   font-weight: 600;
-  color: var(--nord3);
-}
-
-#navigation a {
-  color: var(--nord2);
-  font-size: calc(var(--screen-font-size) * 0.9);
-}
-
-#navigation a:hover {
-  color: var(--nord0);
-  background-color: var(--nord5);
-  border-left-color: var(--nord7);
-}
-
-#navigation a.current {
-  color: var(--nord10);
-  background-color: rgba(94, 129, 172, 0.1);
-  border-left-color: var(--nord10);
-  font-weight: 500;
+  color: var(--color-text-subtle);
 }
 
 #navigation .directory-name {
-  color: var(--nord1);
-  font-size: calc(var(--screen-font-size) * 0.8);
   font-weight: 600;
+  color: var(--nord1);
 }
 
-/* Container adjustments specific to this template */
-body:has(#navigation) #container {
-  max-width: calc(90ch - 280px);
-  margin-right: auto;
-  margin-top: calc(var(--screen-unit) * 1);
-  margin-bottom: calc(var(--screen-unit) * 1);
-  padding: calc(var(--screen-unit) * 1) calc(var(--screen-unit) * 4);
-}
-
-/* Fallback for browsers that don't support :has() */
-@supports not selector(:has(#navigation)) {
-  body.has-navigation #container {
-    max-width: calc(90ch - 280px);
-    margin-right: auto;
-    padding: calc(var(--screen-unit) * 1) calc(var(--screen-unit) * 4);
-  }
-}
-
+/* Responsive design */
 @media (max-width: 960px) {
   body {
     background-color: transparent;
@@ -238,41 +173,29 @@ body:has(#navigation) #container {
   }
   
   #navigation {
-    border-bottom: 1px solid var(--nord4);
+    border-bottom: 1px solid var(--color-border);
   }
   
   body:has(#navigation) #container,
   body.has-navigation #container,
   #container {
-    max-width: 90ch;
+    max-width: var(--container-max-width);
     margin: 0;
-    padding: calc(var(--screen-unit) * 2) calc(var(--screen-unit) * 2);
+    padding: var(--space-xl) var(--space-xl);
     border-radius: 0;
     box-shadow: none;
     border: none;
   }
 }
 
+/* Print styles - Nord-specific overrides */
 @media print {
-  :root {
-    --screen-font-size: var(--print-font-size);
-    --screen-line-height: var(--print-line-height);
-  }
-  
   body {
     background-color: white !important;
     color: #000 !important;
-    font-size: var(--print-font-size) !important;
-    line-height: var(--print-line-height) !important;
   }
   
   #container {
-    box-shadow: none !important;
-    border: none !important;
-    border-radius: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    max-width: none !important;
     background-color: white !important;
   }
   
@@ -280,44 +203,22 @@ body:has(#navigation) #container {
     color: #000 !important;
   }
   
-  a {
-    color: #000 !important;
-    text-decoration: underline !important;
-  }
-  
   code {
     background-color: #f5f5f5 !important;
-    border-radius: 0 !important;
     color: #000 !important;
   }
   
   pre {
     background-color: #f8f8f8 !important;
     border: 1px solid #ddd !important;
-    border-radius: 0 !important;
     color: #000 !important;
-  }
-  
-  pre code {
-    background-color: transparent !important;
   }
   
   table {
     background-color: white !important;
-    box-shadow: none !important;
-  }
-  
-  th, td {
-    border: 1px solid #000 !important;
-    color: #000 !important;
   }
   
   th {
     background-color: #f0f0f0 !important;
-  }
-  
-  @page {
-    margin: 0.75in;
-    size: letter;
   }
 }

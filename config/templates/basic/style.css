@@ -1,207 +1,147 @@
-/*@import url('https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400..900;1,400..900&display=swap');*/
-/*@import url('https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,200..900;1,200..900&display=swap');*/
 @import url('https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&display=swap');
 
-:root {
-  --screen-font-size: 21px;
-  --screen-line-height: 1.4;
-  --screen-unit: calc(var(--screen-line-height) * var(--screen-font-size));
-
-  --print-font-size: 10pt;
-  --print-line-height: calc(var(--print-font-size) * 1.618);
-  --print-unit: var(--print-line-height);
-
-  --basic-text: #2c2c2c;
-  --basic-medium-subtle: #666666;
-  --basic-subtle: #8a8a8a;
-  --basic-accent: #007acc;
-  --basic-background: #fcfcfc;
-  --basic-border: #ccc;
-  --link-color: var(--basic-accent);
-}
-
+/* Import base system */
 @import "../base/style.css";
 @import "../base/navigation.css";
+@import "../base/utilities.css";
 
+/* Basic template theme variables */
+:root {
+  /* Typography settings - uses golden ratio scaling */
+  --base-font-size: 21px;
+  --base-line-height: 1.4;
+  --scale-ratio: 1.3; /* Golden ratio for more dramatic scale */
+
+  /* Print settings */
+  --print-font-size: 10pt;
+  --print-line-height: calc(var(--print-font-size) * 1.618);
+  
+  /* Minimal color palette */
+  --color-text: #2c2c2c;
+  --color-text-subtle: #666666;
+  --color-text-muted: #8a8a8a;
+  --color-background: #fcfcfc;
+  --color-surface: #fcfcfc;
+  --color-surface-subtle: #f8f9fa;
+  --color-border: #cccccc;
+  --color-accent: #007acc;
+  --color-accent-hover: #005fa3;
+  --color-accent-subtle: rgba(0, 122, 204, 0.1);
+  
+  /* Component colors - minimal styling */
+  --color-code-bg: rgba(0, 0, 0, 0.04);
+  --color-code-text: var(--color-text);
+  --color-pre-bg: rgba(0, 0, 0, 0.02);
+  --color-pre-text: var(--color-text);
+  --color-quote-bg: transparent;
+  --color-quote-text: var(--color-text-muted);
+  --color-quote-border: var(--color-border);
+  
+  /* Navigation colors */
+  --color-nav-bg: #f8f9fa;
+  --color-nav-text: var(--color-text);
+  --color-nav-text-hover: var(--color-text);
+  --color-nav-text-active: var(--color-accent);
+  --color-nav-bg-hover: #f0f0f0;
+  --color-nav-bg-active: #f0f8ff;
+  --color-nav-border: var(--color-border);
+  --color-nav-border-active: var(--color-accent);
+  
+  /* Table colors - minimal */
+  --color-table-bg: var(--color-surface);
+  --color-table-header-bg: transparent;
+  --color-table-border: var(--color-border);
+  --color-table-stripe: transparent;
+  --color-table-hover: transparent;
+  
+  /* Layout */
+  --container-max-width: 50rem;
+  --container-padding: var(--space-base) var(--space-2xl);
+}
+
+/* Typography */
 body {
   font-family: 'Crimson Text', serif;
   font-optical-sizing: auto;
-  font-weight: 400;
-  font-style: normal;
-  font-size: var(--screen-font-size);
-  line-height: var(--screen-line-height);
-  text-rendering: optimizeLegibility;
-  color: var(--basic-text);
-  background-color: var(--basic-background);
   font-weight: 350;
-  margin: 0;
-  padding: 0;
+  font-style: normal;
+  background-color: var(--color-background);
+  color: var(--color-text);
+  text-rendering: optimizeLegibility;
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-weight: 300;
-  color: var(--basic-text);
-}
-
-h1 {
-  font-size: calc(var(--screen-font-size) * 2.2);
-  margin-top: calc(var(--screen-unit) * 2);
-  margin-bottom: calc(var(--screen-unit) * 1.5);
-  line-height: 1.2;
+  color: var(--color-text);
 }
 
 h2 {
-  font-size: calc(var(--screen-font-size) * 1.618);
-  margin-top: calc(var(--screen-unit) * 1.618);
-  margin-bottom: calc(var(--screen-unit) * 0.618);
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: var(--space-xs);
 }
 
+/* Enhanced typography with golden ratio spacing */
 p {
-  margin: calc(var(--screen-unit) * 0.618) 0;
   hyphens: auto;
 }
 
-blockquote {
-  border-left: 2px solid var(--basic-border);
-  padding-top: 0.3rem;
-  padding-bottom: 0.3rem;
-  padding-left: var(--screen-unit);
-  margin-left: 0;
-  font-style: italic;
-  color: var(--basic-subtle);
+/* Container layouts */
+#container {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: var(--container-padding);
 }
 
-code {
-  font-family: Monaco, "Roboto Mono", "Ubuntu Mono", Consolas, "Courier New", monospace;
-  font-size: calc(var(--screen-font-size) * 0.75);
-  background-color: rgba(0, 0, 0, 0.04);
-  padding: 0.1em 0.6em;
-  font-weight: 400;
-  line-height: calc(var(--screen-line-height) * 1.1);
-}
-
-pre {
-  background-color: rgba(0, 0, 0, 0.02);
-  border: 1px solid var(--basic-border);
-  border-radius: 6px;
-  padding: calc(var(--screen-unit) * 0.8);
-  overflow-x: auto;
-}
-
-pre code {
-  background-color: transparent;
-  padding: 0;
-  border-radius: 0;
-  font-size: calc(var(--screen-font-size) * 0.7);
-}
-
-a:link, a:visited {
-  color: var(--basic-accent);
-  text-decoration: none;
-  border-bottom: 1px solid transparent;
-  transition: border-bottom-color 0.2s ease;
-}
-
-a:hover {
-  text-decoration: none;
-}
-
-ul, ol {
-  margin: calc(var(--screen-unit) * 0.5) 0;
-  padding-left: calc(var(--screen-unit) * 1.2);
-}
-
-li {
-  margin: calc(var(--screen-unit) * 0.25) 0;
-}
-
-table {
-  border-collapse: collapse;
-  margin: calc(var(--screen-unit) * 1) 0;
-  width: 100%;
-}
-
-th, td {
-  padding: calc(var(--screen-unit) * 0.4) calc(var(--screen-unit) * 0.6);
-  text-align: left;
-  border: none;
-}
-
-th {
-  border-bottom: 1px solid var(--basic-border);
-  font-weight: 400;
-  font-style: italic;
-}
-
-/* Navigation visual styling - layout imported from base */
-#navigation {
-  background-color: #f8f9fa;
-  border-right: 1px solid var(--basic-border);
-}
-
-#navigation h3 {
-  font-size: calc(var(--screen-font-size) * 1.2);
-  font-weight: 600;
-  color: var(--basic-medium-subtle);
-}
-
-#navigation a {
-  color: var(--basic-text);
-  font-size: calc(var(--screen-font-size) * 0.7);
-}
-
-#navigation a:hover {
-  color: var(--basic-text);
-  background-color: #f0f0f0;
-  border-left-color: var(--basic-border);
-}
-
-#navigation a.current {
-  color: var(--basic-accent);
-  background-color: #f0f8ff;
-  border-left-color: var(--basic-accent);
-  font-weight: 500;
-}
-
-#navigation .directory-name {
-  color: var(--basic-medium-subtle);
-  font-size: calc(var(--screen-font-size) * 0.75);
-}
-
-/* Container adjustments specific to this template */
-body:has(#navigation) #container {
-  padding: 1rem 4rem;
-  max-width: 50rem;
+/* Container adjustments when navigation is present */
+body:has(#navigation) #container,
+body.has-navigation #container {
+  max-width: var(--container-max-width);
   margin-right: auto;
   margin-top: 0;
   margin-bottom: 0;
 }
 
-/* Fallback for browsers that don't support :has() */
-@supports not selector(:has(#navigation)) {
-  body.has-navigation #container {
-    max-width: calc(50rem - 280px);
-    margin-right: auto;
-  }
+/* Enhanced code styling */
+code {
+  font-family: Monaco, "Roboto Mono", "Ubuntu Mono", Consolas, "Courier New", monospace;
+  font-weight: 400;
+  line-height: calc(var(--base-line-height) * 1.1);
 }
 
-/* Default container when no navigation */
-#container {
-  padding: 1rem 4rem;
-  max-width: 50rem;
-  margin: 0 auto;
+/* Simplified table styling */
+th {
+  font-weight: 400;
+  font-style: italic;
+  border-bottom: 1px solid var(--color-border);
 }
 
-/* Responsive navigation */
+td {
+  border: none;
+}
+
+/* Navigation font size adjustments */
+#navigation h3 {
+  font-size: calc(var(--base-font-size) * 1.2);
+}
+
+#navigation a {
+  font-size: calc(var(--base-font-size) * 0.7);
+}
+
+#navigation .directory-name {
+  font-size: calc(var(--base-font-size) * 0.75);
+}
+
+/* Responsive design */
 @media (max-width: 960px) {
   #navigation {
-    border-bottom: 1px solid var(--basic-border);
+    border-bottom: 1px solid var(--color-border);
   }
   
   body:has(#navigation) #container,
   body.has-navigation #container,
   #container {
-    max-width: 50rem;
-    padding: 2rem 2rem;
+    max-width: var(--container-max-width);
+    padding: var(--space-xl) var(--space-xl);
   }
 }

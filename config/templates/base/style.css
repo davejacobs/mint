@@ -1,72 +1,109 @@
 @import './reset.css';
+@import './variables.css';
 
 body {
-  line-height: var(--screen-line-height);
-  font-size: var(--screen-font-size, 16px);
+  line-height: var(--base-line-height);
+  font-size: var(--base-font-size);
 }
 
 h1, h2, h3, h4, h5, h6 {
-  margin-top: 1.5rem;
-  margin-bottom: 0.75rem;
-  line-height: 1.3;
+  margin-top: var(--space-md);
+  margin-bottom: var(--space-sm);
+  line-height: var(--base-line-height);
 }
 
 h1 {
-  font-size: 2em;
-  margin-top: 0.75rem;
+  font-size: var(--font-size-2xl);
+  margin-top: 0;
+  margin-bottom: var(--space-base);
 }
 
 h2 {
-  font-size: 1.5em;
+  font-size: var(--font-size-xl);
 }
 
 h3 {
-  font-size: 1.25em;
+  font-size: var(--font-size-lg);
 }
 
 h4 {
-  font-size: 1.1em;
+  font-size: var(--font-size-base);
 }
 
 h5, h6 {
-  font-size: 1em;
+  font-size: var(--font-size-sm);
 }
 
 ul, ol {
-  margin: 1rem 0;
-  padding-left: 2rem;
+  margin: var(--space-base) 0;
+  padding-left: var(--space-lg);
 }
 
 li {
-  margin: 0.25rem 0;
+  margin: var(--space-xs) 0;
 }
 
 ul ul, ol ol, ul ol, ol ul {
-  margin: 0.25rem 0;
+  margin: var(--space-xs) 0;
 }
 
 p {
-  margin: 1rem 0;
+  margin: var(--space-base) 0;
 }
 
 a {
-  text-decoration: underline;
+  color: var(--color-accent);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: var(--transition-fast);
 }
 
-code, pre {
-  font-family: monospace;
+a:hover {
+  color: var(--color-accent-hover);
+  border-bottom-color: var(--color-accent-hover);
+}
+
+code {
+  font-family: 'SF Mono', 'JetBrains Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
+  font-size: var(--font-size-xs);
+  background-color: var(--color-code-bg);
+  color: var(--color-code-text);
+  padding: 0.1em 0.3em;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-code-border);
 }
 
 pre {
-  margin: 1rem 0;
-  padding: 1rem;
+  font-family: 'SF Mono', 'JetBrains Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
+}
+
+pre code {
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  border-radius: 0;
+  font-size: var(--font-size-xs);
+}
+
+pre {
+  margin: var(--space-base) 0;
+  padding: var(--space-base);
   overflow-x: auto;
   white-space: pre;
+  background-color: var(--color-pre-bg);
+  color: var(--color-pre-text);
+  border: 1px solid var(--color-pre-border);
+  border-radius: var(--radius-base);
 }
 
 blockquote {
-  margin: 1rem 0 1rem 2rem;
-  padding-left: 1rem;
+  margin: var(--space-base) 0;
+  padding: var(--space-sm) var(--space-base);
+  margin-left: 0;
+  background-color: var(--color-quote-bg);
+  color: var(--color-quote-text);
+  border-left: 3px solid var(--color-quote-border);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
 }
 
 img {
@@ -76,19 +113,46 @@ img {
 
 table {
   border-collapse: collapse;
-  margin: 1rem 0;
+  margin: var(--space-base) 0;
+  width: 100%;
+  background-color: var(--color-table-bg);
+  border: 1px solid var(--color-table-border);
+  border-radius: var(--radius-base);
+  overflow: hidden;
 }
 
 th, td {
-  padding: 0.5rem;
+  padding: var(--space-sm) var(--space-sm);
   text-align: left;
-  border: 1px solid;
+  border-bottom: 1px solid var(--color-table-border);
+  border-left: none;
+  border-right: none;
+  border-top: none;
+}
+
+th {
+  background-color: var(--color-table-header-bg);
+  color: var(--color-table-header-text);
+  font-weight: 500;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tr:nth-child(even) {
+  background-color: var(--color-table-stripe);
+}
+
+tr:hover {
+  background-color: var(--color-table-hover);
 }
 
 hr {
-  margin: 2rem 0;
+  margin: var(--space-xl) 0;
   border: none;
-  border-top: 1px solid;
+  height: 1px;
+  background-color: var(--color-border);
 }
 
 strong {
@@ -99,24 +163,5 @@ em {
   font-style: italic;
 }
 
-@media print {
-  body {
-    font-size: var(--print-font-size, 10px);
-  }
-  
-  // Prevent page breaks inside important elements
-  h1, h2, h3, h4, h5, h6, blockquote, pre, img {
-    page-break-inside: avoid;
-  }
-  
-  // Keep headings with their content
-  h1, h2, h3, h4, h5, h6 {
-    page-break-after: avoid;
-  }
-  
-  // Prevent widows and orphans
-  p, li {
-    widows: 3;
-    orphans: 3;
-  }
-}
+/* Import print styles - templates can override specific aspects */
+@import './print.css';

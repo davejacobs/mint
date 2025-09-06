@@ -1,98 +1,93 @@
+/* Import base Nord template and override for dark theme */
 @import "../nord/style.css";
 
+/* Nord dark theme overrides */
 :root {
-  /* Override Nord colors for dark theme */
-  --nord-text: var(--nord6);           /* Light text */
-  --nord-text-subtle: var(--nord4);   /* Subtle light text */
-  --nord-background: var(--nord0);     /* Dark background */
-  --nord-surface: var(--nord2);       /* Slightly lighter dark surface */
-  --nord-border: var(--nord3);        /* Dark borders */
-  --nord-accent: var(--nord8);        /* Light blue accent */
-  --nord-secondary: var(--nord7);     /* Teal secondary */
+  /* Dark theme semantic color mappings */
+  --color-text: var(--nord6);           /* Light text */
+  --color-text-subtle: var(--nord4);   /* Subtle light text */
+  --color-text-muted: var(--nord5);    /* Muted light text */
+  --color-background: var(--nord1);    /* Dark background */
+  --color-surface: var(--nord2);       /* Slightly lighter dark surface */
+  --color-surface-subtle: var(--nord3); /* Even lighter surface for contrast */
+  --color-border: var(--nord3);        /* Dark borders */
+  --color-accent: var(--nord8);        /* Light blue accent */
+  --color-accent-hover: var(--nord7);  /* Teal accent hover */
+  --color-accent-subtle: rgba(136, 192, 208, 0.15);
+  
+  /* Component colors for dark theme */
+  --color-code-bg: var(--nord3);       /* Lighter dark background */
+  --color-code-text: var(--nord13);    /* Yellow code text for visibility */
+  --color-pre-bg: var(--nord2);        /* Lighter dark background */
+  --color-pre-text: var(--nord6);      /* Light pre code text */
+  --color-quote-bg: var(--nord2);      /* Lighter dark background for better contrast */
+  --color-quote-text: var(--nord4);
+  --color-quote-border: var(--nord14); /* Green accent border */
+  
+  /* Navigation dark theme colors */
+  --color-nav-bg: var(--nord0);
+  --color-nav-text: var(--nord4);
+  --color-nav-text-hover: var(--nord6);
+  --color-nav-text-active: var(--nord8);
+  --color-nav-bg-hover: var(--nord2);
+  --color-nav-bg-active: rgba(136, 192, 208, 0.15);
+  --color-nav-border: var(--nord3);
+  --color-nav-border-active: var(--nord8);
+  
+  /* Table dark theme colors */
+  --color-table-bg: var(--nord2);      /* Dark table background */
+  --color-table-header-bg: var(--nord3); /* Slightly lighter header background */
+  --color-table-header-text: var(--nord8); /* Light blue header text */
+  --color-table-border: var(--nord3);
+  --color-table-stripe: transparent;
+  --color-table-hover: rgba(143, 188, 187, 0.1);
 }
 
-/* Set body background to the old container color */
+/* Override body background for full dark theme */
 body {
-  background-color: var(--nord1) !important; /* Use the previous container color */
-  color: var(--nord-text) !important; /* Ensure body text is light */
+  background-color: var(--color-background) !important;
+  color: var(--color-text) !important;
 }
 
-/* Override heading colors for dark theme contrast with Nord accent colors */
+/* Override heading colors for dark theme contrast */
 h1, h2, h3, h4, h5, h6 {
-  color: var(--nord-text); /* Use light text color for all headings */
+  color: var(--color-text);
 }
 
-/* Override specific elements that need darker styling */
-blockquote {
-  background-color: var(--nord2); /* Lighter dark background for better contrast */
-  color: var(--nord4);
-  border-left-color: var(--nord14); /* Green accent border */
-}
-
+/* Enhanced code styling for dark theme */
 code {
-  background-color: var(--nord3);  /* Lighter dark background */
-  color: var(--nord13);            /* Yellow code text for visibility */
-  border: 1px solid var(--nord10); /* Dark blue border */
+  border: 1px solid var(--nord10);
 }
 
 pre {
-  background-color: var(--nord2);  /* Lighter dark background */
-  border: 1px solid var(--nord9);  /* Blue border */
+  border: 1px solid var(--nord9);
 }
 
-pre code {
-  color: var(--nord6);             /* Light pre code text */
-  border: none;                    /* Remove border from pre code */
-}
-
-strong {
-  color: var(--nord-text);
-}
-
-em {
-  color: var(--nord-text);
-}
-
-/* Horizontal rule styling */
+/* Horizontal rule styling for dark theme */
 hr {
-  background-color: var(--nord7);  /* Teal horizontal rule */
-  border: none;
+  background-color: var(--nord7);
   height: 2px;
 }
 
+/* Table enhancements for dark theme */
 table {
-  background-color: var(--nord-surface);  /* Dark table background */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);  /* Darker shadow */
-  /*border: 1px solid var(--nord10);  /* Dark blue border */*/
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 th {
-  background-color: var(--nord3);  /* Slightly lighter header background */
-  color: var(--nord8);             /* Light blue header text */
-  border-bottom: 2px solid var(--nord7);  /* Teal bottom border for headers */
+  border-bottom: 2px solid var(--nord7);
 }
 
 td {
-  border-bottom: 1px solid var(--nord3);  /* Use nord3 for cell borders */
+  border-bottom: 1px solid var(--nord3);
 }
-
-tr:hover {
-  background-color: rgba(143, 188, 187, 0.1);  /* Teal-tinted row hover */
-}
-
-/*#container {
-  background-color: var(--nord-surface);  /* Lighter dark container */
-  box-shadow: 
-    0 4px 6px rgba(0, 0, 0, 0.2),
-    0 10px 20px rgba(0, 0, 0, 0.3);  /* Darker shadows */
-}*/
 
 /* Ensure all text elements have proper light colors */
 p, li, td, dd, dt {
-  color: var(--nord-text) !important;
+  color: var(--color-text) !important;
 }
 
-/* Links should be clearly visible */
+/* Links for dark theme */
 a {
   color: var(--nord8) !important;
 }
@@ -101,37 +96,63 @@ a:hover {
   color: var(--nord7) !important;
 }
 
-/* Lists */
+/* Lists for dark theme */
 ul, ol {
-  color: var(--nord-text);
+  color: var(--color-text);
 }
 
-/* Navigation dark theme overrides */
-#navigation {
-  background-color: var(--nord0);
-  border-right-color: var(--nord3);
-}
-
-#navigation h3 {
-  color: var(--nord4);
-}
-
-#navigation a {
-  color: var(--nord4);
-}
-
-#navigation a:hover {
-  color: var(--nord6);
-  background-color: var(--nord2);
-  border-left-color: var(--nord7);
-}
-
-#navigation a.current {
-  color: var(--nord8);
-  background-color: rgba(136, 192, 208, 0.15);
-  border-left-color: var(--nord8);
-}
-
+/* Navigation directory names */
 #navigation .directory-name {
   color: var(--nord5);
+}
+
+/* Print styles - force light theme for printing */
+@media print {
+  body {
+    background-color: white !important;
+    color: #000 !important;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    color: #000 !important;
+  }
+  
+  p, li, td, dd, dt {
+    color: #000 !important;
+  }
+  
+  a {
+    color: #000 !important;
+  }
+  
+  code {
+    background-color: #f5f5f5 !important;
+    color: #000 !important;
+    border: 1px solid #ddd !important;
+  }
+  
+  pre {
+    background-color: #f8f8f8 !important;
+    border: 1px solid #ddd !important;
+    color: #000 !important;
+  }
+  
+  table {
+    background-color: white !important;
+    box-shadow: none !important;
+  }
+  
+  th, td {
+    color: #000 !important;
+    border: 1px solid #000 !important;
+  }
+  
+  th {
+    background-color: #f0f0f0 !important;
+  }
+  
+  blockquote {
+    color: #333 !important;
+    background-color: transparent !important;
+  }
 }
