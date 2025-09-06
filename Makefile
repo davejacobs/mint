@@ -14,7 +14,8 @@ build:
 
 install: build
 	@version=$$(ruby -e "require './lib/mint/version'; puts Mint::VERSION") && \
-	cd .. && gem install mint/mint-$$version.gem && cd -
+	cd .. && gem install mint/mint-$$version.gem && cd - && \
+	trash mint-$$version.gem
 
 bump-minor:
 	@echo "Current version: $$(ruby -e "require './lib/mint/version'; puts Mint::VERSION")"
