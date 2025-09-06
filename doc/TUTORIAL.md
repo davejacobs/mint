@@ -75,12 +75,83 @@ You can also use the `--recursive` option to automatically include subdirectorie
 
 ## Configuration
 
-Mint looks for configuration files in this order:
+Mint can be configured using TOML configuration files that specify defaults for any command-line option. Configuration files are loaded in this order (later files override earlier ones):
 
-1. `./mint.yml` (local directory)
-2. `~/.config/mint/config.yml` (user home)
+1. **Global**: Built-in defaults
+2. **User**: `~/.config/mint/config.toml`  
+3. **Local**: `.mint/config.toml` (current directory)
+4. **Command-line**: Explicit options (highest priority)
 
-Command-line options override configuration file settings.
+### Creating a config file
+
+Create `.mint/config.toml` in your project directory:
+
+```toml
+# Use a specific template by default
+template = "nord"
+
+# Always publish to a build directory
+destination = "public"
+
+# Preserve source directory structure
+preserve-structure = true
+
+# Enable navigation for documentation sites
+navigation = true
+navigation-title = "My Documentation"
+navigation-depth = 2
+
+# Extract titles from filenames
+file-title = true
+```
+
+Now when you run `mint publish docs/**/*.md`, it will automatically:
+- Use the Nord template
+- Output to the `public/` directory  
+- Preserve the directory structure from `docs/`
+- Generate navigation with your custom title
+- Extract page titles from filenames
+
+You can still override any config setting from the command line:
+
+```bash
+# Use a different destination despite config file
+mint publish docs/**/*.md --destination staging
+```
+
+### Config file locations
+
+You can place config files at different scopes:
+
+- **`.mint/config.toml`** - Project-specific settings (highest priority)
+- **`~/.config/mint/config.toml`** - User-wide defaults  
+- Built-in defaults (lowest priority)
+
+### Available config options
+
+Any command-line option can be specified in the config file using the same name. Use either hyphens or underscores:
+
+```toml
+# These are equivalent:
+preserve-structure = true
+preserve_structure = true
+
+# All available options:
+template = "nord"
+layout = "custom"
+style = "dark"  
+working-dir = "/path/to/docs"
+output-file = "%{basename}.%{new_extension}"
+destination = "build"
+style-mode = "external"
+style-destination = "assets/css"
+preserve-structure = true
+navigation = true
+navigation-drop = 1
+navigation-depth = 3
+navigation-title = "Documentation"
+file-title = true
+```
 
 ## Template paths
 

@@ -94,9 +94,40 @@ The `original` mode is particularly useful for template development, as it allow
 - **Beautiful output** – Professional-looking HTML ready for print or web
 - **Highly customizable** – Create your own templates and styles
 
-## Templates and customization
+## Configuration
 
-Mint supports layouts written in ERB and stylesheets can be written in CSS, SCSS, or SASS.
+Mint can be configured using TOML configuration files that specify defaults for commandline options.
+Configuration options are loaded in the following order (later files override earlier ones):
+
+1. **Global**: Built-in defaults
+2. **User**: `~/.config/mint/config.toml`  
+3. **Local**: `.mint/config.toml` (current directory)
+4. **Commandline**: Explicit flags override any other configuration
+
+### Example config file
+
+Create `.mint/config.toml` in your project directory:
+
+```toml
+# Template and styling
+template = "nord"
+
+# File output handling
+destination = "public"
+preserve-structure = true
+output-file = "%{basename}_processed.%{new_extension}"
+style-mode = "external"
+
+# Navigation
+navigation = true
+navigation-title = "My Docs"
+navigation-depth = 3
+navigation-drop = 1
+
+# Other options
+file-title = true
+working-dir = "/path/to/source"
+```
 
 ## Contributing
 
