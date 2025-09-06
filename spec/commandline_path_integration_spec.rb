@@ -25,7 +25,7 @@ RSpec.describe "Mint::Commandline.publish! Path Integration" do
           create_markdown_file(file, "# Document #{i + 1}")
         end
         
-        config = Mint::Config.new(destination_directory: Pathname.new("output"), preserve_structure: true)
+        config = Mint::Config.with_defaults(destination_directory: Pathname.new("output"), preserve_structure: true)
         Mint::Commandline.publish!(files, config: config)
         
         expect(File.exist?("output/readme.html")).to be true
@@ -43,7 +43,7 @@ RSpec.describe "Mint::Commandline.publish! Path Integration" do
         create_markdown_file("tutorials/first-steps.md", "# First Steps")
         
         files = Dir.glob("**/*.md")
-        config = Mint::Config.new(destination_directory: Pathname.new("site"), preserve_structure: true)
+        config = Mint::Config.with_defaults(destination_directory: Pathname.new("site"), preserve_structure: true)
         
         Mint::Commandline.publish!(files, config: config)
         
@@ -68,7 +68,7 @@ RSpec.describe "Mint::Commandline.publish! Path Integration" do
           create_markdown_file(file, "# Page #{i + 1}")
         end
         
-        config = Mint::Config.new(
+        config = Mint::Config.with_defaults(
           working_directory: Pathname.new("source"),
           destination_directory: Pathname.new("../build"),  # Relative to root directory
           preserve_structure: true
@@ -91,7 +91,7 @@ RSpec.describe "Mint::Commandline.publish! Path Integration" do
         FileUtils.mkdir_p(["content", "public"])
         create_markdown_file("content/article.md", "# Article")
         
-        config = Mint::Config.new(
+        config = Mint::Config.with_defaults(
           destination_directory: Pathname.new("public"),
           style_mode: :external,
           preserve_structure: true
@@ -107,7 +107,7 @@ RSpec.describe "Mint::Commandline.publish! Path Integration" do
         FileUtils.mkdir_p(["src/docs", "web/pages", "web/assets"])
         create_markdown_file("src/docs/guide.md", "# Guide")
         
-        config = Mint::Config.new(
+        config = Mint::Config.with_defaults(
           destination_directory: Pathname.new("web/pages"),
           style_destination_directory: Pathname.new("web/assets"),
           style_mode: :external,
@@ -123,7 +123,7 @@ RSpec.describe "Mint::Commandline.publish! Path Integration" do
 
     describe "error handling with paths" do
       it "handles nonexistent source files gracefully" do
-        config = Mint::Config.new(destination_directory: Pathname.new("output"), preserve_structure: true)
+        config = Mint::Config.with_defaults(destination_directory: Pathname.new("output"), preserve_structure: true)
         
         expect {
           Mint::Commandline.publish!(["nonexistent/file.md"], config: config)
@@ -133,7 +133,7 @@ RSpec.describe "Mint::Commandline.publish! Path Integration" do
       it "creates deeply nested destination directories as needed" do
         create_markdown_file("test.md", "# Test")
         
-        config = Mint::Config.new(
+        config = Mint::Config.with_defaults(
           destination_directory: Pathname.new("very/deeply/nested/output/directory")
         )
         
@@ -156,7 +156,7 @@ RSpec.describe "Mint::Commandline.publish! Path Integration" do
           "# API Reference\n\nBack to [Introduction](../guides/intro.md).")
         
         files = ["docs/guides/intro.md", "docs/api/reference.md"]
-        config = Mint::Config.new(destination_directory: Pathname.new("site"), preserve_structure: true)
+        config = Mint::Config.with_defaults(destination_directory: Pathname.new("site"), preserve_structure: true)
         
         Mint::Commandline.publish!(files, config: config)
         
@@ -190,7 +190,7 @@ RSpec.describe "Mint::Commandline.publish! Path Integration" do
           create_markdown_file(file, "# Content #{i + 1}")
         end
         
-        config = Mint::Config.new(destination_directory: Pathname.new("public"), preserve_structure: true)
+        config = Mint::Config.with_defaults(destination_directory: Pathname.new("public"), preserve_structure: true)
         Mint::Commandline.publish!(files, config: config)
         
         expect(File.exist?("public/content/posts/2023/welcome.html")).to be true
@@ -218,7 +218,7 @@ RSpec.describe "Mint::Commandline.publish! Path Integration" do
           create_markdown_file(file, "# Package Documentation #{i + 1}")
         end
         
-        config = Mint::Config.new(destination_directory: Pathname.new("docs-site"), preserve_structure: true)
+        config = Mint::Config.with_defaults(destination_directory: Pathname.new("docs-site"), preserve_structure: true)
         Mint::Commandline.publish!(files, config: config)
         
         expect(File.exist?("docs-site/packages/core/docs/api.html")).to be true

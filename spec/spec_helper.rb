@@ -7,8 +7,8 @@ require_relative "support/cli_helpers"
 RSpec.configure do |config|
   config.before(:all) do
     @old_dir = Dir.getwd
-    FileUtils.mkdir_p "/tmp/mint-test"
-    @tmp_dir = File.realpath "/tmp/mint-test"
+    FileUtils.mkdir_p "./tmp/mint-test"
+    @tmp_dir = File.realpath "./tmp/mint-test"
 
     @content_file = "content.md"
     @content_file_2 = "content-2.md"
@@ -33,7 +33,7 @@ RSpec.configure do |config|
   end
 
   config.after(:each) do
-    ["content.html", ".mint/defaults.yaml"].map {|file| Pathname.new file }.
+    ["content.html", ".mint/config.toml"].map {|file| Pathname.new file }.
       select(&:exist?).
       each {|file| FileUtils.rm_rf file }
   end

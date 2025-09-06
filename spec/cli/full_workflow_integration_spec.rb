@@ -14,12 +14,11 @@ RSpec.describe "Full CLI Workflow Integration" do
         it "can set up a new project from scratch" do
           # 1. Create configuration file manually (since set command was removed)
           FileUtils.mkdir_p(".mint")
-          config_data = {
-            "layout_name" => "default",
-            "style_name" => "default",
-            "destination_directory" => "output"
-          }
-          File.write(".mint/config.yaml", config_data.to_yaml)
+          File.write(".mint/config.toml", <<~TOML)
+            layout = "default"
+            style = "default"
+            destination = "output"
+          TOML
 
           # 2. Create content files
           create_markdown_file("index.md", <<~MARKDOWN)
@@ -37,7 +36,7 @@ RSpec.describe "Full CLI Workflow Integration" do
 
           # 3. Create output directory and publish
           FileUtils.mkdir_p("output")
-          config = Mint::Config.new(destination_directory: Pathname.new("output"))
+          config = Mint::Config.with_defaults(destination_directory: Pathname.new("output"))
           
           expect {
             Mint::Commandline.publish!(["index.md", "about.md"], config: config)
@@ -57,7 +56,7 @@ RSpec.describe "Full CLI Workflow Integration" do
       describe "documentation site workflow" do
         it "can build a multi-page documentation site" do
           # Set up configuration for documentation
-          config = Mint::Config.new(
+          config = Mint::Config.with_defaults(
             layout_name: "default",
             style_name: "default",
             destination_directory: Pathname.new("docs"),
@@ -93,7 +92,7 @@ RSpec.describe "Full CLI Workflow Integration" do
       describe "blog workflow" do
         it "can manage a simple blog" do
           # Set up blog configuration
-          config = Mint::Config.new(
+          config = Mint::Config.with_defaults(
             layout_name: "default", 
             destination_directory: Pathname.new("blog"),
             preserve_structure: true  # Preserve posts/ structure
@@ -125,12 +124,12 @@ RSpec.describe "Full CLI Workflow Integration" do
 
           # Test error when nonexistent style is specified
           expect {
-            Mint::Commandline.publish!(["test.md"], config: Mint::Config.new(style_name: "nonexistent"))
+            Mint::Commandline.publish!(["test.md"], config: Mint::Config.with_defaults(style_name: "nonexistent"))
           }.to raise_error(Mint::StyleNotFoundException)
 
           # Recovery: Use existing layout
           expect {
-            Mint::Commandline.publish!(["test.md"], config: Mint::Config.new(layout_name: "default"))
+            Mint::Commandline.publish!(["test.md"], config: Mint::Config.with_defaults(layout_name: "default"))
           }.not_to raise_error
 
           expect(File.exist?("test.html")).to be true
@@ -139,13 +138,13 @@ RSpec.describe "Full CLI Workflow Integration" do
         it "handles corrupted configuration gracefully" do
           # Create corrupted config file
           FileUtils.mkdir_p(".mint")
-          File.write(".mint/config.yaml", "invalid: yaml: content: [")
+          File.write(".mint/config.toml", "invalid = toml content [")
 
           create_markdown_file("test.md", "# Test")
 
           # Should still work with explicit config
           expect {
-            Mint::Commandline.publish!(["test.md"], config: Mint::Config.new)
+            Mint::Commandline.publish!(["test.md"], config: Mint::Config.defaults)
           }.not_to raise_error
 
           expect(File.exist?("test.html")).to be true
@@ -162,7 +161,7 @@ RSpec.describe "Full CLI Workflow Integration" do
             files << filename
           end
 
-          config = Mint::Config.new
+          config = Mint::Config.defaults
 
           # Measure performance
           start_time = Time.now

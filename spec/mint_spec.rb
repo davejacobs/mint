@@ -18,7 +18,7 @@ describe Mint do
   end
 
   describe ".configuration" do
-    context "when there is no config.yaml file on the Mint path" do
+    context "when there is no config.toml file on the Mint path" do
       it "returns a default Config object" do
         config = Mint.configuration
         expect(config).to be_a(Mint::Config)
@@ -29,10 +29,10 @@ describe Mint do
       end
     end
 
-    context "when there is a config.yaml file on the Mint path" do
+    context "when there is a config.toml file on the Mint path" do
       before do
         FileUtils.mkdir_p(".mint")
-        File.write(".mint/config.yaml", YAML.dump({ style_name: "custom" }))
+        File.write(".mint/config.toml", "style = \"custom\"")
       end
 
       after do
@@ -162,7 +162,7 @@ describe Mint do
         source_file = "test.md"
         File.write(source_file, "# Test\n\nThis is a test.")
         
-        config = Mint::Config.new(destination_directory: Pathname.new("./"))
+        config = Mint::Config.with_defaults(destination_directory: Pathname.new("./"))
         
         # This should succeed if templates exist, or raise an error if they don't
         begin

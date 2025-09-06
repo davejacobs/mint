@@ -1,6 +1,5 @@
 require "pathname"
 require "tempfile"
-require "yaml"
 require "active_support/core_ext/string/inflections"
 
 module Mint

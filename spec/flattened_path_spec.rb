@@ -15,7 +15,7 @@ RSpec.describe "Flattened Path Handling (default behavior)" do
         FileUtils.mkdir_p(["docs/guides", "output"])
         create_markdown_file("docs/guides/setup.md", "# Setup Guide")
         
-        config = Mint::Config.new(destination_directory: Pathname.new("output"))
+        config = Mint::Config.with_defaults(destination_directory: Pathname.new("output"))
         Mint.publish!("docs/guides/setup.md", config: config)
         
         # File should be flattened to output directory
@@ -36,7 +36,7 @@ RSpec.describe "Flattened Path Handling (default behavior)" do
           "src/pages/admin/dashboard.md"
         ]
         
-        config = Mint::Config.new(destination_directory: Pathname.new("build"))
+        config = Mint::Config.with_defaults(destination_directory: Pathname.new("build"))
         
         files.each {|file| Mint.publish!(file, config: config) }
         
@@ -57,7 +57,7 @@ RSpec.describe "Flattened Path Handling (default behavior)" do
         create_markdown_file("docs/v1/index.md", "# V1 Index")
         create_markdown_file("docs/v2/index.md", "# V2 Index")
         
-        config = Mint::Config.new(destination_directory: Pathname.new("output"))
+        config = Mint::Config.with_defaults(destination_directory: Pathname.new("output"))
         
         # Process files separately to see collision behavior
         Mint.publish!("docs/v1/index.md", config: config)
@@ -84,7 +84,7 @@ RSpec.describe "Flattened Path Handling (default behavior)" do
           "content/pages/about.md"
         ]
         
-        config = Mint::Config.new(destination_directory: Pathname.new("site"))
+        config = Mint::Config.with_defaults(destination_directory: Pathname.new("site"))
         Mint::Commandline.publish!(files, config: config)
         
         # All files flattened to site directory
@@ -102,7 +102,7 @@ RSpec.describe "Flattened Path Handling (default behavior)" do
         
         create_markdown_file("source/docs/guide.md", "# User Guide")
         
-        config = Mint::Config.new(
+        config = Mint::Config.with_defaults(
           working_directory: Pathname.new("source"),
           destination_directory: Pathname.new("../public")
         )
@@ -118,7 +118,7 @@ RSpec.describe "Flattened Path Handling (default behavior)" do
         FileUtils.mkdir_p("output")
         create_markdown_file("index.md", "# Home Page")
         
-        config = Mint::Config.new(destination_directory: Pathname.new("output"))
+        config = Mint::Config.with_defaults(destination_directory: Pathname.new("output"))
         Mint.publish!("index.md", config: config)
         
         expect(File.exist?("output/index.html")).to be true
@@ -128,7 +128,7 @@ RSpec.describe "Flattened Path Handling (default behavior)" do
         FileUtils.mkdir_p(["docs", "site"])
         create_markdown_file("docs/manual.md", "# Manual")
         
-        config = Mint::Config.new(
+        config = Mint::Config.with_defaults(
           destination_directory: Pathname.new("site"),
           style_mode: :external
         )

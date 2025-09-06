@@ -118,15 +118,12 @@ module CLIHelpers
                  end
     
     FileUtils.mkdir_p(config_dir)
-    config_file = "#{config_dir}/config.yaml"
+    config_file = "#{config_dir}/config.toml"
     
-    basic_config = {
-      'layout' => 'default',
-      'style' => 'default',
-      'destination' => nil
-    }
-    
-    File.write(config_file, basic_config.to_yaml)
+    File.write(config_file, <<~TOML)
+      layout = "default"
+      style = "default"
+    TOML
     config_file
   end
 

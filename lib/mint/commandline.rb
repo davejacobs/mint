@@ -1,5 +1,4 @@
 require "pathname"
-require "yaml"
 require "optparse"
 require "fileutils"
 require "shellwords"
@@ -123,7 +122,7 @@ module Mint
       
       files = commandline_options[:files].map {|f| Pathname.new(f).expand_path }
       commandline_config = Config.new(commandline_options)
-      config = Mint.configuration.merge(commandline_config)
+      config = Config.defaults.merge(Mint.configuration).merge(commandline_config)
 
       [command, config, files, parser.help]
     end

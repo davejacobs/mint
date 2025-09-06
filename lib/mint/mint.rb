@@ -25,9 +25,8 @@ module Mint
   SCOPES              = { local: LOCAL_SCOPE, user: USER_SCOPE, global: GLOBAL_SCOPE }
   SCOPE_NAMES         = SCOPES.keys
   PATH                = [LOCAL_SCOPE, USER_SCOPE, GLOBAL_SCOPE]
-  CONFIG_FILE         = "config.yaml"
+  CONFIG_FILE         = "config.toml"
   TEMPLATES_DIRECTORY = "templates"
-  DEFAULT_CONFIG      = Config.new
 
   # Indicates whether the file is a valid stylesheet
   #
@@ -69,7 +68,7 @@ module Mint
       map {|p| p + Mint::CONFIG_FILE }.
       select(&:exist?).
       map {|p| Config.load_file p }.
-      reduce(Mint::DEFAULT_CONFIG) {|agg, cfg| agg.merge cfg }
+      reduce(Config.defaults) {|agg, cfg| agg.merge cfg }
   end
 
   # Publishes a Document object according to its internal specifications.

@@ -20,6 +20,7 @@ Gem::Specification.new do |s|
   s.add_dependency "redcarpet", "~> 3.6", ">= 3.6.1"
   s.add_dependency "sass-embedded", "~> 1.89", ">= 1.89.2"
   s.add_dependency "activesupport", "~> 8.0", ">= 8.0.2.1"
+  s.add_dependency "toml", "~> 0.3"
   s.add_development_dependency "byebug", "~> 11.1", ">= 11.1.3"
   s.add_development_dependency "rspec", "~> 3.13", ">= 3.13.1"
   s.add_development_dependency "rspec-its", "~> 1.3"

@@ -16,7 +16,7 @@ describe "Original style mode integration" do
 
         # Create output directory structure
         Dir.chdir(@test_dir) do
-          config = Mint::Config.new(
+          config = Mint::Config.with_defaults(
             style_mode: :original,
             layout_name: "default",
             style_name: "default"
@@ -39,7 +39,7 @@ describe "Original style mode integration" do
         create_template_directory("nord")
 
         Dir.chdir(@test_dir) do
-          config = Mint::Config.new(
+          config = Mint::Config.with_defaults(
             style_mode: :original,
             layout_name: "nord",
             style_name: "nord"
