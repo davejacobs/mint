@@ -5,20 +5,18 @@
 - [x]: Publish new API docs
 - [x]: Link stylesheets in place for preview & template iteration
 - [x]: Allow easy default layout reuse
-- [ ]: Refresh templates
-    - `make garden` command for easy comparison
+- [x]: Refresh templates
+- [x]: --navigation flags instead of garden template
+- [x]: --file-title for pulling document title from file name
 - [ ]: Bug: Fix output_file, which isn't used
-- [ ]: Tech debt: Move options parsing to top level
-- [ ]: Remove --recursive
+- [ ]: --var for local variables
+- [ ] Proper metadata, local variables
+- [ ] Add --style-output-format to control output name; update docs that --style-destination only affects directory
 - [ ]: Smart quotes
-- [ ]: Allow local variables (from --var flag at CLI, plus a few provided by Mint, like @all_files)
-- [ ]: Create --navigation flag instead of garden template
 - [ ]: Code highlighting
-- [ ]: Split styles into themes and layout styles
 - [ ]: CSS DSL for overriding themes within a document
-- [ ]: `mint serve` plugin for template design with live reloads
-- [ ]: `mint export` plugin, to export styles from --global to --user or --local for further editing
-- [ ]: Finish plugins system; support --output-format flag
-- [ ]: Finish ePub plugin
+- [ ]: Bring back plugins system
+- [ ]: --output-format via plugins
+- [ ]: ePub plugin
 - [ ]: PDF plugin
 - [ ]: `mint doc` to create word processor documents
