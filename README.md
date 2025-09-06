@@ -8,7 +8,7 @@ Transform your plain text documents into beautiful HTML documents with customiza
 gem install mint
 ```
 
-## Quick Start
+## Get started
 
 Transform a Markdown document into styled HTML:
 
@@ -20,7 +20,7 @@ This creates `Document.html` in your current directory with beautiful default st
 
 ## Usage
 
-### Basic Commands
+### Basic commands
 
 ```bash
 # Publish a single document
@@ -42,7 +42,7 @@ mint publish content/**/*.md --navigation --navigation-title "My Documentation" 
 mint publish my-document.md --file-title
 ```
 
-### Common Options
+### Common options
 
 | Flag | Description |
 |------|-------------|
@@ -113,7 +113,7 @@ Configuration options are loaded in the following order (later files override ea
 3. **Local**: `.mint/config.toml` (current directory)
 4. **Commandline**: Explicit flags override any other configuration
 
-### Example config file
+### Example configuration file
 
 Create `.mint/config.toml` in your project directory:
 
@@ -138,9 +138,9 @@ file-title = true
 working-dir = "/path/to/source"
 ```
 
-### Overriding config file settings
+### Overriding configuration file settings
 
-You can override boolean settings from config files using `--no-` flags:
+You can override boolean settings from configuration files using `--no-` flags:
 
 ```bash
 # If your config.toml has navigation = true and file-title = true
