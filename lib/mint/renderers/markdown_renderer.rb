@@ -1,4 +1,3 @@
-require 'tilt/template'
 require 'redcarpet'
 
 module Mint

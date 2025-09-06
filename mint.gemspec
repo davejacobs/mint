@@ -17,7 +17,6 @@ Gem::Specification.new do |s|
   s.files = Dir["{bin,config,lib,man}/**/*"] + [ "README.md", "Gemfile", "LICENSE" ]
   s.test_files = Dir["{features,spec}/**/*"]
   
-  s.add_dependency "tilt", "~> 2.6", ">= 2.6.1"
   s.add_dependency "redcarpet", "~> 3.6", ">= 3.6.1"
   s.add_dependency "sass-embedded", "~> 1.89", ">= 1.89.2"
   s.add_dependency "activesupport", "~> 8.0", ">= 8.0.2.1"
