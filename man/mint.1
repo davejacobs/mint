@@ -53,6 +53,9 @@ Drop first N directory levels from navigation (default: 0)
 .TP
 .BR \-\-navigation\-depth " " \fIDEPTH\fR
 Maximum depth to show in navigation (default: 3)
+.TP
+.BR \-\-file\-title
+Extract title from filename (removes .md extension) and inject into template
 .SH STYLE OPTIONS
 Mint offers flexible control over how stylesheets are incorporated into your documents:
 
@@ -84,6 +87,11 @@ mint publish document.md
 Transform multiple files:
 .nf
 mint publish doc1.md doc2.md doc3.md
+.fi
+.TP
+Extract titles from filenames:
+.nf
+mint publish my-document.md --file-title
 .fi
 .TP
 Use a specific template:

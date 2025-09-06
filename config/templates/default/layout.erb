@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title><%= (metadata.is_a?(Hash) && metadata['title']) || File.basename(source_file, '.*').tr('_-', ' ').split.map(&:capitalize).join(' ') %></title>
+    <title><%= title || (metadata.is_a?(Hash) && metadata['title']) || File.basename(source_file) %></title>
     <%= stylesheet_tag %>
   </head>
   <body>
@@ -30,6 +30,11 @@
         </ul>
       </nav>
     <% end %>
-    <main id="container"><%= content %></main>
+    <main id="container">
+      <% if title %>
+        <h1><%= title %></h1>
+      <% end %>
+      <%= content %>
+    </main>
   </body>
 </html>

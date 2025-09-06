@@ -21,7 +21,8 @@ require 'mint'
 
 Mint.publish! "document.md", 
   layout_name: "professional",
-  style_name: "professional"
+  style_name: "professional",
+  file_title: true
 ```
 
 You can also pass a `Config` object if preferred:
@@ -91,6 +92,7 @@ Mint.publish! "document.md", style_mode: :original
 - `:navigation_title` – Title for navigation panel
 - `:navigation_drop` – Drop first N directory levels from navigation (default: 0)
 - `:navigation_depth` – Maximum depth to show in navigation (default: 3)
+- `:file_title` – Extract title from filename (removes .md extension) and inject into template (default: false)
 
 ## Publishing multiple files
 

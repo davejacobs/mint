@@ -41,6 +41,14 @@ Use different layouts and stylesheets:
 
     mint publish Document.md --layout default --style nord
 
+### Extract titles from filenames
+
+Use the filename as the document title:
+
+    mint publish my-article.md --file-title
+
+This removes the `.md` extension from the filename and uses it as both the HTML title and an H1 heading.
+
 ### Preserve directory structure
 
 Keep your source directory structure in the output:

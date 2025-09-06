@@ -37,6 +37,9 @@ mint publish *.md --destination final-drafts
 
 # Publish with navigation panel
 mint publish content/**/*.md --navigation --navigation-title "My Documentation" --destination public
+
+# Extract titles from filenames
+mint publish my-document.md --file-title
 ```
 
 ### Common Options
@@ -57,6 +60,7 @@ mint publish content/**/*.md --navigation --navigation-title "My Documentation" 
 | `--navigation-title TITLE` | Set title for navigation panel |
 | `--navigation-drop LEVELS` | Drop first N directory levels from navigation |
 | `--navigation-depth DEPTH` | Maximum depth to show in navigation (default: 3) |
+| `--file-title` | Extract title from filename (removes .md extension) and inject into template |
 
 ### Style modes
 

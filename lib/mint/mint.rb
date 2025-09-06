@@ -151,13 +151,20 @@ module Mint
       raise LayoutNotFoundException, "Layout '#{config.layout_name}' does not exist."
     end
 
+    # Extract title from filename if --file-title flag is set
+    file_title = nil
+    if config.file_title
+      file_title = File.basename(source_file, '.*').sub(/\.md$/, '')
+    end
+    
     document_context = variables.merge(
       content: source_content.html_safe, 
       stylesheet_tag: stylesheet_tag,
       metadata: source_metadata || {},
       source_file: source_file,
       working_directory: config.working_directory,
-      config: config
+      config: config,
+      title: file_title
     )
     
     original_document_content = File.read(layout_source_file)

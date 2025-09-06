@@ -93,6 +93,10 @@ module Mint
         cli.on "--navigation-title TITLE", "Set the title for the navigation panel" do |title|
           commandline_options[:navigation_title] = title
         end
+        
+        cli.on "--file-title", "Extract title from filename (removes .md extension) and inject into template" do
+          commandline_options[:file_title] = true
+        end
       end
 
       parser.parse! argv
