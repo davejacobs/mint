@@ -2,7 +2,7 @@
 
 Transform your plain text documents into beautiful HTML documents with customizable styling and templates.
 
-![Status](https://github.com/davejacobs/mint/actions/workflows/test.yml/badge.svg)
+![Status](https://github.com/davejacobs/mint/actions/workflows/build.yml/badge.svg)
 
 ## Why Mint?
 
@@ -63,13 +63,12 @@ mint publish my-document.md --file-title
 | Flag | Description |
 |------|-------------|
 | `-t, --template TEMPLATE` | Use a built-in template (combines layout + style) |
-| `-l, --layout LAYOUT` | Specify only the layout |
-| `-s, --style STYLE` | Specify only the style |
-| `-w, --working-dir WORKING_DIR` | Specify a working directory outside the current directory |
-| `-d, --destination DIR` | Output directory |
-| `-o, --output-file FORMAT` | Custom output filename format with substitutions |
+| `-l, --layout LAYOUT` | Specify only the template layout, by name |
+| `-s, --style STYLE` | Specify only the template style, by name |
 | `-m, --style-mode MODE` | How styles are included (inline, external, original) |
-| `--file-title` | Extract title from filename (removes .md extension) and inject into template |
+| `-o, --output-file FORMAT` | Custom output filename, with substitutions available |
+| `-d, --destination DIR` | Output directory |
+| `--file-title` | Extract title from filename and inject into template |
 | `--preserve-structure` | Preserve source directory structure (e.g., nesting) in destination |
 | `--navigation` | Enable navigation panel showing all files |
 | `--navigation-title TITLE` | Set title for navigation panel |
@@ -108,7 +107,7 @@ Configuration options are loaded in the following order (later files override ea
 
 1. **Global**: Built-in defaults
 2. **User**: `~/.config/mint/config.toml`  
-3. **Local**: `.mint/config.toml` (current directory)
+3. **Local**: `.mint/config.toml`
 4. **Commandline**: Explicit flags override any other configuration
 
 ### Example configuration file
@@ -138,14 +137,15 @@ working-dir = "/path/to/source"
 
 ### Overriding configuration file settings
 
-You can override boolean settings from configuration files using `--no-` flags:
+For most flags, overriding your configuration file is simple: You can simply
+specify a new value via commandline flags. Boolean flags require a slightly
+different approach, the use of `--no-[option]` flags.
+
+If you've set `navigation = true` in `config.toml`, you can override that
+at the commandline:
 
 ```bash
-# If your config.toml has navigation = true and file-title = true
-mint publish docs.md --no-navigation --no-file-title
-
-# Mix positive and negative flags
-mint publish docs.md --preserve-structure --no-navigation
+mint publish docs.md --no-navigation
 ```
 
 Available `--no-` flags:
