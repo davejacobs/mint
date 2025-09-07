@@ -23,9 +23,11 @@
   --space-xs: calc(var(--base-unit) * 0.25);
   --space-sm: calc(var(--base-unit) * 0.5);
   --space-base: var(--base-unit);
+  --space-md: var(--space-base);
   --space-lg: calc(var(--base-unit) * 1.5);
   --space-xl: calc(var(--base-unit) * 2);
   --space-2xl: calc(var(--base-unit) * 3);
+  --space-3xl: calc(var(--base-unit) * 4);
   
   /* Semantic Colors - Templates override these for theming */
   --color-text: #1a1a1a;

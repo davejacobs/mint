@@ -56,7 +56,8 @@
   
   /* Layout */
   --container-max-width: 50rem;
-  --container-padding: var(--space-base) var(--space-2xl);
+  --container-padding: var(--space-lg) var(--space-2xl);
+  --navigation-gap: 4rem;
 }
 
 /* Typography */
@@ -119,17 +120,20 @@ td {
   border: none;
 }
 
-/* Navigation font size adjustments */
+/* Navigation font size adjustments - more compact but readable */
 #navigation h3 {
-  font-size: calc(var(--base-font-size) * 1.2);
+  font-size: calc(var(--base-font-size) * 1.1);
+  margin-bottom: calc(var(--space-base) * 0.75);
 }
 
 #navigation a {
-  font-size: calc(var(--base-font-size) * 0.7);
+  font-size: calc(var(--base-font-size) * 0.75);
+  padding: calc(var(--space-sm) * 0.4) var(--space-sm);
 }
 
 #navigation .directory-name {
-  font-size: calc(var(--base-font-size) * 0.75);
+  font-size: calc(var(--base-font-size) * 0.8);
+  padding: calc(var(--space-sm) * 0.4) var(--space-sm);
 }
 
 /* Responsive design */

@@ -56,7 +56,7 @@
   --color-table-hover: rgba(0, 0, 0, 0.04);
   
   /* Layout */
-  --container-max-width: 65ch;
+  --container-max-width: 60rem;
   --red-bar-width: 8px;
   --red-bar-wide-width: 32px;
 }
