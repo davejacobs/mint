@@ -3,11 +3,6 @@ require "spec_helper"
 RSpec.describe "Config File Integration" do
   include CLIHelpers
 
-  before do
-    allow(ENV).to receive(:[]).and_call_original
-    allow(ENV).to receive(:[]).with("MINT_NO_PIPE").and_return("1")
-    allow($stdin).to receive(:tty?).and_return(true)
-  end
 
   describe "TOML config file support" do
     context "with local config file" do

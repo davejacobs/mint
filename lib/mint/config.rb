@@ -18,6 +18,7 @@ module Mint
     attr_accessor :navigation_title
     attr_accessor :file_title
     attr_accessor :verbose
+    attr_accessor :stdin_mode
     
     DEFAULT_LAYOUT_NAME                 = "default"
     DEFAULT_STYLE_NAME                  = "default"
@@ -31,6 +32,7 @@ module Mint
     DEFAULT_NAVIGATION_DEPTH            = 3
     DEFAULT_FILE_TITLE                  = false
     DEFAULT_VERBOSE                     = false
+    DEFAULT_STDIN_MODE                  = false
     
     def initialize(options = {})
       @help = options[:help]
@@ -48,6 +50,7 @@ module Mint
       @navigation_title = options[:navigation_title]
       @file_title = options[:file_title] if options.key?(:file_title)
       @verbose = options[:verbose] if options.key?(:verbose)
+      @stdin_mode = options[:stdin_mode] if options.key?(:stdin_mode)
     end
     
     def to_h
@@ -66,7 +69,8 @@ module Mint
         navigation_depth: @navigation_depth,
         navigation_title: @navigation_title,
         file_title: @file_title,
-        verbose: @verbose
+        verbose: @verbose,
+        stdin_mode: @stdin_mode
       }
     end
     
@@ -96,7 +100,8 @@ module Mint
         navigation_drop: DEFAULT_NAVIGATION_DROP,
         navigation_depth: DEFAULT_NAVIGATION_DEPTH,
         file_title: DEFAULT_FILE_TITLE,
-        verbose: DEFAULT_VERBOSE
+        verbose: DEFAULT_VERBOSE,
+        stdin_mode: DEFAULT_STDIN_MODE
       })
     end
 

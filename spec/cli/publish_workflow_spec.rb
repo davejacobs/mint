@@ -136,14 +136,14 @@ RSpec.describe "CLI Publishing Workflow" do
           expect(File.exist?("docs/section1/script.html")).to be false
         end
 
-        it "handles empty directories gracefully" do
+        it "raises an error when no files are specified" do
           FileUtils.mkdir_p("empty/nested/dirs")
           
           expect {
-            # Process empty directory - should just not process anything
+            # Process empty directory - should raise an error
             md_files = Dir.glob("empty/**/*.md")
             Mint::Commandline.publish!(md_files, config: Mint::Config.with_defaults(preserve_structure: true))
-          }.not_to raise_error
+          }.to raise_error(ArgumentError, "No files specified. Use file paths or '-' to read from STDIN.")
         end
 
         it "processes current directory when no files specified" do

@@ -51,11 +51,15 @@ mint publish Document.md --destination public
 # Publish multiple files
 mint publish *.md --destination final-drafts
 
+# Read Markdown content piped from STDIN using `-`, limited to a single file
+echo "# Document" | mint publish - --output-file Document.html
+
 # Publish with navigation panel; use globs to recursively include nested files
 mint publish content/**/*.md --preserve-structure --navigation --navigation-title "Documentation" --destination public
 
 # Guess document title (and h1 header) from filename
-mint publish my-document.md --file-title
+mint publish Document.md --file-title
+
 ```
 
 ### Common options
@@ -72,6 +76,7 @@ mint publish my-document.md --file-title
 | `--preserve-structure` | Preserve source directory structure (e.g., nesting) in destination |
 | `--navigation` | Enable navigation panel showing all files |
 | `--navigation-title TITLE` | Set title for navigation panel |
+| `-v, --verbose` | Show verbose output during processing |
 
 ### Style modes
 

@@ -42,7 +42,7 @@ RSpec.describe "Bin Script Integration" do
           create_template_directory("default")
           create_markdown_file("test.md", "# Hello CLI\n\nThis works!")
           
-          result = run_command({"MINT_NO_PIPE" => "1"}, "ruby", "bin/mint", "publish", "test.md")
+          result = run_command({}, "ruby", "bin/mint", "publish", "test.md")
           
           expect(result.success?).to be true
           expect(File.exist?("test.html")).to be true
@@ -57,7 +57,7 @@ RSpec.describe "Bin Script Integration" do
           create_markdown_file("doc1.md", "# Document 1")
           create_markdown_file("doc2.md", "# Document 2")
           
-          result = run_command({"MINT_NO_PIPE" => "1"}, "ruby", "bin/mint", "publish", "doc1.md", "doc2.md")
+          result = run_command({}, "ruby", "bin/mint", "publish", "doc1.md", "doc2.md")
           
           expect(result.success?).to be true
           expect(File.exist?("doc1.html")).to be true
@@ -69,7 +69,7 @@ RSpec.describe "Bin Script Integration" do
           create_template_directory("custom")
           create_markdown_file("styled.md", "# Custom Style")
           
-          result = run_command({"MINT_NO_PIPE" => "1"}, "ruby", "bin/mint", "publish", "--template", "custom", "styled.md")
+          result = run_command({}, "ruby", "bin/mint", "publish", "--template", "custom", "styled.md")
           
           # Should succeed even if template doesn't exist (will use default)
           expect(result.success?).to be true
@@ -103,7 +103,7 @@ RSpec.describe "Bin Script Integration" do
           create_template_directory("default")
           create_markdown_file("test.md", "# Test")
           
-          result = run_command({"MINT_NO_PIPE" => "1"}, "ruby", "bin/mint", "publish", "test.md")
+          result = run_command({}, "ruby", "bin/mint", "publish", "test.md")
           
           expect(result.success?).to be true
           # Should not have excessive debug output
@@ -116,10 +116,10 @@ RSpec.describe "Bin Script Integration" do
           create_template_directory("default")
           create_markdown_file("success.md", "# Success")
           
-          success_result = run_command({"MINT_NO_PIPE" => "1"}, "ruby", "bin/mint", "publish", "success.md")
+          success_result = run_command({}, "ruby", "bin/mint", "publish", "success.md")
           expect(success_result.exit_code).to eq(0)
 
-          failure_result = run_command({"MINT_NO_PIPE" => "1"}, "ruby", "bin/mint", "publish", "nonexistent.md")
+          failure_result = run_command({}, "ruby", "bin/mint", "publish", "nonexistent.md")
           expect(failure_result.exit_code).not_to eq(0)
         end
       end

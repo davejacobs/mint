@@ -88,6 +88,7 @@ module Mint
                raise ArgumentError, "config must be a Config object or Hash"
              end
     
+    
     original_source_content = File.read source_file
     source_metadata, source_text = self.parse_metadata_from original_source_content
     source_text_with_updated_links = Helpers.transform_markdown_links(source_text,

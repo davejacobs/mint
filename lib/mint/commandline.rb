@@ -16,7 +16,12 @@ module Mint
         puts help
         exit 0
       elsif command.to_sym == :publish
-        Mint::Commandline.publish!(files, config: config)
+        begin
+          Mint::Commandline.publish!(files, config: config)
+        rescue ArgumentError => e
+          $stderr.puts "Error: #{e.message}"
+          exit 1
+        end
       else
         possible_binary = "mint-#{command}"
         if File.executable? possible_binary
@@ -121,22 +126,30 @@ module Mint
       parser.parse! argv
       command = argv.shift
       
-      # MINT_NO_PIPE is used for testing, to convince Mint
-      # that STDIN isn't being used
-      commandline_options[:files] =
-        if $stdin.tty? || ENV["MINT_NO_PIPE"]
-          argv
-        else
-          $stdin.each_line.reduce [] do |list, line|
-            list.concat(Shellwords.split(line))
-          end
+      if argv.include?('-')
+        if argv.length > 1
+          $stderr.puts "Error: Cannot mix STDIN ('-') with other file arguments"
+          exit 1
         end
+        
+        commandline_options[:files] = [$stdin.read]
+        commandline_options[:stdin_mode] = true
+      else
+        commandline_options[:files] = argv
+        commandline_options[:stdin_mode] = false
+      end
       
       if commandline_options[:style_mode] == :inline && commandline_options[:style_destination_directory]
         raise ArgumentError, "--style-mode inline and --style-destination cannot be used together"
       end
       
-      files = commandline_options[:files].map {|f| Pathname.new(f).expand_path }
+      # Process files differently based on whether we're reading from STDIN
+      if commandline_options[:stdin_mode]
+        files = commandline_options[:files]
+      else
+        files = commandline_options[:files].map {|f| Pathname.new(f).expand_path }
+      end
+      
       commandline_config = Config.new(commandline_options)
       config = Config.defaults.merge(Mint.configuration).merge(commandline_config)
 
@@ -149,14 +162,36 @@ module Mint
     # @param [Config, Hash] config a Config object or Hash with configuration options
     def self.publish!(source_files, config: Config.new)
       config = config.is_a?(Config) ? config : Config.new(config)
-      navigation_data = NavigationProcessor.process_navigation_data(source_files, config)
-      source_files.each_with_index do |source_file, idx|
-        current_file_navigation_data = NavigationProcessor.process_navigation_for_current_file(
-          source_file, navigation_data, config
-        )
-        output_file = Mint.publish!(source_file, config: config, variables: { files: current_file_navigation_data }, render_style: idx == 0)
+      
+      if source_files.empty?
+        raise ArgumentError, "No files specified. Use file paths or '-' to read from STDIN."
+      end
+      
+      if config.stdin_mode
+        require 'tempfile'
+        
+        stdin_content = source_files.first
+        temp_file = Tempfile.new(['stdin', '.md'])
+        temp_file.write(stdin_content)
+        temp_file.close
+        
+        output_file = Mint.publish!(temp_file.path, config: config, variables: {}, render_style: true)
         if config.verbose
-          puts "Published: #{source_file} -> #{output_file}"
+          puts "Published: STDIN -> #{output_file}"
+        end
+        
+        temp_file.unlink
+      else
+        navigation_data = NavigationProcessor.process_navigation_data(source_files, config)
+        source_files.each_with_index do |source_file, idx|
+          
+          current_file_navigation_data = NavigationProcessor.process_navigation_for_current_file(
+            source_file, navigation_data, config
+          )
+          output_file = Mint.publish!(source_file, config: config, variables: { files: current_file_navigation_data }, render_style: idx == 0)
+          if config.verbose
+            puts "Published: #{source_file} -> #{output_file}"
+          end
         end
       end
     end
