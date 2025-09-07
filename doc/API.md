@@ -1,4 +1,4 @@
-# Mint Ruby API
+# Mint API
 
 Use Mint programmatically in your Ruby applications to convert Markdown documents to styled HTML.
 
