@@ -2,6 +2,8 @@
 
 Transform your plain text documents into beautiful HTML documents with customizable styling and templates.
 
+![Status](https://github.com/davejacobs/mint/actions/workflows/test.yml/badge.svg)
+
 ## Why Mint?
 
 - **Focus on writing** – Keep documents as plain text

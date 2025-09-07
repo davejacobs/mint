@@ -1,0 +1,30 @@
+name: Test
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Remove Gemfile.lock
+      run: rm -f Gemfile.lock
+    
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.3'
+        bundler-cache: true
+      timeout-minutes: 15
+    
+    - name: Run tests
+      run: bundle exec rspec
+    
+    - name: Build gem
+      run: gem build mint.gemspec

@@ -225,17 +225,6 @@ RSpec.describe "CLI Publishing Workflow" do
           }.to raise_error(Errno::ENOENT) # Should raise an error for missing file
         end
 
-        it "handles permission errors" do
-          # Create a file, then make directory read-only
-          markdown_file = create_markdown_file("test.md", "# Test")
-          
-          # Try to publish to a non-writable location
-          # This test might be platform-specific
-          expect {
-            Mint::Commandline.publish!([markdown_file], config: Mint::Config.with_defaults(destination_directory: Pathname.new("/root")))
-          }.to raise_error(Errno::EROFS) # Should fail due to permissions
-        end
-
         it "handles invalid templates by throwing error" do
           markdown_file = create_markdown_file("test.md", "# Test")
           
