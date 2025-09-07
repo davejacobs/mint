@@ -8,16 +8,21 @@
 - [x]: Refresh templates
 - [x]: --navigation flags instead of garden template
 - [x]: --file-title for pulling document title from file name
-- [ ]: Config file -- isn't quite working yet
-- [ ]: --include-files should transfer any non-md files (JPEGs, PNGs, SVGs, PDFs)
-- [ ]: --var for local variables
-- [ ] Proper metadata, local variables
-- [ ] Add --style-output-format to control output name; update docs that --style-destination only affects directory
+- [x]: New config file
+- [x]: --no-* options
+- [x]: --verbose
+- [x]: More reliable STDIN support via - notation
+- [ ]: index.html handling
+- [ ]: --output-file - for STDOUT support; only work with style-mode inline or original (?)
+- [ ]: Tech debt: Modular navigation and relative path code
+- [ ]: Javascript support (to hide navigation)
+- [ ]: --include-files should transfer any non-md files (JPEGs, PNGs, SVGs, PDFs) to destination directory
+- [ ]: --var for local variables as template metadata
+- [ ] Robust metadata
+- [ ] --style-output-format to control output name; update docs that --style-destination only affects directory
 - [ ]: Smart quotes
 - [ ]: Code highlighting
-- [ ]: CSS DSL for overriding themes within a document
-- [ ]: Bring back plugins system
-- [ ]: --output-format via plugins
+- [ ]: CSS DSL in metadata
+- [ ]: Plugins system (revamped)
 - [ ]: ePub plugin
 - [ ]: PDF plugin
-- [ ]: `mint doc` to create word processor documents
