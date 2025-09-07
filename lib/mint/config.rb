@@ -17,6 +17,7 @@ module Mint
     attr_accessor :navigation_depth
     attr_accessor :navigation_title
     attr_accessor :file_title
+    attr_accessor :verbose
     
     DEFAULT_LAYOUT_NAME                 = "default"
     DEFAULT_STYLE_NAME                  = "default"
@@ -29,6 +30,7 @@ module Mint
     DEFAULT_NAVIGATION_DROP             = 0
     DEFAULT_NAVIGATION_DEPTH            = 3
     DEFAULT_FILE_TITLE                  = false
+    DEFAULT_VERBOSE                     = false
     
     def initialize(options = {})
       @help = options[:help]
@@ -45,6 +47,7 @@ module Mint
       @navigation_depth = options[:navigation_depth] if options.key?(:navigation_depth)
       @navigation_title = options[:navigation_title]
       @file_title = options[:file_title] if options.key?(:file_title)
+      @verbose = options[:verbose] if options.key?(:verbose)
     end
     
     def to_h
@@ -62,7 +65,8 @@ module Mint
         navigation_drop: @navigation_drop,
         navigation_depth: @navigation_depth,
         navigation_title: @navigation_title,
-        file_title: @file_title
+        file_title: @file_title,
+        verbose: @verbose
       }
     end
     
@@ -91,7 +95,8 @@ module Mint
         navigation: DEFAULT_NAVIGATION,
         navigation_drop: DEFAULT_NAVIGATION_DROP,
         navigation_depth: DEFAULT_NAVIGATION_DEPTH,
-        file_title: DEFAULT_FILE_TITLE
+        file_title: DEFAULT_FILE_TITLE,
+        verbose: DEFAULT_VERBOSE
       })
     end
 
@@ -126,7 +131,8 @@ module Mint
         'navigation-title' => :navigation_title,
         'navigation_title' => :navigation_title,
         'file-title' => :file_title,
-        'file_title' => :file_title
+        'file_title' => :file_title,
+        'verbose' => :verbose
       }
 
       mapped = {}

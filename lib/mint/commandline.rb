@@ -43,6 +43,10 @@ module Mint
           commandline_options[:help] = true
         end
 
+        cli.on "-v", "--verbose", "Show verbose output" do
+          commandline_options[:verbose] = true
+        end
+
         cli.on "-t", "--template TEMPLATE", "Specify a template by name (default: default)" do |t|
           commandline_options[:layout_name] = t
           commandline_options[:style_name] = t
@@ -150,7 +154,10 @@ module Mint
         current_file_navigation_data = NavigationProcessor.process_navigation_for_current_file(
           source_file, navigation_data, config
         )
-        Mint.publish!(source_file, config: config, variables: { files: current_file_navigation_data }, render_style: idx == 0)
+        output_file = Mint.publish!(source_file, config: config, variables: { files: current_file_navigation_data }, render_style: idx == 0)
+        if config.verbose
+          puts "Published: #{source_file} -> #{output_file}"
+        end
       end
     end
   end

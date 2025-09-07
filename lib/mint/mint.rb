@@ -185,6 +185,8 @@ module Mint
     destination_file_path.open("w+") do |f|
       f << document_content
     end
+    
+    destination_file_path
   end
   
   # Finds a template directory by name
