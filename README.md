@@ -7,9 +7,10 @@ Transform your plain text documents into beautiful HTML documents with customiza
 ## Why Mint?
 
 - **Focus on writing** – Keep documents as plain text
-- **Version control friendly** – Text files work great with Git
-- **Scriptable** – Automate document processing
 - **Beautiful output** – Professional-looking HTML ready for print or web
+- **Digital gardnes** – Easily publish linked sets of HTML documents from tools like Obsidian
+- **Version control-friendly** – Text documents work great with Git
+- **Scriptable** – Automate document processing and analysis
 - **Highly customizable** – Create your own templates and styles
 
 ## Installation
@@ -21,7 +22,7 @@ gem install mint
 ## Documentation
 
 - **Complete usage guide:** [TUTORIAL.md](doc/TUTORIAL.md)
-- **Man page:** `man mint` (after installation)
+- **Man page:** `man mint`
 - **API documentation:** [RubyDoc](http://www.rubydoc.info/github/davejacobs/mint)
 
 ## Get started
@@ -32,7 +33,9 @@ Transform a Markdown document into styled HTML:
 mint publish Document.md
 ```
 
-This creates `Document.html` in your current directory with beautiful default styling.
+This creates `Document.html` in your current directory with beautiful default styling. The styles
+are inlined by default, so you can send your document to anyone you'd like, and they'll see the
+same thing.
 
 ## Usage
 
@@ -59,7 +62,6 @@ mint publish content/**/*.md --preserve-structure --navigation --navigation-titl
 
 # Guess document title (and h1 header) from filename
 mint publish Document.md --file-title
-
 ```
 
 ### Common options
@@ -76,7 +78,7 @@ mint publish Document.md --file-title
 | `--preserve-structure` | Preserve source directory structure (e.g., nesting) in destination |
 | `--navigation` | Enable navigation panel showing all files |
 | `--navigation-title TITLE` | Set title for navigation panel |
-| `-v, --verbose` | Show verbose output during processing |
+| `-v, --verbose` | Show information about document processing |
 
 ### Style modes
 
@@ -94,7 +96,7 @@ The `original` mode is particularly useful for template development, as it allow
 - `basic` – Clean, minimal styling, focuses on text
 - `nord` – Clean, uses Nord color scheme and sans text
 - `nord-dark` – Dark version of Nord
-- `magazine` – Refined & easy to adapt for publications
+- `magazine` – Refined & easy to adapt for publications
 
 ### Custom templates
 
