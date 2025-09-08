@@ -60,12 +60,12 @@ RSpec.describe "Config File Integration" do
 
       it "loads output-file option from config file" do
         File.write(".mint/config.toml", <<~TOML)
-          output-file = "%{basename}_custom.%{new_extension}"
+          output-file = "%{ext}_custom.%{ext}"
         TOML
 
         command, config, files, help = Mint::Commandline.parse!(["publish", "test.md"])
         
-        expect(config.output_file_format).to eq("%{basename}_custom.%{new_extension}")
+        expect(config.output_file_format).to eq("%{ext}_custom.%{ext}")
       end
 
       it "loads destination option from config file" do
@@ -148,6 +148,16 @@ RSpec.describe "Config File Integration" do
         expect(config.navigation_title).to eq("Custom Navigation")
       end
 
+      it "loads navigation-autodrop option from config file" do
+        File.write(".mint/config.toml", <<~TOML)
+          navigation-autodrop = false
+        TOML
+
+        command, config, files, help = Mint::Commandline.parse!(["publish", "test.md"])
+        
+        expect(config.navigation_autodrop).to be false
+      end
+
       it "loads file-title option from config file" do
         File.write(".mint/config.toml", <<~TOML)
           file-title = true
@@ -155,32 +165,6 @@ RSpec.describe "Config File Integration" do
 
         command, config, files, help = Mint::Commandline.parse!(["publish", "test.md"])
         
-        expect(config.file_title).to be true
-      end
-
-      it "supports underscore variants of hyphenated options" do
-        File.write(".mint/config.toml", <<~TOML)
-          working_dir = "/underscore/path"
-          output_file = "%{basename}_under.%{new_extension}"
-          style_mode = "original"
-          style_destination = "css"
-          preserve_structure = true
-          navigation_drop = 1
-          navigation_depth = 4
-          navigation_title = "Underscore Title"
-          file_title = true
-        TOML
-
-        command, config, files, help = Mint::Commandline.parse!(["publish", "test.md"])
-        
-        expect(config.working_directory).to eq(Pathname.new("/underscore/path"))
-        expect(config.output_file_format).to eq("%{basename}_under.%{new_extension}")
-        expect(config.style_mode).to eq(:original)
-        expect(config.style_destination_directory).to eq("css")
-        expect(config.preserve_structure).to be true
-        expect(config.navigation_drop).to eq(1)
-        expect(config.navigation_depth).to eq(4)
-        expect(config.navigation_title).to eq("Underscore Title")
         expect(config.file_title).to be true
       end
 

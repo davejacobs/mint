@@ -40,7 +40,7 @@ Specify a specific style template by name
 Specify a working directory outside the current directory
 .TP
 .BR \-o ", " \-\-output\-file " " \fIFORMAT\fR
-Specify output filename format with substitutions (%{basename}, %{original_extension}, %{new_extension})
+Specify output filename format with substitutions (%{basename}, %{original_ext}, %{new_extension})
 .TP
 .BR \-\-preserve\-structure
 Preserve source directory structure (e.g., nesting) in destination
@@ -57,11 +57,17 @@ Disable navigation panel
 .BR \-\-navigation\-title " " \fITITLE\fR
 Set title for navigation panel
 .TP
+.BR \-\-navigation\-autodrop
+Automatically drop common directory levels from navigation (default: true)
+.TP
+.BR \-\-no\-navigation\-autodrop
+Don't automatically drop common directory levels from navigation
+.TP
 .BR \-\-navigation\-drop " " \fILEVELS\fR
-Drop first N directory levels from navigation (default: 0)
+Drop first N directory levels from navigation (cannot be used with --navigation-autodrop)
 .TP
 .BR \-\-navigation\-depth " " \fIDEPTH\fR
-Maximum depth to show in navigation (default: 3)
+Maximum depth to show in navigation after dropping levels (default: 3)
 .TP
 .BR \-\-file\-title
 Extract title from filename (removes .md extension) and inject into template
@@ -150,7 +156,7 @@ Mint comes with several built-in templates:
 .B nord/nord-dark
 \- Modern color schemes using the Nord color scheme
 .PP
-Templates use ERB for layouts and support CSS, SCSS, or SASS for styling.
+Templates use ERB-flavored HTML for layouts and CSS for styling.
 .SH FILES
 .TP
 .I ~/.config/mint/

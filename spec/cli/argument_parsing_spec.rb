@@ -79,15 +79,15 @@ RSpec.describe "CLI Argument Parsing" do
 
     context "with output options" do
       it "parses --output-file option" do
-        command, config, files, help = Mint::Commandline.parse!(["publish", "--output-file", "%{basename}_custom.%{new_extension}", "file.md"])
+        command, config, files, help = Mint::Commandline.parse!(["publish", "--output-file", "%{name}_custom.%{ext}", "file.md"])
         
-        expect(config.output_file_format).to eq("%{basename}_custom.%{new_extension}")
+        expect(config.output_file_format).to eq("%{name}_custom.%{ext}")
       end
 
       it "has default output file format" do
         command, config, files, help = Mint::Commandline.parse!(["publish", "file.md"])
         
-        expect(config.output_file_format).to eq("%{basename}.%{new_extension}")
+        expect(config.output_file_format).to eq("%{name}.%{ext}")
       end
     end
 
@@ -141,6 +141,12 @@ RSpec.describe "CLI Argument Parsing" do
         
         expect(config.file_title).to be true
       end
+
+      it "parses --navigation-autodrop flag" do
+        command, config, files, help = Mint::Commandline.parse!(["publish", "--navigation-autodrop", "file.md"])
+        
+        expect(config.navigation_autodrop).to be true
+      end
     end
 
     context "negative boolean flags" do
@@ -160,6 +166,26 @@ RSpec.describe "CLI Argument Parsing" do
         command, config, files, help = Mint::Commandline.parse!(["publish", "--no-file-title", "file.md"])
         
         expect(config.file_title).to be false
+      end
+
+      it "parses --no-navigation-autodrop flag" do
+        command, config, files, help = Mint::Commandline.parse!(["publish", "--no-navigation-autodrop", "file.md"])
+        
+        expect(config.navigation_autodrop).to be false
+      end
+    end
+    
+    describe "option conflicts" do
+      it "raises error when --navigation-autodrop and --navigation-drop are used together" do
+        expect {
+          Mint::Commandline.parse!(["publish", "--navigation-autodrop", "--navigation-drop", "2", "file.md"])
+        }.to raise_error(ArgumentError, "--navigation-autodrop cannot be used with --navigation-drop")
+      end
+      
+      it "allows --navigation-autodrop with --navigation-drop 0" do
+        expect {
+          command, config, files, help = Mint::Commandline.parse!(["publish", "--navigation-autodrop", "--navigation-drop", "0", "file.md"])
+        }.not_to raise_error
       end
     end
   end

@@ -81,7 +81,7 @@ if ARGV.length > 0
     puts "\nAvailable test suites:".yellow
     Dir.glob("spec/cli/*_spec.rb").each do |file|
       basename = File.basename(file, "_spec.rb")
-      puts "  - #{basename}"
+      puts "  - #{name}"
     end
     exit 1
   end

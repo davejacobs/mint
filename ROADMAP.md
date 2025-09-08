@@ -12,9 +12,10 @@
 - [x]: --no-* options
 - [x]: --verbose
 - [x]: More reliable STDIN support via - notation
-- [ ]: index.html handling
-- [ ]: --output-file - for STDOUT support; only work with style-mode inline or original (?)
 - [ ]: Tech debt: Modular navigation and relative path code
+- [ ]: index.html handling with --navigation
+- [ ]: Breadcrumb support
+- [ ]: --output-file - for STDOUT support; only work with style-mode inline or original (?)
 - [ ]: Javascript support (to hide navigation)
 - [ ]: --include-files should transfer any non-md files (JPEGs, PNGs, SVGs, PDFs) to destination directory
 - [ ]: --var for local variables as template metadata

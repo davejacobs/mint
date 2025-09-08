@@ -78,6 +78,9 @@ mint publish Document.md --file-title
 | `--preserve-structure` | Preserve source directory structure (e.g., nesting) in destination |
 | `--navigation` | Enable navigation panel showing all files |
 | `--navigation-title TITLE` | Set title for navigation panel |
+| `--navigation-autodrop` | Automatically drop common parent directories from published files and navigation (default: true) |
+| `--navigation-drop N` | Drop N directory levels from navigation (cannot be used with --navigation-autodrop) |
+| `--navigation-depth N` | Maximum depth to show in navigation after dropping levels (default: 3) |
 | `-v, --verbose` | Show information about document processing |
 
 ### Style modes
@@ -134,8 +137,9 @@ style-mode = "external"
 # Navigation
 navigation = true
 navigation-title = "My Docs"
-navigation-depth = 3
-navigation-drop = 1
+navigation-autodrop = true          # Automatically drop common directory levels (default: true)
+navigation-depth = 3               # Maximum depth after dropping levels (default: 3)
+navigation-drop = 1                # Alternative to autodrop - manually specify levels to drop
 
 # Other options
 file-title = true

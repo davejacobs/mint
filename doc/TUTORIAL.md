@@ -106,6 +106,7 @@ file-title = true
 ```
 
 Now when you run `mint publish docs/**/*.md`, it will automatically:
+
 - Use the Nord template
 - Output to the `public/` directory  
 - Preserve the directory structure from `docs/`
@@ -132,6 +133,7 @@ For boolean options set to `true` in your config file, you can disable them usin
 - `--no-preserve-structure` - Don't preserve directory structure
 - `--no-navigation` - Disable navigation panel  
 - `--no-file-title` - Don't extract titles from filenames
+- `--no-navigation-autodrop` - Disable automatic directory level dropping
 
 This is particularly useful when you have defaults in your config file but want to selectively disable features for specific builds.
 
@@ -163,6 +165,44 @@ navigation-depth = 3
 navigation-title = "Documentation"
 file-title = true
 ```
+
+## Navigation behavior
+
+When navigation is enabled, Mint organizes your files into a navigable directory structure. By default, Mint uses **autodrop** to create cleaner navigation by automatically removing common directory levels.
+
+### Autodrop (default behavior)
+
+Autodrop removes directory levels that are common to all files, stopping when it reaches multiple top-level nodes. This creates more meaningful navigation:
+
+```bash
+# Example: All files under docs/content/
+mint publish docs/content/guide/*.md docs/content/api/*.md --navigation
+
+# Navigation shows:
+#   guide/
+#     getting-started.md
+#     advanced.md  
+#   api/
+#     reference.md
+# (docs/content/ is automatically dropped)
+```
+
+### Manual control
+
+You can control navigation behavior with these options:
+
+```bash
+# Disable autodrop - show full directory structure
+mint publish docs/**/*.md --no-navigation-autodrop --navigation
+
+# Manual drop - remove exactly N levels (cannot be used with navigation-autodrop)
+mint publish docs/**/*.md --navigation-drop 2 --navigation
+
+# Limit navigation depth after dropping
+mint publish docs/**/*.md --navigation-depth 2 --navigation
+```
+
+**Important**: `--navigation-autodrop` and `--navigation-drop` cannot be used together. Autodrop is enabled by default; use `--no-navigation-autodrop` if you want manual control.
 
 ## Template paths
 

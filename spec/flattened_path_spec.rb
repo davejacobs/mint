@@ -16,7 +16,8 @@ RSpec.describe "Flattened Path Handling (default behavior)" do
         create_markdown_file("docs/guides/setup.md", "# Setup Guide")
         
         config = Mint::Config.with_defaults(destination_directory: Pathname.new("output"))
-        Mint.publish!("docs/guides/setup.md", config: config)
+        workspace = Mint::Workspace.new(["docs/guides/setup.md"], config)
+        workspace.publish!
         
         # File should be flattened to output directory
         expect(File.exist?("output/setup.html")).to be true
@@ -38,7 +39,8 @@ RSpec.describe "Flattened Path Handling (default behavior)" do
         
         config = Mint::Config.with_defaults(destination_directory: Pathname.new("build"))
         
-        files.each {|file| Mint.publish!(file, config: config) }
+        workspace = Mint::Workspace.new(files, config)
+        workspace.publish!
         
         # All files should be flattened to build directory
         expect(File.exist?("build/readme.html")).to be true
@@ -60,8 +62,8 @@ RSpec.describe "Flattened Path Handling (default behavior)" do
         config = Mint::Config.with_defaults(destination_directory: Pathname.new("output"))
         
         # Process files separately to see collision behavior
-        Mint.publish!("docs/v1/index.md", config: config)
-        Mint.publish!("docs/v2/index.md", config: config)
+        workspace = Mint::Workspace.new(["docs/v1/index.md", "docs/v2/index.md"], config)
+        workspace.publish!
         
         # Only one index.html should exist (last one wins)
         expect(File.exist?("output/index.html")).to be true
@@ -107,7 +109,8 @@ RSpec.describe "Flattened Path Handling (default behavior)" do
           destination_directory: Pathname.new("../public")
         )
         
-        Mint.publish!("source/docs/guide.md", config: config)
+        workspace = Mint::Workspace.new(["source/docs/guide.md"], config)
+        workspace.publish!
         
         # File should be flattened in public directory
         expect(File.exist?("public/guide.html")).to be true
@@ -119,7 +122,8 @@ RSpec.describe "Flattened Path Handling (default behavior)" do
         create_markdown_file("index.md", "# Home Page")
         
         config = Mint::Config.with_defaults(destination_directory: Pathname.new("output"))
-        Mint.publish!("index.md", config: config)
+        workspace = Mint::Workspace.new(["index.md"], config)
+        workspace.publish!
         
         expect(File.exist?("output/index.html")).to be true
       end

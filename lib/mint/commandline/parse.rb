@@ -1,38 +1,11 @@
 require "pathname"
 require "optparse"
-require "fileutils"
-require "shellwords"
 require "active_support/core_ext/object/blank"
 
-require_relative "./config"
-require_relative "./navigation_processor"
+require_relative "../config"
 
 module Mint
   module Commandline
-    def self.run!(argv)
-      command, config, files, help = Mint::Commandline.parse! argv
-
-      if config.help || command.nil?
-        puts help
-        exit 0
-      elsif command.to_sym == :publish
-        begin
-          Mint::Commandline.publish!(files, config: config)
-        rescue ArgumentError => e
-          $stderr.puts "Error: #{e.message}"
-          exit 1
-        end
-      else
-        possible_binary = "mint-#{command}"
-        if File.executable? possible_binary
-          system "#{possible_binary} #{argv[1..-1].join ' '}"
-        else
-          $stderr.puts "Error: Unknown command '#{command}'"
-          exit 1
-        end
-      end
-    end
-
     # Parses ARGV using OptionParser, mutating ARGV
     #
     # @param [Array] argv a list of arguments to parse
@@ -69,7 +42,7 @@ module Mint
           commandline_options[:working_directory] = Pathname.new w
         end
 
-        cli.on "-o", "--output-file FORMAT", "Specify the output file format with substitutions: \%{basename}, \%{original_extension}, \%{new_extension} (default: \%{basename}.\%{new_extension})" do |o|
+        cli.on "-o", "--output-file FORMAT", "Specify the output file format with substitutions: \%{name}, \%{original_ext}, \%{ext} (default: \%{name}.\%{ext})" do |o|
           commandline_options[:output_file_format] = o
         end
 
@@ -100,6 +73,14 @@ module Mint
 
         cli.on "--no-navigation", "Don't make navigation information available to layout" do
           commandline_options[:navigation] = false
+        end
+        
+        cli.on "--navigation-autodrop", "Automatically drop common directory levels from navigation until multiple top-level nodes exist (default: true)" do
+          commandline_options[:navigation_autodrop] = true
+        end
+
+        cli.on "--no-navigation-autodrop", "Don't automatically drop common directory levels from navigation" do
+          commandline_options[:navigation_autodrop] = false
         end
         
         cli.on "--navigation-drop LEVELS", Integer, "Drop the first N levels of the directory hierarchy from navigation (default: 0)" do |levels|
@@ -143,6 +124,10 @@ module Mint
         raise ArgumentError, "--style-mode inline and --style-destination cannot be used together"
       end
       
+      if commandline_options[:navigation_autodrop] && commandline_options[:navigation_drop] && commandline_options[:navigation_drop] > 0
+        raise ArgumentError, "--navigation-autodrop cannot be used with --navigation-drop"
+      end
+      
       # Process files differently based on whether we're reading from STDIN
       if commandline_options[:stdin_mode]
         files = commandline_options[:files]
@@ -154,46 +139,6 @@ module Mint
       config = Config.defaults.merge(Mint.configuration).merge(commandline_config)
 
       [command, config, files, parser.help]
-    end
-
-    # For each file specified, publishes a new file based on configuration.
-    #
-    # @param [Array] source_files files a group of filenames
-    # @param [Config, Hash] config a Config object or Hash with configuration options
-    def self.publish!(source_files, config: Config.new)
-      config = config.is_a?(Config) ? config : Config.new(config)
-      
-      if source_files.empty?
-        raise ArgumentError, "No files specified. Use file paths or '-' to read from STDIN."
-      end
-      
-      if config.stdin_mode
-        require 'tempfile'
-        
-        stdin_content = source_files.first
-        temp_file = Tempfile.new(['stdin', '.md'])
-        temp_file.write(stdin_content)
-        temp_file.close
-        
-        output_file = Mint.publish!(temp_file.path, config: config, variables: {}, render_style: true)
-        if config.verbose
-          puts "Published: STDIN -> #{output_file}"
-        end
-        
-        temp_file.unlink
-      else
-        navigation_data = NavigationProcessor.process_navigation_data(source_files, config)
-        source_files.each_with_index do |source_file, idx|
-          
-          current_file_navigation_data = NavigationProcessor.process_navigation_for_current_file(
-            source_file, navigation_data, config
-          )
-          output_file = Mint.publish!(source_file, config: config, variables: { files: current_file_navigation_data }, render_style: idx == 0)
-          if config.verbose
-            puts "Published: #{source_file} -> #{output_file}"
-          end
-        end
-      end
     end
   end
 end
