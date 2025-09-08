@@ -145,19 +145,14 @@ You can place config files at different scopes:
 
 ### Available config options
 
-Any command-line option can be specified in the config file using the same name. Use either hyphens or underscores:
+Any command-line option can be specified in the config file using the same name.
 
 ```toml
-# These are equivalent:
-preserve-structure = true
-preserve_structure = true
-
-# All available options:
 template = "nord"
 layout = "custom"
-style = "dark"  
-working-dir = "/path/to/docs"
-output-file = "%{basename}.%{new_extension}"
+style = "custom-dark"  
+working-dir = "./path/to/docs"
+output-file = "%{ext}.%{new_extension}"
 destination = "build"
 style-mode = "external"
 style-destination = "assets/css"
