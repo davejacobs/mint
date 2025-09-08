@@ -6,8 +6,8 @@ Create custom layouts and styles to control how your documents look when publish
 
 Templates consist of two parts:
 
-- **Layout**: The HTML structure (written in [ERB][] or [Haml][])  
-- **Style**: The CSS styling (written in CSS, [Sass][], or [SCSS][])
+- **Layout**: The HTML structure (interpolating context using [ERB][])
+- **Style**: The CSS styling
 
 Mint provides convenience methods and base stylesheets to ease template creation.
 
@@ -19,24 +19,27 @@ Templates are organized in directories under `templates/`:
 templates/
 ├── my-template/
 │   ├── layout.erb
-│   └── style.scss
+│   └── style.css
 └── another-template/
-    ├── layout.haml
+    ├── layout.html
     └── style.css
 ```
 
-Templates work best when their layout and style are designed together, but users can mix and match them.
+Templates work best when their layout and style are designed together,
+but users can mix and match them. Custom templates that have only a style
+file will use the `layout.html` from Mint's `default` template.
 
 ## Creating a layout
 
-Layouts define the HTML structure around your content. Use template files (not raw HTML) so you can insert dynamic content.
+Layouts define the HTML structure around your content. Use template files
+(not raw HTML) so you can insert dynamic content.
 
 ### Essential methods
 
 - `content` – Inserts the converted Markdown content
 - `stylesheet_tag` – Includes the stylesheet (inline or linked)
 
-### ERB example
+### Layout example
 
 ```erb
 <!doctype html>
@@ -54,24 +57,7 @@ Layouts define the HTML structure around your content. Use template files (not r
 </html>
 ```
 
-### Haml example
-
-```haml
-!!!
-%html
-  %head
-    %meta(charset="utf-8")
-    %title= title
-    = stylesheet_tag
-  %body
-    %article= content
-```
-
-## Creating styles
-
-Stylesheets control the visual appearance of your documents. Mint compiles Sass/SCSS automatically.
-
-### CSS example
+### Style example
 
 ```css
 body {
@@ -88,35 +74,9 @@ h1, h2, h3 {
 }
 ```
 
-### SCSS example
-
-```scss
-$primary-font: Georgia, serif;
-$max-width: 800px;
-$text-color: #333;
-
-body {
-  font-family: $primary-font;
-  line-height: 1.6;
-  max-width: $max-width;
-  margin: 0 auto;
-  padding: 2rem;
-}
-
-h1, h2, h3 {
-  color: $text-color;
-  font-weight: normal;
-}
-```
-
 ## Built-in templates
 
-Mint includes several ready-to-use templates:
-
-- **default** - Clean, minimal styling
-- **nord** - Light theme inspired by Nord color palette
-- **nord-dark** - Dark theme inspired by Nord color palette
-- **garden** - For digital gardens with navigation
+Mint includes several [ready-to-use templates][built-in templates], which can be consulted as a reference.
 
 ## Template variables
 
@@ -124,39 +84,37 @@ Available in layout templates:
 
 - `content` – The converted document content
 - `title` – Document title (from first heading or filename)
-- `stylesheet_tag` – Proper stylesheet inclusion
+- `stylesheet_tag` – A fully formed HTML tag representing either inline
+  styles or a link to an external stylesheet, according to the user's
+  preference (`--style-mode` option)
 
 ## Testing templates
 
 Test your templates during development:
 
 ```bash
-# Test with a sample document
-mint publish sample.md --template my-template --destination test/
-
-# Use simulation mode to preview without creating files
-mint publish sample.md --template my-template --simulation
+mint publish Sample.md --template my-template --destination test --style-mode original
 ```
+
+`--style-mode original` lets you easily update your CSS, even if it links
+to other CSS, and refresh your `Sample.html` without a fresh `publish` command.
 
 ## Best practices
 
-- Keep layouts semantic and accessible
-- Use relative units (em, rem) for better scalability  
-- Test with various document lengths and structures
-- Consider print styles for PDF output
-- Follow a consistent naming convention
-- Include fallback fonts in your CSS
+- Review built-in templates to understand the provided CSS variables,
+  which can significantly reduce the work you need to do
+- Test with various document lengths and structures; several auto-generated
+  examples are provided in this repository
+- Don't forget about print styles!
 
 ## Template locations
 
 Mint searches for templates in this order:
 
-1. Current working directory
+1. `./mint/templates`
 2. `${HOME}/.mint/templates/`
-3. System templates directory
-4. Built-in Mint templates
+4. Built-in Mint templates (location is packaging dependent, but should be
+   available from Gem installation path)
 
+[built-in templates]: https://github.com/davejacobs/mint/tree/master/config/templates
 [ERB]: https://ruby-doc.org/stdlib-3.1.1/libdoc/erb/rdoc/ERB.html
-[Haml]: https://haml.info
-[Sass]: https://sass-lang.com/
-[SCSS]: https://sass-lang.com/
