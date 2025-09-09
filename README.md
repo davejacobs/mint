@@ -8,7 +8,7 @@ Transform your plain text documents into beautiful HTML documents with customiza
 
 - **Focus on writing** – Keep documents as plain text
 - **Beautiful output** – Professional-looking HTML ready for print or web
-- **Digital gardnes** – Easily publish linked sets of HTML documents from tools like Obsidian
+- **Digital gardens** – Easily publish linked sets of HTML documents from tools like Obsidian
 - **Version control-friendly** – Text documents work great with Git
 - **Scriptable** – Automate document processing and analysis
 - **Highly customizable** – Create your own templates and styles
