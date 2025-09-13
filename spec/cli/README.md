@@ -64,7 +64,7 @@ stdout, stderr = capture_output do
 end
 
 # File creation
-create_markdown_file("test.md", "# Content")
+create_markdown_path("test.md", "# Content")
 create_template_directory("custom", with_layout: true)
 
 # Command execution

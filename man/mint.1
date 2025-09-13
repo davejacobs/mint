@@ -40,13 +40,13 @@ Specify a specific style template by name
 Specify a working directory outside the current directory
 .TP
 .BR \-o ", " \-\-output\-file " " \fIFORMAT\fR
-Specify output filename format with substitutions (%{basename}, %{original_extension}, %{new_extension})
+Specify output filename format with substitutions (%{basename}, %{original_ext}, %{new_extension})
 .TP
 .BR \-\-preserve\-structure
-Preserve source directory structure (e.g., nesting) in destination
+Preserve source directory structure (e.g., nesting) in destination (default: true)
 .TP
 .BR \-\-no\-preserve\-structure
-Don't preserve source directory structure in destination
+Flatten all files into destination directory
 .TP
 .BR \-\-navigation
 Enable navigation panel showing all files
@@ -57,17 +57,20 @@ Disable navigation panel
 .BR \-\-navigation\-title " " \fITITLE\fR
 Set title for navigation panel
 .TP
-.BR \-\-navigation\-drop " " \fILEVELS\fR
-Drop first N directory levels from navigation (default: 0)
+.BR \-\-autodrop
+Automatically drop common directory levels from output paths and navigation (default: true)
+.TP
+.BR \-\-no\-autodrop
+Don't automatically drop common directory levels
 .TP
 .BR \-\-navigation\-depth " " \fIDEPTH\fR
 Maximum depth to show in navigation (default: 3)
 .TP
-.BR \-\-file\-title
-Extract title from filename (removes .md extension) and inject into template
+.BR \-\-insert\-title\-heading
+Insert document title as H1 heading into content
 .TP
-.BR \-\-no\-file\-title
-Don't extract title from filename
+.BR \-\-no\-insert\-title\-heading
+Don't insert title as H1 heading
 .SH STYLE OPTIONS
 Mint offers flexible control over how stylesheets are incorporated into your documents:
 
@@ -75,7 +78,7 @@ Mint offers flexible control over how stylesheets are incorporated into your doc
 By default, Mint inlines CSS directly into your HTML documents, creating self-contained files:
 .RS
 .nf
-mint publish document.md
+mint publish Document.md
 .fi
 .RE
 
@@ -83,12 +86,21 @@ mint publish document.md
 Create external stylesheets that are linked from your HTML documents:
 .RS
 .nf
-mint publish document.md --style-destination css
-mint publish document.md --style-destination styles/main.css
+mint publish Document.md --style-destination css
+mint publish Document.md --style-destination styles/main.css
 .fi
 .RE
 
 External stylesheets are useful when you want to share stylesheets across multiple documents, keep HTML files smaller, or allow separate caching of styles.
+
+.SH DIRECTORY STRUCTURE
+Mint provides flexible control over how source directory structure is handled in the output:
+
+By default, Mint preserves the source directory structure but applies "autodrop" to remove common directory levels. For example, if all files are under docs/content/, that common prefix is automatically dropped.
+
+Use --no-preserve-structure to flatten all files into the destination directory, ignoring source directory structure entirely.
+
+Use --no-autodrop with --preserve-structure to keep the complete original directory structure without dropping any levels.
 .SH CONFIGURATION
 Mint can be configured using TOML configuration files in the following order of precedence:
 .IP 1. 2
@@ -104,39 +116,39 @@ Boolean options set to true in configuration files can be overridden using --no-
 .RS
 .nf
 # If config.toml has: navigation = true
-mint publish docs.md --no-navigation
+mint publish Document.md --no-navigation
 .fi
 .RE
 .SH EXAMPLES
 .TP
 Transform a single Markdown file:
 .nf
-mint publish document.md
+mint publish Document.md
 .fi
 .TP
 Transform multiple files:
 .nf
-mint publish doc1.md doc2.md doc3.md
+mint publish Document1.md Document2.md Document3.md
 .fi
 .TP
-Extract titles from filenames:
+Insert title as H1 heading:
 .nf
-mint publish my-document.md --file-title
+mint publish Document.md --insert-title-heading
 .fi
 .TP
 Use a specific template:
 .nf
-mint publish resume.md --template resume
+mint publish Document.md --template nord
 .fi
 .TP
 Create external stylesheet:
 .nf
-mint publish document.md --style-destination css
+mint publish Document.md --style-destination css
 .fi
 .TP
-Override config file settings:
+Override boolean config file settings with --no-* variants:
 .nf
-mint publish docs.md --no-navigation --no-file-title
+mint publish Document.md --no-navigation --no-insert-title-heading
 .fi
 .SH TEMPLATES
 Mint comes with several built-in templates:
@@ -150,7 +162,7 @@ Mint comes with several built-in templates:
 .B nord/nord-dark
 \- Modern color schemes using the Nord color scheme
 .PP
-Templates use ERB for layouts and support CSS, SCSS, or SASS for styling.
+Templates use ERB-flavored HTML for layouts and CSS for styling.
 .SH FILES
 .TP
 .I ~/.config/mint/

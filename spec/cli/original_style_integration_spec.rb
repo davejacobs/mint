@@ -12,7 +12,7 @@ describe "Original style mode integration" do
 
     describe "with --style-mode original" do
       it "works with built-in templates in original mode" do
-        create_markdown_file("test.md", "# Test Document\n\nThis is a test.")
+        create_markdown_path("test.md", "# Test Document\n\nThis is a test.")
 
         # Create output directory structure
         Dir.chdir(@test_dir) do
@@ -23,7 +23,7 @@ describe "Original style mode integration" do
           )
 
           expect {
-            Mint::Commandline.publish!(["test.md"], config: config)
+            Mint::Commandline.publish!([Pathname.new("test.md")], config: config)
           }.not_to raise_error
 
           expect(File.exist?("test.html")).to be true
@@ -35,7 +35,7 @@ describe "Original style mode integration" do
       end
 
       it "correctly outputs original style mode with different templates" do
-        create_markdown_file("test.md", "# Nord Test\n\nTesting with Nord theme.")
+        create_markdown_path("test.md", "# Nord Test\n\nTesting with Nord theme.")
         create_template_directory("nord")
 
         Dir.chdir(@test_dir) do
@@ -47,7 +47,7 @@ describe "Original style mode integration" do
 
           # Should work with any template that exists, or fall back gracefully
           expect {
-            Mint::Commandline.publish!(["test.md"], config: config)
+            Mint::Commandline.publish!([Pathname.new("test.md")], config: config)
           }.not_to raise_error
 
           expect(File.exist?("test.html")).to be true

@@ -21,7 +21,7 @@ RSpec.describe "Full CLI Workflow Integration" do
           TOML
 
           # 2. Create content files
-          create_markdown_file("index.md", <<~MARKDOWN)
+          create_markdown_path("index.md", <<~MARKDOWN)
             # Welcome to My Site
             
             This is my new project built with Mint.
@@ -32,14 +32,14 @@ RSpec.describe "Full CLI Workflow Integration" do
             - Customizable templates
           MARKDOWN
 
-          create_markdown_file("about.md", "# About\n\nThis is the about page.")
+          create_markdown_path("about.md", "# About\n\nThis is the about page.")
 
           # 3. Create output directory and publish
           FileUtils.mkdir_p("output")
           config = Mint::Config.with_defaults(destination_directory: Pathname.new("output"))
           
           expect {
-            Mint::Commandline.publish!(["index.md", "about.md"], config: config)
+            Mint::Commandline.publish!([Pathname.new("index.md"), Pathname.new("about.md")], config: config)
           }.not_to raise_error
 
           # 4. Verify output
@@ -66,25 +66,25 @@ RSpec.describe "Full CLI Workflow Integration" do
           # Create documentation structure
           FileUtils.mkdir_p(["source/guides", "source/api", "docs"])
           
-          create_markdown_file("source/index.md", "# Documentation\n\nWelcome to our docs!")
-          create_markdown_file("source/guides/getting-started.md", "# Getting Started\n\nInstallation guide.")
-          create_markdown_file("source/guides/advanced.md", "# Advanced Usage\n\nAdvanced features.")
-          create_markdown_file("source/api/reference.md", "# API Reference\n\nComplete API docs.")
+          create_markdown_path("source/index.md", "# Documentation\n\nWelcome to our docs!")
+          create_markdown_path("source/guides/getting-started.md", "# Getting Started\n\nInstallation guide.")
+          create_markdown_path("source/guides/advanced.md", "# Advanced Usage\n\nAdvanced features.")
+          create_markdown_path("source/api/reference.md", "# API Reference\n\nComplete API docs.")
 
           # Publish all documentation
-          md_files = Dir.glob("source/**/*.md")
+          md_files = Dir.glob("source/**/*.md").map {|f| Pathname.new(f) }
           expect {
             Mint::Commandline.publish!(md_files, config: config)
           }.not_to raise_error
 
-          # Verify structure is maintained
-          expect(File.exist?("docs/source/index.html")).to be true
-          expect(File.exist?("docs/source/guides/getting-started.html")).to be true
-          expect(File.exist?("docs/source/guides/advanced.html")).to be true
-          expect(File.exist?("docs/source/api/reference.html")).to be true
+          # Verify structure is maintained (with autodrop applied)
+          expect(File.exist?("docs/index.html")).to be true
+          expect(File.exist?("docs/guides/getting-started.html")).to be true
+          expect(File.exist?("docs/guides/advanced.html")).to be true
+          expect(File.exist?("docs/api/reference.html")).to be true
 
           # Verify content
-          index_content = File.read("docs/source/index.html")
+          index_content = File.read("docs/index.html")
           expect(index_content).to include("Welcome to our docs!")
         end
       end
@@ -101,12 +101,12 @@ RSpec.describe "Full CLI Workflow Integration" do
           # Create blog structure
           FileUtils.mkdir_p(["posts", "blog"])
           
-          create_markdown_file("index.md", "# My Blog\n\nWelcome to my thoughts!")
-          create_markdown_file("posts/2023-01-01-hello-world.md", "# Hello World\n\nMy first post.")
-          create_markdown_file("posts/2023-02-15-update.md", "# February Update\n\nWhat I've been up to.")
+          create_markdown_path("index.md", "# My Blog\n\nWelcome to my thoughts!")
+          create_markdown_path("posts/2023-01-01-hello-world.md", "# Hello World\n\nMy first post.")
+          create_markdown_path("posts/2023-02-15-update.md", "# February Update\n\nWhat I've been up to.")
 
           # Publish blog
-          blog_files = ["index.md"] + Dir.glob("posts/*.md")
+          blog_files = [Pathname.new("index.md")] + Dir.glob("posts/*.md").map {|f| Pathname.new(f) }
           expect {
             Mint::Commandline.publish!(blog_files, config: config)
           }.not_to raise_error
@@ -120,16 +120,16 @@ RSpec.describe "Full CLI Workflow Integration" do
 
       describe "error recovery workflows" do
         it "can recover from and fix common mistakes" do
-          create_markdown_file("test.md", "# Test")
+          create_markdown_path("test.md", "# Test")
 
           # Test error when nonexistent style is specified
           expect {
-            Mint::Commandline.publish!(["test.md"], config: Mint::Config.with_defaults(style_name: "nonexistent"))
+            Mint::Commandline.publish!([Pathname.new("test.md")], config: Mint::Config.with_defaults(style_name: "nonexistent"))
           }.to raise_error(Mint::StyleNotFoundException)
 
           # Recovery: Use existing layout
           expect {
-            Mint::Commandline.publish!(["test.md"], config: Mint::Config.with_defaults(layout_name: "default"))
+            Mint::Commandline.publish!([Pathname.new("test.md")], config: Mint::Config.with_defaults(layout_name: "default"))
           }.not_to raise_error
 
           expect(File.exist?("test.html")).to be true
@@ -140,11 +140,11 @@ RSpec.describe "Full CLI Workflow Integration" do
           FileUtils.mkdir_p(".mint")
           File.write(".mint/config.toml", "invalid = toml content [")
 
-          create_markdown_file("test.md", "# Test")
+          create_markdown_path("test.md", "# Test")
 
           # Should still work with explicit config
           expect {
-            Mint::Commandline.publish!(["test.md"], config: Mint::Config.defaults)
+            Mint::Commandline.publish!([Pathname.new("test.md")], config: Mint::Config.defaults)
           }.not_to raise_error
 
           expect(File.exist?("test.html")).to be true
@@ -157,8 +157,8 @@ RSpec.describe "Full CLI Workflow Integration" do
           files = []
           (1..50).each do |i|
             filename = "doc#{i}.md"
-            create_markdown_file(filename, "# Document #{i}\n\nContent for document #{i}.")
-            files << filename
+            create_markdown_path(filename, "# Document #{i}\n\nContent for document #{i}.")
+            files << Pathname.new(filename)
           end
 
           config = Mint::Config.defaults

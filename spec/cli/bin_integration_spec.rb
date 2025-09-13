@@ -40,7 +40,7 @@ RSpec.describe "Bin Script Integration" do
       describe "publish command" do
         it "publishes markdown files via CLI" do
           create_template_directory("default")
-          create_markdown_file("test.md", "# Hello CLI\n\nThis works!")
+          create_markdown_path("test.md", "# Hello CLI\n\nThis works!")
           
           result = run_command({}, "ruby", "bin/mint", "publish", "test.md")
           
@@ -54,8 +54,8 @@ RSpec.describe "Bin Script Integration" do
 
         it "handles multiple files" do
           create_template_directory("default")
-          create_markdown_file("doc1.md", "# Document 1")
-          create_markdown_file("doc2.md", "# Document 2")
+          create_markdown_path("doc1.md", "# Document 1")
+          create_markdown_path("doc2.md", "# Document 2")
           
           result = run_command({}, "ruby", "bin/mint", "publish", "doc1.md", "doc2.md")
           
@@ -67,7 +67,7 @@ RSpec.describe "Bin Script Integration" do
         it "respects template options" do
           create_template_directory("default")
           create_template_directory("custom")
-          create_markdown_file("styled.md", "# Custom Style")
+          create_markdown_path("styled.md", "# Custom Style")
           
           result = run_command({}, "ruby", "bin/mint", "publish", "--template", "custom", "styled.md")
           
@@ -101,7 +101,7 @@ RSpec.describe "Bin Script Integration" do
       describe "output formatting and verbosity" do
         it "produces clean output for normal operations" do
           create_template_directory("default")
-          create_markdown_file("test.md", "# Test")
+          create_markdown_path("test.md", "# Test")
           
           result = run_command({}, "ruby", "bin/mint", "publish", "test.md")
           
@@ -114,7 +114,7 @@ RSpec.describe "Bin Script Integration" do
       describe "integration with system tools" do
         it "exits with appropriate status codes" do
           create_template_directory("default")
-          create_markdown_file("success.md", "# Success")
+          create_markdown_path("success.md", "# Success")
           
           success_result = run_command({}, "ruby", "bin/mint", "publish", "success.md")
           expect(success_result.exit_code).to eq(0)

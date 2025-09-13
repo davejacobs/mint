@@ -52,7 +52,7 @@ module CLIHelpers
   end
 
   # Create a sample markdown file with content
-  def create_markdown_file(name = "test.md", content = "# Test\n\nHello world!")
+  def create_markdown_path(name = "test.md", content = "# Test\n\nHello world!")
     File.write(name, content)
     name
   end

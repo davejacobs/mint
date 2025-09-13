@@ -1,38 +1,11 @@
 require "pathname"
 require "optparse"
-require "fileutils"
-require "shellwords"
 require "active_support/core_ext/object/blank"
 
-require_relative "./config"
-require_relative "./navigation_processor"
+require_relative "../config"
 
 module Mint
   module Commandline
-    def self.run!(argv)
-      command, config, files, help = Mint::Commandline.parse! argv
-
-      if config.help || command.nil?
-        puts help
-        exit 0
-      elsif command.to_sym == :publish
-        begin
-          Mint::Commandline.publish!(files, config: config)
-        rescue ArgumentError => e
-          $stderr.puts "Error: #{e.message}"
-          exit 1
-        end
-      else
-        possible_binary = "mint-#{command}"
-        if File.executable? possible_binary
-          system "#{possible_binary} #{argv[1..-1].join ' '}"
-        else
-          $stderr.puts "Error: Unknown command '#{command}'"
-          exit 1
-        end
-      end
-    end
-
     # Parses ARGV using OptionParser, mutating ARGV
     #
     # @param [Array] argv a list of arguments to parse
@@ -69,7 +42,7 @@ module Mint
           commandline_options[:working_directory] = Pathname.new w
         end
 
-        cli.on "-o", "--output-file FORMAT", "Specify the output file format with substitutions: \%{basename}, \%{original_extension}, \%{new_extension} (default: \%{basename}.\%{new_extension})" do |o|
+        cli.on "-o", "--output-file FORMAT", "Specify the output file format with substitutions: \%{name}, \%{original_ext}, \%{ext} (default: \%{name}.\%{ext})" do |o|
           commandline_options[:output_file_format] = o
         end
 
@@ -81,12 +54,12 @@ module Mint
           commandline_options[:style_mode] = mode.to_sym
         end
 
-        cli.on "--style-destination DESTINATION", "Create stylesheet in specified directory and link it" do |destination|
+        cli.on "--style-destination DESTINATION", "Create stylesheet in specified directory (relative to --destination) and link it" do |destination|
           commandline_options[:style_mode] = :external
           commandline_options[:style_destination_directory] = destination
         end
 
-        cli.on "--preserve-structure", "Preserve source directory structure in destination (default: false)" do
+        cli.on "--preserve-structure", "Preserve source directory structure in destination (default: true)" do
           commandline_options[:preserve_structure] = true
         end
 
@@ -102,11 +75,15 @@ module Mint
           commandline_options[:navigation] = false
         end
         
-        cli.on "--navigation-drop LEVELS", Integer, "Drop the first N levels of the directory hierarchy from navigation (default: 0)" do |levels|
-          commandline_options[:navigation_drop] = levels
+        cli.on "--autodrop", "Automatically drop common directory levels from output file paths (default: true)" do
+          commandline_options[:autodrop] = true
+        end
+
+        cli.on "--no-autodrop", "Don't automatically drop common directory levels from output file paths" do
+          commandline_options[:autodrop] = false
         end
         
-        cli.on "--navigation-depth DEPTH", Integer, "Maximum depth to show in navigation after dropping levels (default: 3)" do |depth|
+        cli.on "--navigation-depth DEPTH", Integer, "Maximum depth to show in navigation (default: 3)" do |depth|
           commandline_options[:navigation_depth] = depth
         end
         
@@ -114,12 +91,12 @@ module Mint
           commandline_options[:navigation_title] = title
         end
         
-        cli.on "--file-title", "Extract title from filename (removes .md extension) and inject into template" do
-          commandline_options[:file_title] = true
+        cli.on "--insert-title-heading", "Insert the document's title as an H1 heading into the document content" do
+          commandline_options[:insert_title_heading] = true
         end
 
-        cli.on "--no-file-title", "Don't extract title from filename" do
-          commandline_options[:file_title] = false
+        cli.on "--no-insert-title-heading", "Don't insert title as H1 heading" do
+          commandline_options[:insert_title_heading] = false
         end
       end
 
@@ -132,8 +109,15 @@ module Mint
           exit 1
         end
         
-        commandline_options[:files] = [$stdin.read]
+        commandline_options[:files] = []
         commandline_options[:stdin_mode] = true
+        commandline_options[:stdin_content] = $stdin.read
+
+        # Because STDIN will be written to a temporary file, we don't want to preserve structure or autodrop;
+        # that filesystem should not be visible to the user.
+        commandline_options[:preserve_structure] = false
+        commandline_options[:autodrop] = true
+
       else
         commandline_options[:files] = argv
         commandline_options[:stdin_mode] = false
@@ -143,57 +127,18 @@ module Mint
         raise ArgumentError, "--style-mode inline and --style-destination cannot be used together"
       end
       
+      
       # Process files differently based on whether we're reading from STDIN
       if commandline_options[:stdin_mode]
         files = commandline_options[:files]
       else
-        files = commandline_options[:files].map {|f| Pathname.new(f).expand_path }
+        files = commandline_options[:files].map {|f| Pathname.new(f) }
       end
       
       commandline_config = Config.new(commandline_options)
       config = Config.defaults.merge(Mint.configuration).merge(commandline_config)
 
       [command, config, files, parser.help]
-    end
-
-    # For each file specified, publishes a new file based on configuration.
-    #
-    # @param [Array] source_files files a group of filenames
-    # @param [Config, Hash] config a Config object or Hash with configuration options
-    def self.publish!(source_files, config: Config.new)
-      config = config.is_a?(Config) ? config : Config.new(config)
-      
-      if source_files.empty?
-        raise ArgumentError, "No files specified. Use file paths or '-' to read from STDIN."
-      end
-      
-      if config.stdin_mode
-        require 'tempfile'
-        
-        stdin_content = source_files.first
-        temp_file = Tempfile.new(['stdin', '.md'])
-        temp_file.write(stdin_content)
-        temp_file.close
-        
-        output_file = Mint.publish!(temp_file.path, config: config, variables: {}, render_style: true)
-        if config.verbose
-          puts "Published: STDIN -> #{output_file}"
-        end
-        
-        temp_file.unlink
-      else
-        navigation_data = NavigationProcessor.process_navigation_data(source_files, config)
-        source_files.each_with_index do |source_file, idx|
-          
-          current_file_navigation_data = NavigationProcessor.process_navigation_for_current_file(
-            source_file, navigation_data, config
-          )
-          output_file = Mint.publish!(source_file, config: config, variables: { files: current_file_navigation_data }, render_style: idx == 0)
-          if config.verbose
-            puts "Published: #{source_file} -> #{output_file}"
-          end
-        end
-      end
     end
   end
 end

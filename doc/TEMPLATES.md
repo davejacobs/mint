@@ -6,7 +6,7 @@ Create custom layouts and styles to control how your documents look when publish
 
 Templates consist of two parts:
 
-- **Layout**: The HTML structure (interpolating context using [ERB][])
+- **Layout**: The HTML structure (interpolating context variables using [ERB][])
 - **Style**: The CSS styling
 
 Mint provides convenience methods and base stylesheets to ease template creation.
@@ -18,7 +18,7 @@ Templates are organized in directories under `templates/`:
 ```
 templates/
 ├── my-template/
-│   ├── layout.erb
+│   ├── layout.html
 │   └── style.css
 └── another-template/
     ├── layout.html

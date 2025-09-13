@@ -23,7 +23,7 @@ gem install mint
 
 - **Complete usage guide:** [TUTORIAL.md](doc/TUTORIAL.md)
 - **Man page:** `man mint`
-- **API documentation:** [RubyDoc](http://www.rubydoc.info/github/davejacobs/mint)
+- **API documentation:** [RubyDoc](http://www.rubydoc.info/gems/mint)
 
 ## Get started
 
@@ -42,10 +42,10 @@ same thing.
 ### Basic commands
 
 ```bash
-# Publish a single document
+# Publish a single document with a default template
 mint publish Document.md
 
-# Publish with a template
+# Publish with a non-default template
 mint publish Document.md --template nord
 
 # Publish to a specific directory
@@ -54,11 +54,15 @@ mint publish Document.md --destination public
 # Publish multiple files
 mint publish *.md --destination final-drafts
 
-# Read Markdown content piped from STDIN using `-`, limited to a single file
+# Read Markdown content piped from STDIN, limited to a single file; note the `-`
+# as a special filename
 echo "# Document" | mint publish - --output-file Document.html
 
-# Publish with navigation panel; use globs to recursively include nested files
-mint publish content/**/*.md --preserve-structure --navigation --navigation-title "Documentation" --destination public
+# Publish multiple files and generate a left-hand navigation panel; use globs
+# to recursively include nested files. By default, nested directories will
+# be preserved, but any common directories for all files (in this case, `content`),
+# will be automatically removed from the output ("autodropped").
+mint publish content/**/*.md --destination public --navigation --navigation-title "Documentation"
 
 # Guess document title (and h1 header) from filename
 mint publish Document.md --file-title
@@ -72,23 +76,15 @@ mint publish Document.md --file-title
 | `-l, --layout LAYOUT` | Specify only the template layout, by name |
 | `-s, --style STYLE` | Specify only the template style, by name |
 | `-m, --style-mode MODE` | How styles are included (inline, external, original) |
-| `-o, --output-file FORMAT` | Custom output filename, with substitutions available |
 | `-d, --destination DIR` | Output directory |
+| `-o, --output-file FORMAT` | Custom output filename, with substitutions available |
+| `--no-autodrop` | Do not automatically drop common parent directories from published files |
+| `--no-preserve-structure` | Flatten all published files into one directory rather than preserving structure |
 | `--file-title` | Extract title from filename and inject into template |
-| `--preserve-structure` | Preserve source directory structure (e.g., nesting) in destination |
 | `--navigation` | Enable navigation panel showing all files |
 | `--navigation-title TITLE` | Set title for navigation panel |
-| `-v, --verbose` | Show information about document processing |
-
-### Style modes
-
-Mint offers three ways to include styles in your HTML output:
-
-- `inline` (default) – CSS is embedded directly in the HTML document as `<style>` tags
-- `external` – CSS is compiled and saved as separate files, linked with `<link>` tags
-- `original` – Links directly to original CSS template files without processing (for live editing)
-
-The `original` mode is particularly useful for template development, as it allows you to edit CSS files and see changes immediately without republishing. Only `.css` files are supported in this mode, and `@import` statements in CSS files will be included as additional `<link>` tags.
+| `--navigation-depth N` | Maximum depth to show in navigation after dropping levels (default: 3) |
+| `-v, --verbose` | Show where documents were published |
 
 ### Built-in templates
 
@@ -134,8 +130,9 @@ style-mode = "external"
 # Navigation
 navigation = true
 navigation-title = "My Docs"
-navigation-depth = 3
-navigation-drop = 1
+navigation-autodrop = true          # Automatically drop common directory levels (default: true)
+navigation-depth = 3               # Maximum depth after dropping levels (default: 3)
+navigation-drop = 1                # Alternative to autodrop - manually specify levels to drop
 
 # Other options
 file-title = true
@@ -159,6 +156,16 @@ Available `--no-` flags:
 - `--no-preserve-structure` - Don't preserve directory structure 
 - `--no-navigation` - Disable navigation panel
 - `--no-file-title` - Don't extract titles from filenames
+
+### Style modes
+
+Mint offers three ways to include styles in your HTML output:
+
+- `inline` (default) – CSS is embedded directly in the HTML document as `<style>` tags
+- `external` – CSS is compiled and saved as separate files, linked with `<link>` tags
+- `original` – Links directly to original CSS template files without processing (for live editing)
+
+The `original` mode is particularly useful for template development, as it allows you to edit CSS files and see changes immediately without republishing. Only `.css` files are supported in this mode, and `@import` statements in CSS files will be included as additional `<link>` tags.
 
 ## Contributing
 

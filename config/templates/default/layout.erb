@@ -3,26 +3,26 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title><%= title || (metadata.is_a?(Hash) && metadata['title']) || File.basename(source_file) %></title>
+    <title><%= title %></title>
     <%= stylesheet_tag %>
   </head>
   <body>
-    <% if config.navigation && files && files.any? %>
+    <% if show_navigation && files&.any? %>
       <nav id="navigation">
-        <% if config.navigation_title %>
-          <h3><%= config.navigation_title %></h3>
+        <% if navigation_title %>
+          <h3><%= navigation_title %></h3>
         <% end %>
         <ul>
-          <% files.each do |file| %>
-            <% if file[:is_directory] %>
-              <li class="depth-<%= file[:depth] || 0 %> directory">
-                <span class="directory-name"><%= file[:title] %></span>
+          <% files.each do |item| %>
+            <% if item[:is_directory] %>
+              <li class="depth-<%= item[:depth] || 0 %> directory">
+                <span class="directory-name"><%= item[:title] %></span>
               </li>
             <% else %>
-              <li class="depth-<%= file[:depth] || 0 %>">
-                <a href="<%= file[:html_path] %>" 
-                   class="<%= file[:source_path] == source_file ? 'current' : '' %>">
-                  <%= file[:title] %>
+              <li class="depth-<%= item[:depth] || 0 %>">
+                <a href="<%= item[:html_path] %>" 
+                   class="<%= item[:source_path] == current_path ? 'current' : '' %>">
+                  <%= item[:title] %>
                 </a>
               </li>
             <% end %>
@@ -31,7 +31,7 @@
       </nav>
     <% end %>
     <main id="container">
-      <% if title %>
+      <% if insert_title_heading && title %>
         <h1><%= title %></h1>
       <% end %>
       <%= content %>

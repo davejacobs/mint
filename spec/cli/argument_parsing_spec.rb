@@ -79,15 +79,15 @@ RSpec.describe "CLI Argument Parsing" do
 
     context "with output options" do
       it "parses --output-file option" do
-        command, config, files, help = Mint::Commandline.parse!(["publish", "--output-file", "%{basename}_custom.%{new_extension}", "file.md"])
+        command, config, files, help = Mint::Commandline.parse!(["publish", "--output-file", "%{name}_custom.%{ext}", "file.md"])
         
-        expect(config.output_file_format).to eq("%{basename}_custom.%{new_extension}")
+        expect(config.output_file_format).to eq("%{name}_custom.%{ext}")
       end
 
       it "has default output file format" do
         command, config, files, help = Mint::Commandline.parse!(["publish", "file.md"])
         
-        expect(config.output_file_format).to eq("%{basename}.%{new_extension}")
+        expect(config.output_file_format).to eq("%{name}.%{ext}")
       end
     end
 
@@ -136,10 +136,16 @@ RSpec.describe "CLI Argument Parsing" do
         expect(config.navigation).to be true
       end
 
-      it "parses --file-title flag" do
-        command, config, files, help = Mint::Commandline.parse!(["publish", "--file-title", "file.md"])
+      it "parses --insert-title-heading flag" do
+        command, config, files, help = Mint::Commandline.parse!(["publish", "--insert-title-heading", "file.md"])
         
-        expect(config.file_title).to be true
+        expect(config.insert_title_heading).to be true
+      end
+
+      it "parses --autodrop flag" do
+        command, config, files, help = Mint::Commandline.parse!(["publish", "--autodrop", "file.md"])
+        
+        expect(config.autodrop).to be true
       end
     end
 
@@ -156,11 +162,18 @@ RSpec.describe "CLI Argument Parsing" do
         expect(config.navigation).to be false
       end
 
-      it "parses --no-file-title flag" do
-        command, config, files, help = Mint::Commandline.parse!(["publish", "--no-file-title", "file.md"])
+      it "parses --no-insert-title-heading flag" do
+        command, config, files, help = Mint::Commandline.parse!(["publish", "--no-insert-title-heading", "file.md"])
         
-        expect(config.file_title).to be false
+        expect(config.insert_title_heading).to be false
+      end
+
+      it "parses --no-autodrop flag" do
+        command, config, files, help = Mint::Commandline.parse!(["publish", "--no-autodrop", "file.md"])
+        
+        expect(config.autodrop).to be false
       end
     end
+    
   end
 end

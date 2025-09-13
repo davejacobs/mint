@@ -1,12 +1,13 @@
 # Mint tutorial
 
-Mint is a publishing tool that converts plain text Markdown documents into beautifully formatted HTML and PDF files.
+Mint is a publishing tool that converts plain text Markdown documents into beautifully formatted HTML files.
 
 Mint lets you:
 
-- Convert Markdown documents to styled HTML (PDFs and ePubs are planned)
-- Publish entire digital gardens (collections of linked Markdown files)
+- Convert Markdown documents to styled HTML
+- Publish digital gardens—collections of cross-linked Markdown files
 - Apply consistent styling across all your documents
+- Generate navigation for multi-page sites
 - Work entirely offline
 
 ## Installation
@@ -21,13 +22,18 @@ Convert a Markdown file to HTML:
 
     mint publish Document.md
 
-This creates `Document.html` in the current directory.
+This creates `Document.html` in the current directory. It will be styled
+with the default template, and its style will be inlined into the document,
+making it portable as a standalone file.
 
 ### Using templates
 
-Apply a template for automatic styling:
+Instead of the default template, you can choose a different template for automatic styling:
 
     mint publish Document.md --template nord
+
+Mint has several built-in templates, and you can also create your own. (See
+[TEMPLATES](./TEMPLATES.md) for more).
 
 ### Output directory
 
@@ -41,37 +47,38 @@ Use different layouts and stylesheets:
 
     mint publish Document.md --layout default --style nord
 
-### Extract titles from filenames
+### Insert title heading
 
-Use the filename as the document title:
+Insert the document's title as an H1 heading into the content:
 
-    mint publish my-article.md --file-title
+    mint publish Document.md --insert-title-heading
 
-This removes the `.md` extension from the filename and uses it as both the HTML title and an H1 heading.
+This extracts the title from metadata or filename and injects it as an H1 heading at the top of the document content.
 
-### Preserve directory structure
+### Flatten directory structure
 
-Keep your source directory structure in the output:
+Directory structure is preserved by default (except for directories dropped by
+`--autodrop`). To flatten all files into the destination directory:
 
-    mint publish docs/**/*.md --destination public --preserve-structure
+    mint publish docs/**/*.md --destination public --no-preserve-structure
 
-For all available options, see `man mint`.
+Note that if there are multiple files with the same name, only one will be kept.
+(Don't depend on the ordering of which one will be kept in the case of a collision.)
 
 ## Digital gardens
 
-Convert multiple linked Markdown files into a connected website:
+Convert multiple cross-linked Markdown files into a connected "digital garden":
 
-    mint publish my-garden/**/*.md --destination public --template garden
+    mint publish Garden/**/*.md --destination public --navigation --navigation-title "My Garden"
 
-This creates an HTML site with:
-- All your Markdown files converted to HTML
+This publishes a set of documents with:
+
 - Links between files preserved  
-- Navigation sidebar showing all pages
+- A navigation sidebar correctly linking to all other pages
 - Consistent styling across the site
 
-You can also use the `--recursive` option to automatically include subdirectories:
-
-    mint publish my-garden . --recursive --destination public --template garden
+By default, the style will be inlined into each page, but you can also choose
+to create and link to one external stylesheet using `--style-mode external`.
 
 ## Configuration
 
@@ -80,7 +87,8 @@ Mint can be configured using TOML configuration files that specify defaults for 
 1. **Global**: Built-in defaults
 2. **User**: `~/.config/mint/config.toml`  
 3. **Local**: `.mint/config.toml` (current directory)
-4. **Command-line**: Explicit options (highest priority)
+
+Commandline flags supersede any options from these configuration files.
 
 ### Creating a config file
 
@@ -93,7 +101,7 @@ template = "nord"
 # Always publish to a build directory
 destination = "public"
 
-# Preserve source directory structure
+# Preserve source directory structure (default: true)
 preserve-structure = true
 
 # Enable navigation for documentation sites
@@ -101,16 +109,17 @@ navigation = true
 navigation-title = "My Documentation"
 navigation-depth = 2
 
-# Extract titles from filenames
-file-title = true
+# Insert title as H1 heading
+insert-title-heading = true
 ```
 
 Now when you run `mint publish docs/**/*.md`, it will automatically:
+
 - Use the Nord template
 - Output to the `public/` directory  
 - Preserve the directory structure from `docs/`
 - Generate navigation with your custom title
-- Extract page titles from filenames
+- Insert page titles as H1 headings
 
 You can still override any config setting from the command line:
 
@@ -119,29 +128,20 @@ You can still override any config setting from the command line:
 mint publish docs/**/*.md --destination staging
 
 # Override boolean settings from config using --no- flags
-mint publish docs/**/*.md --no-navigation --no-file-title
-
-# Mix positive and negative overrides
-mint publish docs/**/*.md --preserve-structure --no-navigation
+mint publish docs/**/*.md --no-navigation --no-insert-title-heading
 ```
 
 ### Overriding boolean config settings
 
-For boolean options set to `true` in your config file, you can disable them using `--no-` flags:
+For boolean options set to `true` in your config file, you can disable them using`--no-` flags:
 
+- `--no-autodrop` - Disable automatic directory level dropping
 - `--no-preserve-structure` - Don't preserve directory structure
 - `--no-navigation` - Disable navigation panel  
-- `--no-file-title` - Don't extract titles from filenames
+- `--no-insert-title-heading` - Don't insert title as H1 heading
 
-This is particularly useful when you have defaults in your config file but want to selectively disable features for specific builds.
-
-### Config file locations
-
-You can place config files at different scopes:
-
-- **`.mint/config.toml`** - Project-specific settings (highest priority)
-- **`~/.config/mint/config.toml`** - User-wide defaults  
-- Built-in defaults (lowest priority)
+This is particularly useful when you have defaults in your config file but want to selectively
+disable features for specific builds.
 
 ### Available config options
 
@@ -158,16 +158,7 @@ style-mode = "external"
 style-destination = "assets/css"
 preserve-structure = true
 navigation = true
-navigation-drop = 1
 navigation-depth = 3
 navigation-title = "Documentation"
-file-title = true
+insert-title-heading = true
 ```
-
-## Template paths
-
-Mint searches for templates in this order:
-
-1. Current working directory
-2. `${HOME}/.mint` 
-3. Mint gem directory (global, built-in templates)

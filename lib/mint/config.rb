@@ -2,60 +2,63 @@ require "toml"
 
 module Mint
   class Config
-    attr_accessor :help
     attr_accessor :files
+    attr_accessor :stdin_mode
+    attr_accessor :help
+    attr_accessor :verbose
     attr_accessor :layout_name
     attr_accessor :style_name
     attr_accessor :style_mode
     attr_accessor :output_file_format
-    attr_accessor :working_directory
+    attr_accessor :working_directory            # This can't be set by the user
     attr_accessor :destination_directory
     attr_accessor :style_destination_directory
     attr_accessor :preserve_structure
+    attr_accessor :insert_title_heading
+    attr_accessor :autodrop
     attr_accessor :navigation
-    attr_accessor :navigation_drop
     attr_accessor :navigation_depth
     attr_accessor :navigation_title
-    attr_accessor :file_title
-    attr_accessor :verbose
-    attr_accessor :stdin_mode
     
+    DEFAULT_STDIN_MODE                  = false
+    DEFAULT_VERBOSE                     = false
     DEFAULT_LAYOUT_NAME                 = "default"
     DEFAULT_STYLE_NAME                  = "default"
     DEFAULT_STYLE_MODE                  = :inline
-    DEFAULT_OUTPUT_FILE_FORMAT          = '%{basename}.%{new_extension}'
-    DEFAULT_WORKING_DIRECTORY           = lambda { Pathname.getwd }
-    DEFAULT_DESTINATION_DIRECTORY       = lambda { Pathname.getwd }
-    DEFAULT_PRESERVE_STRUCTURE          = false
+    DEFAULT_OUTPUT_FILE_FORMAT          = '%{name}.%{ext}'
+    DEFAULT_WORKING_DIRECTORY           = lambda { Pathname.getwd.expand_path }
+    DEFAULT_DESTINATION_DIRECTORY       = lambda { Pathname.getwd.expand_path }
+    DEFAULT_PRESERVE_STRUCTURE          = true
+    DEFAULT_INSERT_TITLE_HEADING        = false
+    DEFAULT_AUTODROP                    = true
     DEFAULT_NAVIGATION                  = false
-    DEFAULT_NAVIGATION_DROP             = 0
     DEFAULT_NAVIGATION_DEPTH            = 3
-    DEFAULT_FILE_TITLE                  = false
-    DEFAULT_VERBOSE                     = false
-    DEFAULT_STDIN_MODE                  = false
+    DEFAULT_NAVIGATION_TITLE            = nil
     
     def initialize(options = {})
+      @stdin_mode = options[:stdin_mode] if options.key?(:stdin_mode)
       @help = options[:help]
+      @verbose = options[:verbose] if options.key?(:verbose)
       @layout_name = options[:layout_name] || options[:template_name]
       @style_name = options[:style_name] || options[:template_name]
       @style_mode = options[:style_mode]
       @output_file_format = options[:output_file_format]
-      @working_directory = options[:working_directory]
+      @working_directory = options[:working_directory]&.expand_path
       @destination_directory = options[:destination_directory]
-      @style_destination_directory = options[:style_destination_directory] || @destination_directory
+      @style_destination_directory = options[:style_destination_directory]
       @preserve_structure = options[:preserve_structure] if options.key?(:preserve_structure)
+      @insert_title_heading = options[:insert_title_heading] if options.key?(:insert_title_heading)
+      @autodrop = options[:autodrop] if options.key?(:autodrop)
       @navigation = options[:navigation] if options.key?(:navigation)
-      @navigation_drop = options[:navigation_drop] if options.key?(:navigation_drop)
       @navigation_depth = options[:navigation_depth] if options.key?(:navigation_depth)
       @navigation_title = options[:navigation_title]
-      @file_title = options[:file_title] if options.key?(:file_title)
-      @verbose = options[:verbose] if options.key?(:verbose)
-      @stdin_mode = options[:stdin_mode] if options.key?(:stdin_mode)
     end
     
     def to_h
       {
+        stdin_mode: @stdin_mode,
         help: @help,
+        verbose: @verbose,
         layout_name: @layout_name,
         style_name: @style_name,
         style_mode: @style_mode,
@@ -64,23 +67,31 @@ module Mint
         destination_directory: @destination_directory,
         style_destination_directory: @style_destination_directory,
         preserve_structure: @preserve_structure,
+        insert_title_heading: @insert_title_heading,
+        autodrop: @autodrop,
         navigation: @navigation,
-        navigation_drop: @navigation_drop,
         navigation_depth: @navigation_depth,
-        navigation_title: @navigation_title,
-        file_title: @file_title,
-        verbose: @verbose,
-        stdin_mode: @stdin_mode
+        navigation_title: @navigation_title
       }
     end
     
     def merge(config = Config.new)
       Config.new(to_h.merge(config.to_h.reject {|_, v| v.nil? }))
     end
+
+    def self.ensure_config(config)
+      case config
+      when Config
+        config
+      when Hash
+        Config.new(config)
+      else
+        raise ArgumentError, "config must be a Config object or Hash"
+      end
+    end
     
     def self.load_file(file)
       toml_config = TOML.load_file(file)
-      # Map TOML keys (flag-style) to Config constructor keys
       mapped_config = map_toml_keys_to_config(toml_config) if toml_config.is_a?(Hash)
       Config.new(mapped_config || {})
     end
@@ -88,24 +99,24 @@ module Mint
     def self.defaults
       dest_dir = DEFAULT_DESTINATION_DIRECTORY.call
       Config.new({
+        stdin_mode: DEFAULT_STDIN_MODE,
+        verbose: DEFAULT_VERBOSE,
         layout_name: DEFAULT_LAYOUT_NAME,
         style_name: DEFAULT_STYLE_NAME,
         style_mode: DEFAULT_STYLE_MODE,
         output_file_format: DEFAULT_OUTPUT_FILE_FORMAT,
         working_directory: DEFAULT_WORKING_DIRECTORY.call,
         destination_directory: dest_dir,
-        style_destination_directory: dest_dir,
+        style_destination_directory: Pathname.new('.'),
         preserve_structure: DEFAULT_PRESERVE_STRUCTURE,
+        insert_title_heading: DEFAULT_INSERT_TITLE_HEADING,
+        autodrop: DEFAULT_AUTODROP,
         navigation: DEFAULT_NAVIGATION,
-        navigation_drop: DEFAULT_NAVIGATION_DROP,
         navigation_depth: DEFAULT_NAVIGATION_DEPTH,
-        file_title: DEFAULT_FILE_TITLE,
-        verbose: DEFAULT_VERBOSE,
-        stdin_mode: DEFAULT_STDIN_MODE
+        navigation_title: DEFAULT_NAVIGATION_TITLE
       })
     end
 
-    # Helper method for tests to create config with defaults and overrides
     def self.with_defaults(overrides = {})
       defaults.merge(new(overrides))
     end
@@ -114,30 +125,20 @@ module Mint
 
     def self.map_toml_keys_to_config(toml_config)
       mapping = {
+        'verbose' => :verbose,
         'template' => :template_name,
         'layout' => :layout_name,
         'style' => :style_name,
-        'working-dir' => :working_directory,
-        'working_dir' => :working_directory,
         'output-file' => :output_file_format,
-        'output_file' => :output_file_format,
         'destination' => :destination_directory,
         'style-mode' => :style_mode,
-        'style_mode' => :style_mode,
         'style-destination' => :style_destination_directory,
-        'style_destination' => :style_destination_directory,
         'preserve-structure' => :preserve_structure,
-        'preserve_structure' => :preserve_structure,
+        'insert-title-heading' => :insert_title_heading,
+        'autodrop' => :autodrop,
         'navigation' => :navigation,
-        'navigation-drop' => :navigation_drop,
-        'navigation_drop' => :navigation_drop,
         'navigation-depth' => :navigation_depth,
-        'navigation_depth' => :navigation_depth,
-        'navigation-title' => :navigation_title,
-        'navigation_title' => :navigation_title,
-        'file-title' => :file_title,
-        'file_title' => :file_title,
-        'verbose' => :verbose
+        'navigation-title' => :navigation_title
       }
 
       mapped = {}
@@ -146,7 +147,7 @@ module Mint
         
         # Handle special conversions
         case mapped_key
-        when :working_directory, :destination_directory
+        when :destination_directory
           mapped[mapped_key] = Pathname.new(value) if value
         when :style_mode
           mapped[mapped_key] = value.to_sym if value

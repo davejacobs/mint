@@ -4,7 +4,6 @@ require "set"
 module Mint
   # Parses CSS files to extract @import statements and calculate relative paths
   class CssParser
-    
     # Extracts @import statements from CSS content
     #
     # @param [String] css_content the CSS content to parse
@@ -16,7 +15,7 @@ module Mint
       # Remove /* ... */ style comments
       css_without_comments = css_content.gsub(/\/\*.*?\*\//m, '')
       
-      # Match @import statements with various formats:
+      # Matched formats include:
       # @import "file.css";
       # @import 'file.css';
       # @import url("file.css");
@@ -57,7 +56,7 @@ module Mint
         relative_path = css_file.relative_path_from(html_dir).to_s
         css_files << relative_path unless css_files.include?(relative_path)
         
-      rescue => e
+      rescue => _
         # If we can't read the CSS file, skip it
         # This allows the system to gracefully handle missing or unreadable files
       end
