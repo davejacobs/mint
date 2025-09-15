@@ -22,7 +22,7 @@
 /* Navigation header */
 #navigation h3 {
   margin: 0 0 var(--space-sm) 0;
-  padding: 0 var(--space-base);
+  padding: 0 var(--space-sm);
   font-size: var(--font-size-sm);
   font-weight: 600;
   color: var(--color-nav-text);
@@ -71,7 +71,7 @@
   padding: var(--space-xs) var(--space-xs);
   font-weight: 600;
   color: var(--color-nav-text-hover);
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-xxs);
 }
 
 /* Depth-based indentation */

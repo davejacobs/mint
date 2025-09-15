@@ -11,6 +11,7 @@
   
   /* Typographic Scale - Templates can override --scale-ratio */
   --scale-ratio: 1.25; /* Minor third by default */
+  --font-size-xxs: calc(var(--base-font-size) * 0.6);
   --font-size-xs: calc(var(--base-font-size) * 0.75);
   --font-size-sm: calc(var(--base-font-size) * 0.875);
   --font-size-base: var(--base-font-size);
