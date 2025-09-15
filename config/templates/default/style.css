@@ -8,9 +8,9 @@
 /* Default template theme variables */
 :root {
   /* Typography settings for this theme */
-  --base-font-size: 21px;
+  --base-font-size: 16px;
   --base-line-height: 1.4;
-  --scale-ratio: 1.25;
+  --scale-ratio: 1.2;
   
   /* Print settings */
   --print-font-size: 11pt;
@@ -54,7 +54,7 @@
   --color-table-hover: rgba(0, 0, 0, 0.04);
   
   /* Layout */
-  --container-max-width: 85ch;
+  --container-max-width: 80rem;
 }
 
 /* Typography */
@@ -107,18 +107,17 @@ p + p {
 /* Container layouts */
 #container {
   max-width: var(--container-max-width);
-  margin: var(--space-xl) auto;
-  padding: var(--container-padding);
+  padding: var(--space-base) var(--space-2xl);
   background-color: var(--color-background);
 }
 
 /* Container adjustments when navigation is present */
 body:has(#navigation) #container,
 body.has-navigation #container {
-  max-width: calc(var(--container-max-width) - var(--navigation-width));
+  /*max-width: calc(var(--container-max-width) - var(--navigation-width));*/
   margin-right: auto;
-  margin-top: var(--space-xl);
-  margin-bottom: var(--space-xl);
+  /*margin-top: var(--space-xl);*/
+  /*margin-bottom: var(--space-xl);*/
 }
 
 /* Enhanced blockquotes */

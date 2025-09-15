@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
-
 /* Base Navigation Layout - Structural styles only */
 /* Colors, fonts, and borders should be overridden in individual templates */
 
@@ -11,9 +9,9 @@
   width: var(--navigation-width);
   height: 100vh;
   overflow-y: auto;
-  padding: var(--space-xl) 0;
+  padding: var(--space-base) 0;
   z-index: var(--z-navigation);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-weight: 400;
   background-color: var(--color-nav-bg);
   border-right: 1px solid var(--color-nav-border);
@@ -21,8 +19,8 @@
 
 /* Navigation header */
 #navigation h3 {
-  margin: 0 0 var(--space-base) 0;
-  padding: 0 var(--space-md);
+  margin: 0 0 var(--space-sm) 0;
+  padding: 0 var(--space-base);
   font-size: var(--font-size-sm);
   font-weight: 600;
   color: var(--color-nav-text);
@@ -42,9 +40,9 @@
 /* Navigation links layout */
 #navigation a {
   display: block;
-  padding: var(--space-sm) var(--space-lg);
+  padding: var(--space-xs) var(--space-xs);
   text-decoration: none;
-  border-left: 3px solid transparent;
+  border-left: 2px solid transparent;
   border-bottom: none;
   transition: var(--transition-fast);
   font-weight: 400;
@@ -68,7 +66,7 @@
 /* Directory names (non-clickable) */
 #navigation .directory-name {
   display: block;
-  padding: var(--space-sm) var(--space-lg);
+  padding: var(--space-xs) var(--space-xs);
   font-weight: 600;
   color: var(--color-nav-text-hover);
   font-size: var(--font-size-xs);
@@ -77,22 +75,22 @@
 /* Depth-based indentation */
 #navigation .depth-0 a,
 #navigation .depth-0 .directory-name {
-  padding-left: var(--space-md);
+  padding-left: var(--space-sm);
 }
 
 #navigation .depth-1 a,
 #navigation .depth-1 .directory-name {
-  padding-left: calc(var(--space-md) + var(--space-md));
+  padding-left: calc(var(--space-sm) * 2);
 }
 
 #navigation .depth-2 a,
 #navigation .depth-2 .directory-name {
-  padding-left: calc(var(--space-md) + var(--space-md) * 2);
+  padding-left: calc(var(--space-sm) * 3);
 }
 
 #navigation .depth-3 a,
 #navigation .depth-3 .directory-name {
-  padding-left: calc(var(--space-md) + var(--space-md) * 3);
+  padding-left: calc(var(--space-sm) * 4);
 }
 
 /* Container adjustments when navigation is present */
@@ -116,9 +114,9 @@ body:has(#navigation) #container {
     width: 100%;
     height: auto;
     border-right: none;
-    padding: 1rem 0;
+    padding: var(--space-sm) 0;
   }
-  
+
   body:has(#navigation) #container,
   body.has-navigation #container {
     margin-left: auto;
