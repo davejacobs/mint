@@ -88,11 +88,9 @@ mint publish Document.md --file-title
 
 ### Built-in templates
 
-- `default` – Clean, centered, modern layout
-- `basic` – Clean, minimal styling, focuses on text
-- `nord` – Clean, uses Nord color scheme and sans text
+- `default` – Clean layout with serif font
+- `nord` – Modern layout with sans-serif font; uses Nord color scheme and sans text
 - `nord-dark` – Dark version of Nord
-- `magazine` – Refined & easy to adapt for publications
 
 ### Custom templates
 

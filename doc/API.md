@@ -207,7 +207,6 @@ Output:           api/intro.html, api/classes.html, guide.html
 
 Available templates:
 - `default` – Clean, centered layout
-- `basic` – Minimal styling
 - `nord` – Nord color scheme
 - `nord-dark` – Dark Nord theme
 
