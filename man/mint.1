@@ -1,6 +1,6 @@
 .TH MINT 1 "December 2024" "mint" "User Commands"
 .SH NAME
-mint \- transform plain text documents into beautiful styled HTML
+mint \- transform plain text documents into styled HTML
 .SH SYNOPSIS
 .B mint
 .I COMMAND
@@ -8,18 +8,17 @@ mint \- transform plain text documents into beautiful styled HTML
 .SH DESCRIPTION
 Mint transforms your plain text documents into beautiful documents. It makes that process as simple (but customizable) as possible.
 
-Mint processes Markdown, Textile, and other templating languages into styled HTML documents ready to print, email, and present.
 .SH COMMANDS
 .TP
 .B publish
-Transform one or more source files into HTML documents
+Transform one or more Markdown files into HTML documents
 .SH OPTIONS
 .TP
 .BR \-h ", " \-\-help
 Show mint usage information
 .TP
 .BR \-d ", " \-\-destination " " \fIDIRECTORY\fR
-Specify a destination directory, relative to the root
+Specify a destination directory
 .TP
 .BR \-m ", " \-\-style\-mode " " \fIMODE\fR
 Specify how styles are included (inline, external, original). Default is inline.
@@ -31,13 +30,10 @@ Create stylesheet at specified directory or file path and link it. This sets sty
 Specify a template to use for both layout and styling
 .TP
 .BR \-l ", " \-\-layout " " \fILAYOUT\fR
-Specify a specific layout template by name
+Specify a specific layout by name
 .TP
 .BR \-\-style " " \fISTYLE\fR
-Specify a specific style template by name
-.TP
-.BR \-w ", " \-\-working\-dir " " \fIWORKING_DIR\fR
-Specify a working directory outside the current directory
+Specify a specific style by name
 .TP
 .BR \-o ", " \-\-output\-file " " \fIFORMAT\fR
 Specify output filename format with substitutions (%{basename}, %{original_ext}, %{new_extension})
