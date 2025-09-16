@@ -36,7 +36,7 @@ Specify a specific layout by name
 Specify a specific style by name
 .TP
 .BR \-o ", " \-\-output\-file " " \fIFORMAT\fR
-Specify output filename format with substitutions (%{basename}, %{original_ext}, %{new_extension})
+Specify output filename format with substitutions (%{basename}, %{original_ext}, %{new_extension}), or '-' to output to STDOUT. STDOUT mode can only be used with a single file or STDIN input, and only with --style-mode inline or original.
 .TP
 .BR \-\-preserve\-structure
 Preserve source directory structure (e.g., nesting) in destination (default: true)
@@ -145,6 +145,16 @@ mint publish Document.md --style-destination css
 Override boolean config file settings with --no-* variants:
 .nf
 mint publish Document.md --no-navigation --no-insert-title-heading
+.fi
+.TP
+Output to STDOUT instead of a file:
+.nf
+mint publish Document.md --output-file -
+.fi
+.TP
+Pipe from STDIN to STDOUT:
+.nf
+echo "# Document" | mint publish - --output-file -
 .fi
 .SH TEMPLATES
 Mint comes with several built-in templates:

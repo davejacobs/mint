@@ -58,6 +58,12 @@ mint publish *.md --destination final-drafts
 # as a special filename
 echo "# Document" | mint publish - --output-file Document.html
 
+# Output to STDOUT instead of a file
+mint publish Document.md --output-file -
+
+# Pipe from STDIN to STDOUT
+echo "# Document" | mint publish - --output-file -
+
 # Publish multiple files and generate a left-hand navigation panel; use globs
 # to recursively include nested files. By default, nested directories will
 # be preserved, but any common directories for all files (in this case, `content`),
@@ -77,7 +83,7 @@ mint publish Document.md --file-title
 | `-s, --style STYLE` | Specify only the template style, by name |
 | `-m, --style-mode MODE` | How styles are included (inline, external, original) |
 | `-d, --destination DIR` | Output directory |
-| `-o, --output-file FORMAT` | Custom output filename, with substitutions available |
+| `-o, --output-file FORMAT` | Custom output filename, with substitutions available, or `-` for STDOUT |
 | `--no-autodrop` | Do not automatically drop common parent directories from published files |
 | `--no-preserve-structure` | Flatten all published files into one directory rather than preserving structure |
 | `--file-title` | Extract title from filename and inject into template |

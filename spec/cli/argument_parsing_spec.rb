@@ -86,8 +86,14 @@ RSpec.describe "CLI Argument Parsing" do
 
       it "has default output file format" do
         command, config, files, help = Mint::Commandline.parse!(["publish", "file.md"])
-        
+
         expect(config.output_file_format).to eq("%{name}.%{ext}")
+      end
+
+      it "parses --output-file - for stdout" do
+        command, config, files, help = Mint::Commandline.parse!(["publish", "--output-file", "-", "file.md"])
+
+        expect(config.stdout_mode).to be true
       end
     end
 
@@ -170,10 +176,49 @@ RSpec.describe "CLI Argument Parsing" do
 
       it "parses --no-autodrop flag" do
         command, config, files, help = Mint::Commandline.parse!(["publish", "--no-autodrop", "file.md"])
-        
+
         expect(config.autodrop).to be false
       end
     end
-    
+
+    context "stdout mode validation" do
+      it "allows --output-file - with single file" do
+        expect {
+          Mint::Commandline.parse!(["publish", "--output-file", "-", "file.md"])
+        }.not_to raise_error
+      end
+
+      it "allows --output-file - with STDIN" do
+        allow($stdin).to receive(:read).and_return("# Test")
+        expect {
+          Mint::Commandline.parse!(["publish", "--output-file", "-", "-"])
+        }.not_to raise_error
+      end
+
+      it "rejects --output-file - with multiple files" do
+        expect {
+          Mint::Commandline.parse!(["publish", "--output-file", "-", "file1.md", "file2.md"])
+        }.to raise_error(ArgumentError, "--output-file - can only be used with a single file or STDIN")
+      end
+
+      it "allows --output-file - with --style-mode inline" do
+        expect {
+          Mint::Commandline.parse!(["publish", "--output-file", "-", "--style-mode", "inline", "file.md"])
+        }.not_to raise_error
+      end
+
+      it "allows --output-file - with --style-mode original" do
+        expect {
+          Mint::Commandline.parse!(["publish", "--output-file", "-", "--style-mode", "original", "file.md"])
+        }.not_to raise_error
+      end
+
+      it "rejects --output-file - with --style-mode external" do
+        expect {
+          Mint::Commandline.parse!(["publish", "--output-file", "-", "--style-mode", "external", "file.md"])
+        }.to raise_error(ArgumentError, "--output-file - can only be used with --style-mode inline or --style-mode original")
+      end
+    end
+
   end
 end

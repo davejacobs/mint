@@ -42,8 +42,12 @@ module Mint
           commandline_options[:working_directory] = Pathname.new w
         end
 
-        cli.on "-o", "--output-file FORMAT", "Specify the output file format with substitutions: \%{name}, \%{original_ext}, \%{ext} (default: \%{name}.\%{ext})" do |o|
-          commandline_options[:output_file_format] = o
+        cli.on "-o", "--output-file FORMAT", "Specify the output file format with substitutions: \%{name}, \%{original_ext}, \%{ext}, or '-' to output to stdout (default: \%{name}.\%{ext})" do |o|
+          if o == "-"
+            commandline_options[:stdout_mode] = true
+          else
+            commandline_options[:output_file_format] = o
+          end
         end
 
         cli.on "-d", "--destination DESTINATION", "Specify a destination directory, relative to the root (default: current directory)" do |d|
@@ -126,11 +130,21 @@ module Mint
       if commandline_options[:style_mode] == :inline && commandline_options[:style_destination_directory]
         raise ArgumentError, "--style-mode inline and --style-destination cannot be used together"
       end
+
+      # STDOUT mode can only be used with a single file and with --style-mode original or --style-mode inline
+      if commandline_options[:stdout_mode]
+        if !commandline_options[:stdin_mode] && commandline_options[:files].length > 1
+          raise ArgumentError, "--output-file - can only be used with a single file or STDIN"
+        end
+
+        style_mode = commandline_options[:style_mode] || Config::DEFAULT_STYLE_MODE
+        unless [:inline, :original].include?(style_mode)
+          raise ArgumentError, "--output-file - can only be used with --style-mode inline or --style-mode original"
+        end
+      end
       
-      
-      # Process files differently based on whether we're reading from STDIN
       if commandline_options[:stdin_mode]
-        files = commandline_options[:files]
+        files = [commandline_options[:stdin_content]]
       else
         files = commandline_options[:files].map {|f| Pathname.new(f) }
       end

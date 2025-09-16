@@ -46,6 +46,7 @@ module Mint
           style_destination_path: style_destination_path,
           style_mode: @config.style_mode,
           insert_title_heading: @config.insert_title_heading,
+          stdout_mode: @config.stdout_mode,
           transform_links: lambda {|link_basename| update_basename(link_basename, new_extension: "html", format_string: @config.output_file_format) },
           render_style: index == 0
         )

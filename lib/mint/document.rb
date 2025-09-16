@@ -38,6 +38,7 @@ module Mint
                    style_destination_path:,
                    style_mode:,
                    insert_title_heading:,
+                   stdout_mode: false,
                    transform_links: Proc.new,
                    render_style: true)
       @working_directory = working_directory
@@ -48,6 +49,7 @@ module Mint
       @style_path = style_path
       @style_destination_path = style_destination_path
       @style_mode = style_mode
+      @stdout_mode = stdout_mode
       @insert_title_heading = insert_title_heading
       @transform_links = transform_links
       @render_style = render_style
@@ -95,23 +97,24 @@ module Mint
       layout_content = File.read(@layout_path)
       rendered_content = Renderers::Erb.render(layout_content, layout_variables)
       
-      # Write the rendered content to the destination path
-      full_destination_path = @destination_directory_path.absolute? ? 
-        @destination_directory_path + @destination_path : 
-        @working_directory + @destination_directory_path + @destination_path
-      
-      full_destination_path.dirname.mkpath
-      full_destination_path.open("w+") do |f|
-        f << rendered_content
-      end
+      if @stdout_mode
+        puts rendered_content
+        return "STDOUT"
+      else
+        full_destination_path = @destination_directory_path.absolute? ?
+          @destination_directory_path + @destination_path :
+          @working_directory + @destination_directory_path + @destination_path
 
-      # Return the destination path used, for use in verbose output
-      begin
-        full_destination_path.relative_path_from(@working_directory)
-      rescue ArgumentError
-        # If, for some reason, the paths don't share a common prefix,
-        # return the full path to avoid an error
-        full_destination_path
+        full_destination_path.dirname.mkpath
+        full_destination_path.open("w+") do |f|
+          f << rendered_content
+        end
+
+        begin
+          full_destination_path.relative_path_from(@working_directory)
+        rescue ArgumentError
+          full_destination_path
+        end
       end
     end
     

@@ -4,6 +4,7 @@ module Mint
   class Config
     attr_accessor :files
     attr_accessor :stdin_mode
+    attr_accessor :stdout_mode
     attr_accessor :help
     attr_accessor :verbose
     attr_accessor :layout_name
@@ -21,6 +22,7 @@ module Mint
     attr_accessor :navigation_title
     
     DEFAULT_STDIN_MODE                  = false
+    DEFAULT_STDOUT_MODE                 = false
     DEFAULT_VERBOSE                     = false
     DEFAULT_LAYOUT_NAME                 = "default"
     DEFAULT_STYLE_NAME                  = "default"
@@ -37,6 +39,7 @@ module Mint
     
     def initialize(options = {})
       @stdin_mode = options[:stdin_mode] if options.key?(:stdin_mode)
+      @stdout_mode = options[:stdout_mode] if options.key?(:stdout_mode)
       @help = options[:help]
       @verbose = options[:verbose] if options.key?(:verbose)
       @layout_name = options[:layout_name] || options[:template_name]
@@ -57,6 +60,7 @@ module Mint
     def to_h
       {
         stdin_mode: @stdin_mode,
+        stdout_mode: @stdout_mode,
         help: @help,
         verbose: @verbose,
         layout_name: @layout_name,
@@ -100,6 +104,7 @@ module Mint
       dest_dir = DEFAULT_DESTINATION_DIRECTORY.call
       Config.new({
         stdin_mode: DEFAULT_STDIN_MODE,
+        stdout_mode: DEFAULT_STDOUT_MODE,
         verbose: DEFAULT_VERBOSE,
         layout_name: DEFAULT_LAYOUT_NAME,
         style_name: DEFAULT_STYLE_NAME,
