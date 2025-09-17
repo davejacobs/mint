@@ -9,13 +9,13 @@ module Mint
     # Parses ARGV using OptionParser, mutating ARGV
     #
     # @param [Array] argv a list of arguments to parse
-    # @return [Array] a list that contains the command, a help message,
+    # @return [Array] a list that contains a help message,
     #   parsed config, and selected scopes
     def self.parse!(argv)
       commandline_options = {}
 
       parser = OptionParser.new do |cli|
-        cli.banner = "Usage: mint [command] files [options]"
+        cli.banner = "Usage: mint files [options]"
 
         cli.on "-h", "--help", "Show this help message" do
           commandline_options[:help] = true
@@ -105,8 +105,7 @@ module Mint
       end
 
       parser.parse! argv
-      command = argv.shift
-      
+
       if argv.include?('-')
         if argv.length > 1
           $stderr.puts "Error: Cannot mix STDIN ('-') with other file arguments"
@@ -152,7 +151,7 @@ module Mint
       commandline_config = Config.new(commandline_options)
       config = Config.defaults.merge(Mint.configuration).merge(commandline_config)
 
-      [command, config, files, parser.help]
+      [config, files, parser.help]
     end
   end
 end

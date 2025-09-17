@@ -93,7 +93,7 @@ Available in layout templates:
 Test your templates during development:
 
 ```bash
-mint publish Sample.md --template my-template --destination test --style-mode original
+mint Sample.md --template my-template --destination test --style-mode original
 ```
 
 `--style-mode original` lets you easily update your CSS, even if it links

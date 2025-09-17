@@ -3,15 +3,9 @@
 mint \- transform plain text documents into styled HTML
 .SH SYNOPSIS
 .B mint
-.I COMMAND
 [\fIOPTIONS\fR] [\fIFILE\fR...]
 .SH DESCRIPTION
 Mint transforms your plain text documents into beautiful documents. It makes that process as simple (but customizable) as possible.
-
-.SH COMMANDS
-.TP
-.B publish
-Transform one or more Markdown files into HTML documents
 .SH OPTIONS
 .TP
 .BR \-h ", " \-\-help
@@ -74,7 +68,7 @@ Mint offers flexible control over how stylesheets are incorporated into your doc
 By default, Mint inlines CSS directly into your HTML documents, creating self-contained files:
 .RS
 .nf
-mint publish Document.md
+mint Document.md
 .fi
 .RE
 
@@ -82,8 +76,8 @@ mint publish Document.md
 Create external stylesheets that are linked from your HTML documents:
 .RS
 .nf
-mint publish Document.md --style-destination css
-mint publish Document.md --style-destination styles/main.css
+mint Document.md --style-destination css
+mint Document.md --style-destination styles/main.css
 .fi
 .RE
 
@@ -112,49 +106,49 @@ Boolean options set to true in configuration files can be overridden using --no-
 .RS
 .nf
 # If config.toml has: navigation = true
-mint publish Document.md --no-navigation
+mint Document.md --no-navigation
 .fi
 .RE
 .SH EXAMPLES
 .TP
 Transform a single Markdown file:
 .nf
-mint publish Document.md
+mint Document.md
 .fi
 .TP
 Transform multiple files:
 .nf
-mint publish Document1.md Document2.md Document3.md
+mint Document1.md Document2.md Document3.md
 .fi
 .TP
 Insert title as H1 heading:
 .nf
-mint publish Document.md --insert-title-heading
+mint Document.md --insert-title-heading
 .fi
 .TP
 Use a specific template:
 .nf
-mint publish Document.md --template nord
+mint Document.md --template nord
 .fi
 .TP
 Create external stylesheet:
 .nf
-mint publish Document.md --style-destination css
+mint Document.md --style-destination css
 .fi
 .TP
 Override boolean config file settings with --no-* variants:
 .nf
-mint publish Document.md --no-navigation --no-insert-title-heading
+mint Document.md --no-navigation --no-insert-title-heading
 .fi
 .TP
 Output to STDOUT instead of a file:
 .nf
-mint publish Document.md --output-file -
+mint Document.md --output-file -
 .fi
 .TP
 Pipe from STDIN to STDOUT:
 .nf
-echo "# Document" | mint publish - --output-file -
+echo "# Document" | mint - --output-file -
 .fi
 .SH TEMPLATES
 Mint comes with several built-in templates:

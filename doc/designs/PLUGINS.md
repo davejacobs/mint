@@ -22,7 +22,7 @@ I have two competing goals to balance:
    and consumes `option1`.
 
 2. **The callback option (mainly implemented).** `mint epub publish 
-   file --option1 --option2` calls `mint publish` with the ePub plugin,
+   file --option1 --option2` calls `mint` with the ePub plugin,
    passing in option2 with opts. *This plugin must be in a 
    ~/.config/mint/plugins directory.* (There will be other plugin directories 
    for other scopes.)
@@ -127,8 +127,8 @@ Examples of services could be Crocodoc and Google Docs. Examples of authenticati
 
 Or maybe a plugin could let you could publish multiple output formats, and to multiple locations:
 
-    mint publish --service my-ftp --format html
-    mint publish --blog personal
+    mint --service my-ftp --format html
+    mint --blog personal
 
 The configuration:
 

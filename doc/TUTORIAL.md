@@ -20,7 +20,7 @@ Install Mint through Ruby:
 
 Convert a Markdown file to HTML:
 
-    mint publish Document.md
+    mint Document.md
 
 This creates `Document.html` in the current directory. It will be styled
 with the default template, and its style will be inlined into the document,
@@ -30,7 +30,7 @@ making it portable as a standalone file.
 
 Instead of the default template, you can choose a different template for automatic styling:
 
-    mint publish Document.md --template nord
+    mint Document.md --template nord
 
 Mint has several built-in templates, and you can also create your own. (See
 [TEMPLATES](./TEMPLATES.md) for more).
@@ -39,19 +39,19 @@ Mint has several built-in templates, and you can also create your own. (See
 
 Specify where the output file goes:
 
-    mint publish Document.md --destination final-draft
+    mint Document.md --destination final-draft
 
 ### Mix and match layouts and styles
 
 Use different layouts and stylesheets:
 
-    mint publish Document.md --layout default --style nord
+    mint Document.md --layout default --style nord
 
 ### Insert title heading
 
 Insert the document's title as an H1 heading into the content:
 
-    mint publish Document.md --insert-title-heading
+    mint Document.md --insert-title-heading
 
 This extracts the title from metadata or filename and injects it as an H1 heading at the top of the document content.
 
@@ -60,7 +60,7 @@ This extracts the title from metadata or filename and injects it as an H1 headin
 Directory structure is preserved by default (except for directories dropped by
 `--autodrop`). To flatten all files into the destination directory:
 
-    mint publish docs/**/*.md --destination public --no-preserve-structure
+    mint docs/**/*.md --destination public --no-preserve-structure
 
 Note that if there are multiple files with the same name, only one will be kept.
 (Don't depend on the ordering of which one will be kept in the case of a collision.)
@@ -69,7 +69,7 @@ Note that if there are multiple files with the same name, only one will be kept.
 
 Convert multiple cross-linked Markdown files into a connected "digital garden":
 
-    mint publish Garden/**/*.md --destination public --navigation --navigation-title "My Garden"
+    mint Garden/**/*.md --destination public --navigation --navigation-title "My Garden"
 
 This publishes a set of documents with:
 
@@ -113,7 +113,7 @@ navigation-depth = 2
 insert-title-heading = true
 ```
 
-Now when you run `mint publish docs/**/*.md`, it will automatically:
+Now when you run `mint docs/**/*.md`, it will automatically:
 
 - Use the Nord template
 - Output to the `public/` directory  
@@ -125,10 +125,10 @@ You can still override any config setting from the command line:
 
 ```bash
 # Use a different destination despite config file
-mint publish docs/**/*.md --destination staging
+mint docs/**/*.md --destination staging
 
 # Override boolean settings from config using --no- flags
-mint publish docs/**/*.md --no-navigation --no-insert-title-heading
+mint docs/**/*.md --no-navigation --no-insert-title-heading
 ```
 
 ### Overriding boolean config settings

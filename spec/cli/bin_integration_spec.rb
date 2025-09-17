@@ -30,19 +30,19 @@ RSpec.describe "Bin Script Integration" do
         it "shows help with --help flag" do
           result = run_command("ruby", "bin/mint", "--help")
           
-          expect(result.stdout).to include("Usage: mint [command] files [options]")
+          expect(result.stdout).to include("Usage: mint files [options]")
           expect(result.stdout).to include("--template")
           expect(result.stdout).to include("--layout")
           expect(result.stdout).to include("--style")
         end
       end
 
-      describe "publish command" do
+      describe "file processing" do
         it "publishes markdown files via CLI" do
           create_template_directory("default")
           create_markdown_path("test.md", "# Hello CLI\n\nThis works!")
           
-          result = run_command({}, "ruby", "bin/mint", "publish", "test.md")
+          result = run_command({}, "ruby", "bin/mint", "test.md")
           
           expect(result.success?).to be true
           expect(File.exist?("test.html")).to be true
@@ -57,7 +57,7 @@ RSpec.describe "Bin Script Integration" do
           create_markdown_path("doc1.md", "# Document 1")
           create_markdown_path("doc2.md", "# Document 2")
           
-          result = run_command({}, "ruby", "bin/mint", "publish", "doc1.md", "doc2.md")
+          result = run_command({}, "ruby", "bin/mint", "doc1.md", "doc2.md")
           
           expect(result.success?).to be true
           expect(File.exist?("doc1.html")).to be true
@@ -69,7 +69,7 @@ RSpec.describe "Bin Script Integration" do
           create_template_directory("custom")
           create_markdown_path("styled.md", "# Custom Style")
           
-          result = run_command({}, "ruby", "bin/mint", "publish", "--template", "custom", "styled.md")
+          result = run_command({}, "ruby", "bin/mint", "--template", "custom", "styled.md")
           
           # Should succeed even if template doesn't exist (will use default)
           expect(result.success?).to be true
@@ -78,22 +78,24 @@ RSpec.describe "Bin Script Integration" do
       end
 
       describe "error handling and edge cases" do
-        it "handles unknown commands gracefully" do
-          result = run_command("ruby", "bin/mint", "unknown-command")
-          
+        it "handles missing files gracefully" do
+          create_template_directory("default")
+          result = run_command("ruby", "bin/mint", "nonexistent.md")
+
           expect(result.success?).to be false
-          expect(result.stderr).to include("Unknown command")
+          expect(result.stderr).to include("Error:")
         end
 
         it "handles malformed arguments" do
-          result = run_command("ruby", "bin/mint", "publish", "--invalid-flag")
-          
+          result = run_command("ruby", "bin/mint", "--invalid-flag", "test.md")
+
           expect(result.success?).to be false
         end
 
         it "provides helpful error messages" do
-          result = run_command("ruby", "bin/mint", "unknown-command")
-          
+          create_template_directory("default")
+          result = run_command("ruby", "bin/mint", "nonexistent.md")
+
           expect(result.stderr).to include("Error:")
         end
       end
@@ -103,7 +105,7 @@ RSpec.describe "Bin Script Integration" do
           create_template_directory("default")
           create_markdown_path("test.md", "# Test")
           
-          result = run_command({}, "ruby", "bin/mint", "publish", "test.md")
+          result = run_command({}, "ruby", "bin/mint", "test.md")
           
           expect(result.success?).to be true
           # Should not have excessive debug output
@@ -116,10 +118,10 @@ RSpec.describe "Bin Script Integration" do
           create_template_directory("default")
           create_markdown_path("success.md", "# Success")
           
-          success_result = run_command({}, "ruby", "bin/mint", "publish", "success.md")
+          success_result = run_command({}, "ruby", "bin/mint", "success.md")
           expect(success_result.exit_code).to eq(0)
 
-          failure_result = run_command({}, "ruby", "bin/mint", "publish", "nonexistent.md")
+          failure_result = run_command({}, "ruby", "bin/mint", "nonexistent.md")
           expect(failure_result.exit_code).not_to eq(0)
         end
       end

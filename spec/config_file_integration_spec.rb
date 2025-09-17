@@ -22,7 +22,7 @@ RSpec.describe "Config File Integration" do
           template = "custom"
         TOML
 
-        command, config, files, help = Mint::Commandline.parse!(["publish", "test.md"])
+        config, files, help = Mint::Commandline.parse!(["test.md"])
         
         expect(config.layout_name).to eq("custom")
         expect(config.style_name).to eq("custom")
@@ -33,7 +33,7 @@ RSpec.describe "Config File Integration" do
           layout = "minimal"
         TOML
 
-        command, config, files, help = Mint::Commandline.parse!(["publish", "test.md"])
+        config, files, help = Mint::Commandline.parse!(["test.md"])
         
         expect(config.layout_name).to eq("minimal")
       end
@@ -43,7 +43,7 @@ RSpec.describe "Config File Integration" do
           style = "dark"
         TOML
 
-        command, config, files, help = Mint::Commandline.parse!(["publish", "test.md"])
+        config, files, help = Mint::Commandline.parse!(["test.md"])
         
         expect(config.style_name).to eq("dark")
       end
@@ -54,7 +54,7 @@ RSpec.describe "Config File Integration" do
           output-file = "%{ext}_custom.%{ext}"
         TOML
 
-        command, config, files, help = Mint::Commandline.parse!(["publish", "test.md"])
+        config, files, help = Mint::Commandline.parse!(["test.md"])
         
         expect(config.output_file_format).to eq("%{ext}_custom.%{ext}")
       end
@@ -64,7 +64,7 @@ RSpec.describe "Config File Integration" do
           destination = "build"
         TOML
 
-        command, config, files, help = Mint::Commandline.parse!(["publish", "test.md"])
+        config, files, help = Mint::Commandline.parse!(["test.md"])
         
         expect(config.destination_directory).to eq(Pathname.new("build"))
       end
@@ -74,7 +74,7 @@ RSpec.describe "Config File Integration" do
           style-mode = "external"
         TOML
 
-        command, config, files, help = Mint::Commandline.parse!(["publish", "test.md"])
+        config, files, help = Mint::Commandline.parse!(["test.md"])
         
         expect(config.style_mode).to eq(:external)
       end
@@ -84,7 +84,7 @@ RSpec.describe "Config File Integration" do
           style-destination = "assets/css"
         TOML
 
-        command, config, files, help = Mint::Commandline.parse!(["publish", "test.md"])
+        config, files, help = Mint::Commandline.parse!(["test.md"])
         
         expect(config.style_destination_directory).to eq("assets/css")
       end
@@ -94,7 +94,7 @@ RSpec.describe "Config File Integration" do
           preserve-structure = true
         TOML
 
-        command, config, files, help = Mint::Commandline.parse!(["publish", "test.md"])
+        config, files, help = Mint::Commandline.parse!(["test.md"])
         
         expect(config.preserve_structure).to be true
       end
@@ -104,7 +104,7 @@ RSpec.describe "Config File Integration" do
           navigation = true
         TOML
 
-        command, config, files, help = Mint::Commandline.parse!(["publish", "test.md"])
+        config, files, help = Mint::Commandline.parse!(["test.md"])
         
         expect(config.navigation).to be true
       end
@@ -115,7 +115,7 @@ RSpec.describe "Config File Integration" do
           navigation-depth = 5
         TOML
 
-        command, config, files, help = Mint::Commandline.parse!(["publish", "test.md"])
+        config, files, help = Mint::Commandline.parse!(["test.md"])
         
         expect(config.navigation_depth).to eq(5)
       end
@@ -125,7 +125,7 @@ RSpec.describe "Config File Integration" do
           navigation-title = "Custom Navigation"
         TOML
 
-        command, config, files, help = Mint::Commandline.parse!(["publish", "test.md"])
+        config, files, help = Mint::Commandline.parse!(["test.md"])
         
         expect(config.navigation_title).to eq("Custom Navigation")
       end
@@ -135,7 +135,7 @@ RSpec.describe "Config File Integration" do
           autodrop = false
         TOML
 
-        command, config, files, help = Mint::Commandline.parse!(["publish", "test.md"])
+        config, files, help = Mint::Commandline.parse!(["test.md"])
         
         expect(config.autodrop).to be false
       end
@@ -145,7 +145,7 @@ RSpec.describe "Config File Integration" do
           insert-title-heading = true
         TOML
 
-        command, config, files, help = Mint::Commandline.parse!(["publish", "test.md"])
+        config, files, help = Mint::Commandline.parse!(["test.md"])
         
         expect(config.insert_title_heading).to be true
       end
@@ -161,7 +161,7 @@ RSpec.describe "Config File Integration" do
           insert-title-heading = true
         TOML
 
-        command, config, files, help = Mint::Commandline.parse!(["publish", "test.md"])
+        config, files, help = Mint::Commandline.parse!(["test.md"])
         
         expect(config.layout_name).to eq("blog")
         expect(config.style_name).to eq("blog")
@@ -185,39 +185,39 @@ RSpec.describe "Config File Integration" do
         end
 
         it "command-line template overrides config file template" do
-          command, config, files, help = Mint::Commandline.parse!(["publish", "--template", "cli", "test.md"])
+          config, files, help = Mint::Commandline.parse!(["--template", "cli", "test.md"])
           
           expect(config.layout_name).to eq("cli")
           expect(config.style_name).to eq("cli")
         end
 
         it "command-line layout overrides config file template layout" do
-          command, config, files, help = Mint::Commandline.parse!(["publish", "--layout", "cli-layout", "test.md"])
+          config, files, help = Mint::Commandline.parse!(["--layout", "cli-layout", "test.md"])
           
           expect(config.layout_name).to eq("cli-layout")
           expect(config.style_name).to eq("config") # should still use config for style
         end
 
         it "command-line destination overrides config file destination" do
-          command, config, files, help = Mint::Commandline.parse!(["publish", "--destination", "cli-dest", "test.md"])
+          config, files, help = Mint::Commandline.parse!(["--destination", "cli-dest", "test.md"])
           
           expect(config.destination_directory).to eq(Pathname.new("cli-dest"))
         end
 
         it "command-line style-mode overrides config file style-mode" do
-          command, config, files, help = Mint::Commandline.parse!(["publish", "--style-mode", "inline", "test.md"])
+          config, files, help = Mint::Commandline.parse!(["--style-mode", "inline", "test.md"])
           
           expect(config.style_mode).to eq(:inline)
         end
 
         it "command-line preserve-structure overrides config file preserve-structure" do
-          command, config, files, help = Mint::Commandline.parse!(["publish", "test.md"])
+          config, files, help = Mint::Commandline.parse!(["test.md"])
           
           expect(config.preserve_structure).to be true # from config
         end
 
         it "command-line navigation-depth overrides config file navigation-depth" do
-          command, config, files, help = Mint::Commandline.parse!(["publish", "--navigation-depth", "3", "test.md"])
+          config, files, help = Mint::Commandline.parse!(["--navigation-depth", "3", "test.md"])
           
           expect(config.navigation_depth).to eq(3)
         end
@@ -233,19 +233,19 @@ RSpec.describe "Config File Integration" do
         end
 
         it "--no-preserve-structure overrides config file preserve-structure=true" do
-          command, config, files, help = Mint::Commandline.parse!(["publish", "--no-preserve-structure", "test.md"])
+          config, files, help = Mint::Commandline.parse!(["--no-preserve-structure", "test.md"])
           
           expect(config.preserve_structure).to be false
         end
 
         it "--no-navigation overrides config file navigation=true" do
-          command, config, files, help = Mint::Commandline.parse!(["publish", "--no-navigation", "test.md"])
+          config, files, help = Mint::Commandline.parse!(["--no-navigation", "test.md"])
           
           expect(config.navigation).to be false
         end
 
         it "--no-insert-title-heading overrides config file insert-title-heading=true" do
-          command, config, files, help = Mint::Commandline.parse!(["publish", "--no-insert-title-heading", "test.md"])
+          config, files, help = Mint::Commandline.parse!(["--no-insert-title-heading", "test.md"])
           
           expect(config.insert_title_heading).to be false
         end
@@ -257,7 +257,7 @@ RSpec.describe "Config File Integration" do
             insert-title-heading = false
           TOML
 
-          command, config, files, help = Mint::Commandline.parse!(["publish", "--preserve-structure", "--navigation", "--insert-title-heading", "test.md"])
+          config, files, help = Mint::Commandline.parse!(["--preserve-structure", "--navigation", "--insert-title-heading", "test.md"])
           
           expect(config.preserve_structure).to be true
           expect(config.navigation).to be true
@@ -265,7 +265,7 @@ RSpec.describe "Config File Integration" do
         end
 
         it "combines positive and negative flags" do
-          command, config, files, help = Mint::Commandline.parse!(["publish", "--preserve-structure", "--no-navigation", "test.md"])
+          config, files, help = Mint::Commandline.parse!(["--preserve-structure", "--no-navigation", "test.md"])
           
           expect(config.preserve_structure).to be true  # overridden by CLI flag
           expect(config.navigation).to be false         # overridden by --no- flag
@@ -280,7 +280,7 @@ RSpec.describe "Config File Integration" do
           insert-title-heading = false
         TOML
 
-        command, config, files, help = Mint::Commandline.parse!(["publish", "test.md"])
+        config, files, help = Mint::Commandline.parse!(["test.md"])
         
         expect(config.preserve_structure).to be false
         expect(config.navigation).to be false
@@ -292,13 +292,13 @@ RSpec.describe "Config File Integration" do
           navigation-depth = 10
         TOML
 
-        command, config, files, help = Mint::Commandline.parse!(["publish", "test.md"])
+        config, files, help = Mint::Commandline.parse!(["test.md"])
         
         expect(config.navigation_depth).to eq(10)
       end
 
       it "handles missing config file gracefully" do
-        command, config, files, help = Mint::Commandline.parse!(["publish", "test.md"])
+        config, files, help = Mint::Commandline.parse!(["test.md"])
         
         expect(config.layout_name).to eq("default")
         expect(config.style_name).to eq("default")
@@ -309,7 +309,7 @@ RSpec.describe "Config File Integration" do
       it "handles empty config file gracefully" do
         File.write(".mint/config.toml", "")
 
-        command, config, files, help = Mint::Commandline.parse!(["publish", "test.md"])
+        config, files, help = Mint::Commandline.parse!(["test.md"])
         
         expect(config.layout_name).to eq("default")
         expect(config.style_name).to eq("default")
@@ -324,7 +324,7 @@ RSpec.describe "Config File Integration" do
           destination = "output" # destination comment
         TOML
 
-        command, config, files, help = Mint::Commandline.parse!(["publish", "test.md"])
+        config, files, help = Mint::Commandline.parse!(["test.md"])
         
         expect(config.layout_name).to eq("documented")
         expect(config.style_name).to eq("documented")
@@ -352,7 +352,7 @@ RSpec.describe "Config File Integration" do
           template = "local"
         TOML
 
-        command, config, files, help = Mint::Commandline.parse!(["publish", "test.md"])
+        config, files, help = Mint::Commandline.parse!(["test.md"])
         
         expect(config.layout_name).to eq("local") # local overrides user
         expect(config.destination_directory).to eq(Pathname.new("user-dest")) # user config still applies for non-overridden values

@@ -30,7 +30,7 @@ gem install mint
 Transform a Markdown document into styled HTML:
 
 ```bash
-mint publish Document.md
+mint Document.md
 ```
 
 This creates `Document.html` in your current directory with beautiful default styling. The styles
@@ -43,35 +43,35 @@ same thing.
 
 ```bash
 # Publish a single document with a default template
-mint publish Document.md
+mint Document.md
 
 # Publish with a non-default template
-mint publish Document.md --template nord
+mint Document.md --template nord
 
 # Publish to a specific directory
-mint publish Document.md --destination public
+mint Document.md --destination public
 
 # Publish multiple files
-mint publish *.md --destination final-drafts
+mint *.md --destination final-drafts
 
 # Read Markdown content piped from STDIN, limited to a single file; note the `-`
 # as a special filename
-echo "# Document" | mint publish - --output-file Document.html
+echo "# Document" | mint - --output-file Document.html
 
 # Output to STDOUT instead of a file
-mint publish Document.md --output-file -
+mint Document.md --output-file -
 
 # Pipe from STDIN to STDOUT
-echo "# Document" | mint publish - --output-file -
+echo "# Document" | mint - --output-file -
 
 # Publish multiple files and generate a left-hand navigation panel; use globs
 # to recursively include nested files. By default, nested directories will
 # be preserved, but any common directories for all files (in this case, `content`),
 # will be automatically removed from the output ("autodropped").
-mint publish content/**/*.md --destination public --navigation --navigation-title "Documentation"
+mint content/**/*.md --destination public --navigation --navigation-title "Documentation"
 
 # Guess document title (and h1 header) from filename
-mint publish Document.md --file-title
+mint Document.md --file-title
 ```
 
 ### Common options
@@ -153,7 +153,7 @@ If you've set `navigation = true` in `config.toml`, you can override that
 at the commandline:
 
 ```bash
-mint publish docs.md --no-navigation
+mint docs.md --no-navigation
 ```
 
 Available `--no-` flags:
