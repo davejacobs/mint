@@ -116,6 +116,48 @@ RSpec.describe Mint::Renderers::Erb do
         described_class.render(template, {}, layout_path: layout_path)
       }.to raise_error(/Partial not found/)
     end
+
+    it "includes JavaScript files with javascript_tag" do
+      # Ensure the test JavaScript file exists
+      File.write(File.join(__dir__, "../fixtures/templates/test.js"), "console.log('Test JavaScript loaded');")
+
+      template = "<%= javascript_tag 'test.js' %>"
+
+      result = described_class.render(template, {}, layout_path: layout_path)
+
+      expect(result).to include("<script>")
+      expect(result).to include("console.log('Test JavaScript loaded');")
+      expect(result).to include("</script>")
+    end
+
+    it "handles missing JavaScript files gracefully" do
+      template = "<%= javascript_tag 'missing.js' %>"
+
+      result = described_class.render(template, {}, layout_path: layout_path)
+
+      expect(result).to include("<!-- JavaScript file not found:")
+      expect(result).to include("missing.js -->")
+    end
+
+    it "supports recursive partial rendering" do
+      # Create a test partial that renders another partial
+      File.write(File.join(__dir__, "../fixtures/templates/_recursive_partial.erb"), <<~ERB)
+        <div class="outer">
+          <%= render 'inner_partial', message: "Hello from outer" %>
+        </div>
+      ERB
+
+      File.write(File.join(__dir__, "../fixtures/templates/_inner_partial.erb"), <<~ERB)
+        <span class="inner"><%= message %></span>
+      ERB
+
+      template = '<%= render "recursive_partial" %>'
+
+      result = described_class.render(template, {}, layout_path: layout_path)
+
+      expect(result).to include('<div class="outer">')
+      expect(result).to include('<span class="inner">Hello from outer</span>')
+    end
   end
 
   describe "RenderContext" do

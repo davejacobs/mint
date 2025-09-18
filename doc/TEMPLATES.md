@@ -39,6 +39,7 @@ Layouts define the HTML structure around your content. Use template files
 - `content` – Inserts the converted Markdown content
 - `stylesheet_tag` – Includes the stylesheet (inline or linked)
 - `render` – Renders partials (see **Partials** section below)
+- `javascript_tag` – Includes JavaScript files from the template directory
 
 ### Layout example
 
@@ -130,6 +131,60 @@ Partials can render other partials, enabling complex nested structures like hier
     <% end %>
   </ul>
 </nav>
+```
+
+## JavaScript
+
+Partials can include specific JavaScript files from their directory using the `javascript_tag` helper. This allows for modular, component-specific JavaScript functionality.
+
+### Including JavaScript
+
+Use `javascript_tag` to include JavaScript files:
+
+```erb
+<!-- In a partial -->
+<div class="interactive-component">
+  <!-- HTML content -->
+</div>
+<%= javascript_tag 'component.js' %>
+```
+
+JavaScript files are resolved relative to the partial's directory:
+
+```
+templates/my-template/
+├── layout.erb
+├── _navigation.erb
+├── navigation.js          # JavaScript for navigation partial
+├── _modal.erb
+└── modal.js              # JavaScript for modal partial
+```
+
+### JavaScript file example
+
+```javascript
+// navigation.js
+document.addEventListener('DOMContentLoaded', function() {
+  // Toggle directory visibility
+  document.querySelectorAll('.directory .directory-name').forEach(function(dirName) {
+    dirName.addEventListener('click', function() {
+      const parentLi = this.closest('li');
+      const nestedUl = parentLi.querySelector('ul');
+      if (nestedUl) {
+        nestedUl.style.display = nestedUl.style.display === 'none' ? 'block' : 'none';
+        parentLi.classList.toggle('collapsed');
+      }
+    });
+  });
+});
+```
+
+### Error handling
+
+If a JavaScript file is not found, a HTML comment is inserted instead:
+
+```html
+<!-- JavaScript file not found: /path/to/missing.js -->
 ```
 
 ## Built-in templates
