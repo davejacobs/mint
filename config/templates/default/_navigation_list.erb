@@ -1,0 +1,19 @@
+<ul>
+  <% files.each do |item| %>
+    <% if item[:is_directory] %>
+      <li class="depth-<%= item[:depth] || 0 %> directory">
+        <span class="directory-name"><%= item[:title] %></span>
+        <% if item[:children] && item[:children].any? %>
+          <%= render 'navigation_list', files: item[:children] %>
+        <% end %>
+      </li>
+    <% else %>
+      <li class="depth-<%= item[:depth] || 0 %>">
+        <a href="<%= item[:html_path] %>"
+           class="<%= item[:source_path] == current_path ? 'current' : '' %>">
+          <%= item[:title] %>
+        </a>
+      </li>
+    <% end %>
+  <% end %>
+</ul>

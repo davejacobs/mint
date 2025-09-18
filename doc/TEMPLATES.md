@@ -38,6 +38,7 @@ Layouts define the HTML structure around your content. Use template files
 
 - `content` – Inserts the converted Markdown content
 - `stylesheet_tag` – Includes the stylesheet (inline or linked)
+- `render` – Renders partials (see **Partials** section below)
 
 ### Layout example
 
@@ -72,6 +73,63 @@ h1, h2, h3 {
   color: #333;
   font-weight: normal;
 }
+```
+
+## Partials
+
+Layouts can be broken into reusable partials for better organization and maintainability. Partials are ERB templates that can be rendered from layouts or other partials.
+
+### Using partials
+
+Use the `render` method to include a partial:
+
+```erb
+<%= render 'navigation' %>
+<%= render 'footer', year: 2024 %>
+```
+
+Partial files start with an underscore (`_`) and are resolved relative to the layout file:
+
+```
+templates/my-template/
+├── layout.erb
+├── _navigation.erb
+├── _navigation_list.erb
+└── _footer.erb
+```
+
+### Passing variables to partials
+
+You can pass additional variables to partials as locals:
+
+```erb
+<%= render 'footer', year: 2024, company: "My Company" %>
+```
+
+All variables from the main layout are automatically available in partials.
+
+### Recursive partials
+
+Partials can render other partials, enabling complex nested structures like hierarchical navigation:
+
+```erb
+<!-- _navigation.erb -->
+<nav>
+  <ul>
+    <% files.each do |item| %>
+      <% if item[:is_directory] %>
+        <li class="directory">
+          <span><%= item[:title] %></span>
+          <% if item[:children]&.any? %>
+            <%= render 'navigation_list', files: item[:children] %>
+          <% end %>
+        </li>
+      <% else %>
+        <li><a href="<%= item[:html_path] %>"><%= item[:title] %></a></li>
+      <% end %>
+    <% end %>
+  </ul>
+</nav>
 ```
 
 ## Built-in templates

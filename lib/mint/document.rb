@@ -93,9 +93,9 @@ module Mint
         navigation_title: navigation_title
       }
       
-      # Render the layout
+      # Render the layout using ERB with partial support
       layout_content = File.read(@layout_path)
-      rendered_content = Renderers::Erb.render(layout_content, layout_variables)
+      rendered_content = Renderers::Erb.render(layout_content, layout_variables, layout_path: @layout_path)
       
       if @stdout_mode
         puts rendered_content

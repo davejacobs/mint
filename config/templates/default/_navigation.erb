@@ -1,0 +1,8 @@
+<% if show_navigation && files&.any? %>
+  <nav id="navigation">
+    <% if navigation_title %>
+      <h3><%= navigation_title %></h3>
+    <% end %>
+    <%= render 'navigation_list', files: files %>
+  </nav>
+<% end %>

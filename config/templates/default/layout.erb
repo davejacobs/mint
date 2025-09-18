@@ -7,29 +7,7 @@
     <%= stylesheet_tag %>
   </head>
   <body>
-    <% if show_navigation && files&.any? %>
-      <nav id="navigation">
-        <% if navigation_title %>
-          <h3><%= navigation_title %></h3>
-        <% end %>
-        <ul>
-          <% files.each do |item| %>
-            <% if item[:is_directory] %>
-              <li class="depth-<%= item[:depth] || 0 %> directory">
-                <span class="directory-name"><%= item[:title] %></span>
-              </li>
-            <% else %>
-              <li class="depth-<%= item[:depth] || 0 %>">
-                <a href="<%= item[:html_path] %>" 
-                   class="<%= item[:source_path] == current_path ? 'current' : '' %>">
-                  <%= item[:title] %>
-                </a>
-              </li>
-            <% end %>
-          <% end %>
-        </ul>
-      </nav>
-    <% end %>
+    <%= render 'navigation' %>
     <main id="container">
       <% if insert_title_heading && title %>
         <h1><%= title %></h1>
