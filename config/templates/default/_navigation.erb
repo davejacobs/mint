@@ -1,8 +1,8 @@
-<% if show_navigation && files&.any? %>
+<% if options[:navigation] && documents&.any? %>
   <nav id="navigation">
-    <% if navigation_title %>
-      <h3><%= navigation_title %></h3>
+    <% if options[:navigation_title] %>
+      <h3><%= options[:navigation_title] %></h3>
     <% end %>
-    <%= render 'navigation_list', files: files %>
+    <%= render 'navigation_list', documents: documents %>
   </nav>
 <% end %>

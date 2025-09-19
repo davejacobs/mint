@@ -41,9 +41,14 @@ RSpec.describe "Bin Script Integration" do
         it "publishes markdown files via CLI" do
           create_template_directory("default")
           create_markdown_path("test.md", "# Hello CLI\n\nThis works!")
-          
+
           result = run_command({}, "ruby", "bin/mint", "test.md")
-          
+
+          unless result.success?
+            puts "STDOUT: #{result.stdout}"
+            puts "STDERR: #{result.stderr}"
+          end
+
           expect(result.success?).to be true
           expect(File.exist?("test.html")).to be true
           

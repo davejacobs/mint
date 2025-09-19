@@ -22,13 +22,9 @@ module Mint
     # @param [Pathname] style_path path to style file (relative to working_directory)
     # @param [Pathname] style_destination_path path to style destination file
     # @param [Symbol] style_mode style mode (:inline, :external, :original)
-    # @param [Boolean] insert_title_heading whether to inject title as H1 heading
-    # @param [Boolean] show_navigation whether to show navigation
-    # @param [Integer] navigation_depth navigation depth (optional)
-    # @param [Array<Hash>] navigation_data array of navigation items with :path and :title
-    # @param [String] navigation_title title for navigation panel (optional)
     # @param [Proc] transform_links proc to transform link basenames; yields the basename of the link
     # @param [Boolean] render_style whether to render style
+    # @param [Hash] options custom options to pass to layout templates
     def initialize(working_directory:,
                    source_path:,
                    destination_path:,
@@ -37,10 +33,10 @@ module Mint
                    style_path:,
                    style_destination_path:,
                    style_mode:,
-                   insert_title_heading:,
                    stdout_mode: false,
                    transform_links: Proc.new,
-                   render_style: true)
+                   render_style: true,
+                   options: {})
       @working_directory = working_directory
       @source_path = source_path
       @destination_path = destination_path
@@ -50,9 +46,9 @@ module Mint
       @style_destination_path = style_destination_path
       @style_mode = style_mode
       @stdout_mode = stdout_mode
-      @insert_title_heading = insert_title_heading
       @transform_links = transform_links
       @render_style = render_style
+      @options = options
       @title = guess_title
     end
 
@@ -64,7 +60,7 @@ module Mint
     # destination_directory_path + destination_path.
     #
     # @return [Pathname] the destination path relative to working_directory
-    def publish!(show_navigation: nil, navigation: nil, navigation_depth: nil, navigation_title: nil)
+    def publish!(documents: nil)
       if @style_mode == :external && @render_style
         create_external_stylesheet
       end
@@ -85,12 +81,10 @@ module Mint
         current_path: @source_path.to_s,
         metadata: metadata,
         title: @title,
-        insert_title_heading: @insert_title_heading,
         content: rendered_content.html_safe,
         stylesheet_tag: render_stylesheet_tag(@style_path, @style_mode),
-        files: navigation ? generate_navigation_tree(navigation: navigation) : [],
-        show_navigation: show_navigation,
-        navigation_title: navigation_title
+        documents: documents ? generate_document_tree(documents: documents).serialize : [],
+        options: @options
       }
       
       # Render the layout using ERB with partial support
@@ -157,13 +151,9 @@ module Mint
     #   - :source_path (String) - path to the source file relative to working directory
     #   - :depth (Integer) - nesting depth in the tree
     #   - :is_directory (Boolean) - true if this is a directory entry (optional key)
-    def generate_navigation_tree(navigation:)
-      # Build DocumentTree with documents (path + title pairs)
-      document_tree = DocumentTree.new(navigation)
+    def generate_document_tree(documents:)
+      document_tree = DocumentTree.new(documents)
       reoriented_tree = document_tree.reorient(@destination_path)
-      
-      # Serialize to flat array for ERB template consumption
-      reoriented_tree.serialize(max_depth: @navigation_depth)
     end
 
     private

@@ -101,33 +101,36 @@ RSpec.describe "Config File Integration" do
 
       it "loads navigation option from config file" do
         File.write(".mint/config.toml", <<~TOML)
+          [options]
           navigation = true
         TOML
 
         config, files, help = Mint::Commandline.parse!(["test.md"])
-        
-        expect(config.navigation).to be true
+
+        expect(config.options[:navigation]).to be true
       end
 
 
       it "loads navigation-depth option from config file" do
         File.write(".mint/config.toml", <<~TOML)
+          [options]
           navigation-depth = 5
         TOML
 
         config, files, help = Mint::Commandline.parse!(["test.md"])
-        
-        expect(config.navigation_depth).to eq(5)
+
+        expect(config.options[:navigation_depth]).to eq(5)
       end
 
       it "loads navigation-title option from config file" do
         File.write(".mint/config.toml", <<~TOML)
+          [options]
           navigation-title = "Custom Navigation"
         TOML
 
         config, files, help = Mint::Commandline.parse!(["test.md"])
-        
-        expect(config.navigation_title).to eq("Custom Navigation")
+
+        expect(config.options[:navigation_title]).to eq("Custom Navigation")
       end
 
       it "loads autodrop option from config file" do
@@ -142,12 +145,13 @@ RSpec.describe "Config File Integration" do
 
       it "loads insert-title-heading option from config file" do
         File.write(".mint/config.toml", <<~TOML)
+          [options]
           insert-title-heading = true
         TOML
 
         config, files, help = Mint::Commandline.parse!(["test.md"])
-        
-        expect(config.insert_title_heading).to be true
+
+        expect(config.options[:insert_title_heading]).to be true
       end
 
       it "loads multiple options from config file" do
@@ -156,21 +160,23 @@ RSpec.describe "Config File Integration" do
           destination = "public"
           style-mode = "external"
           preserve-structure = true
+
+          [options]
           navigation = true
           navigation-depth = 2
           insert-title-heading = true
         TOML
 
         config, files, help = Mint::Commandline.parse!(["test.md"])
-        
+
         expect(config.layout_name).to eq("blog")
         expect(config.style_name).to eq("blog")
         expect(config.destination_directory).to eq(Pathname.new("public"))
         expect(config.style_mode).to eq(:external)
         expect(config.preserve_structure).to be true
-        expect(config.navigation).to be true
-        expect(config.navigation_depth).to eq(2)
-        expect(config.insert_title_heading).to be true
+        expect(config.options[:navigation]).to be true
+        expect(config.options[:navigation_depth]).to eq(2)
+        expect(config.options[:insert_title_heading]).to be true
       end
 
       context "command-line options override config file" do
@@ -180,6 +186,8 @@ RSpec.describe "Config File Integration" do
             destination = "config-dest"
             style-mode = "external"
             preserve-structure = true
+
+            [options]
             navigation-depth = 5
           TOML
         end
@@ -217,9 +225,9 @@ RSpec.describe "Config File Integration" do
         end
 
         it "command-line navigation-depth overrides config file navigation-depth" do
-          config, files, help = Mint::Commandline.parse!(["--navigation-depth", "3", "test.md"])
-          
-          expect(config.navigation_depth).to eq(3)
+          config, files, help = Mint::Commandline.parse!(["--opt", "navigation-depth=3", "test.md"])
+
+          expect(config.options[:navigation_depth]).to eq(3)
         end
       end
 
@@ -238,17 +246,7 @@ RSpec.describe "Config File Integration" do
           expect(config.preserve_structure).to be false
         end
 
-        it "--no-navigation overrides config file navigation=true" do
-          config, files, help = Mint::Commandline.parse!(["--no-navigation", "test.md"])
-          
-          expect(config.navigation).to be false
-        end
 
-        it "--no-insert-title-heading overrides config file insert-title-heading=true" do
-          config, files, help = Mint::Commandline.parse!(["--no-insert-title-heading", "test.md"])
-          
-          expect(config.insert_title_heading).to be false
-        end
 
         it "positive flags still work to override config file false values" do
           File.write(".mint/config.toml", <<~TOML)
@@ -257,53 +255,49 @@ RSpec.describe "Config File Integration" do
             insert-title-heading = false
           TOML
 
-          config, files, help = Mint::Commandline.parse!(["--preserve-structure", "--navigation", "--insert-title-heading", "test.md"])
-          
+          config, files, help = Mint::Commandline.parse!(["--preserve-structure", "--opt", "navigation", "--opt", "insert-title-heading", "test.md"])
+
           expect(config.preserve_structure).to be true
-          expect(config.navigation).to be true
-          expect(config.insert_title_heading).to be true
+          expect(config.options[:navigation]).to be true
+          expect(config.options[:insert_title_heading]).to be true
         end
 
-        it "combines positive and negative flags" do
-          config, files, help = Mint::Commandline.parse!(["--preserve-structure", "--no-navigation", "test.md"])
-          
-          expect(config.preserve_structure).to be true  # overridden by CLI flag
-          expect(config.navigation).to be false         # overridden by --no- flag
-          expect(config.insert_title_heading).to be true          # from config file
-        end
       end
 
       it "handles boolean values correctly" do
         File.write(".mint/config.toml", <<~TOML)
           preserve-structure = false
+
+          [options]
           navigation = false
           insert-title-heading = false
         TOML
 
         config, files, help = Mint::Commandline.parse!(["test.md"])
-        
+
         expect(config.preserve_structure).to be false
-        expect(config.navigation).to be false
-        expect(config.insert_title_heading).to be false
+        expect(config.options[:navigation]).to be false
+        expect(config.options[:insert_title_heading]).to be false
       end
 
       it "handles integer values correctly" do
         File.write(".mint/config.toml", <<~TOML)
+          [options]
           navigation-depth = 10
         TOML
 
         config, files, help = Mint::Commandline.parse!(["test.md"])
-        
-        expect(config.navigation_depth).to eq(10)
+
+        expect(config.options[:navigation_depth]).to eq(10)
       end
 
       it "handles missing config file gracefully" do
         config, files, help = Mint::Commandline.parse!(["test.md"])
-        
+
         expect(config.layout_name).to eq("default")
         expect(config.style_name).to eq("default")
         expect(config.preserve_structure).to be true
-        expect(config.navigation).to be false
+        expect(config.options[:navigation]).to be nil
       end
 
       it "handles empty config file gracefully" do
@@ -319,16 +313,83 @@ RSpec.describe "Config File Integration" do
         File.write(".mint/config.toml", <<~TOML)
           # This is a comment
           template = "documented" # inline comment
-          
+
           # Another section
           destination = "output" # destination comment
         TOML
 
         config, files, help = Mint::Commandline.parse!(["test.md"])
-        
+
         expect(config.layout_name).to eq("documented")
         expect(config.style_name).to eq("documented")
         expect(config.destination_directory).to eq(Pathname.new("output"))
+      end
+
+      it "loads nested options section" do
+        File.write(".mint/config.toml", <<~TOML)
+          template = "test"
+
+          [options]
+          navigation = true
+          navigation-depth = 3
+          navigation-title = "Nested Navigation"
+          insert-title-heading = true
+          custom-option = "value"
+        TOML
+
+        config, files, help = Mint::Commandline.parse!(["test.md"])
+
+        expect(config.options[:navigation]).to be true
+        expect(config.options[:navigation_depth]).to eq(3)
+        expect(config.options[:navigation_title]).to eq("Nested Navigation")
+        expect(config.options[:insert_title_heading]).to be true
+        expect(config.options[:custom_option]).to eq("value")
+      end
+
+      it "prefers nested options over flat options" do
+        File.write(".mint/config.toml", <<~TOML)
+          # Flat options (legacy)
+          navigation = false
+          navigation-title = "Flat Title"
+
+          # Nested options (preferred)
+          [options]
+          navigation = true
+          navigation-title = "Nested Title"
+        TOML
+
+        config, files, help = Mint::Commandline.parse!(["test.md"])
+
+        expect(config.options[:navigation]).to be true
+        expect(config.options[:navigation_title]).to eq("Nested Title")
+      end
+
+      it "handles false values in options" do
+        File.write(".mint/config.toml", <<~TOML)
+          [options]
+          navigation = false
+          insert-title-heading = false
+          sidebar = true
+        TOML
+
+        config, files, help = Mint::Commandline.parse!(["test.md"])
+
+        expect(config.options[:navigation]).to be false
+        expect(config.options[:insert_title_heading]).to be false
+        expect(config.options[:sidebar]).to be true
+      end
+
+      it "command-line negated options override config file" do
+        File.write(".mint/config.toml", <<~TOML)
+          [options]
+          navigation = true
+          insert-title-heading = true
+        TOML
+
+        config, files, help = Mint::Commandline.parse!(["--opt", "no-navigation", "test.md"])
+
+        expect(config.options[:navigation]).to be false
+        expect(config.options[:insert_title_heading]).to be true
       end
     end
 

@@ -13,6 +13,7 @@ module Mint
     #   parsed config, and selected scopes
     def self.parse!(argv)
       commandline_options = {}
+      options = {}
 
       parser = OptionParser.new do |cli|
         cli.banner = "Usage: mint files [options]"
@@ -21,7 +22,7 @@ module Mint
           commandline_options[:help] = true
         end
 
-        cli.on "-v", "--verbose", "Show verbose output" do
+        cli.on "--verbose", "Show verbose output" do
           commandline_options[:verbose] = true
         end
 
@@ -71,14 +72,6 @@ module Mint
           commandline_options[:preserve_structure] = false
         end
         
-        cli.on "--navigation", "Make navigation information available to layout, so layout can show a navigation panel (default: false)" do
-          commandline_options[:navigation] = true
-        end
-
-        cli.on "--no-navigation", "Don't make navigation information available to layout" do
-          commandline_options[:navigation] = false
-        end
-        
         cli.on "--autodrop", "Automatically drop common directory levels from output file paths (default: true)" do
           commandline_options[:autodrop] = true
         end
@@ -86,21 +79,25 @@ module Mint
         cli.on "--no-autodrop", "Don't automatically drop common directory levels from output file paths" do
           commandline_options[:autodrop] = false
         end
-        
-        cli.on "--navigation-depth DEPTH", Integer, "Maximum depth to show in navigation (default: 3)" do |depth|
-          commandline_options[:navigation_depth] = depth
-        end
-        
-        cli.on "--navigation-title TITLE", "Set the title for the navigation panel" do |title|
-          commandline_options[:navigation_title] = title
-        end
-        
-        cli.on "--insert-title-heading", "Insert the document's title as an H1 heading into the document content" do
-          commandline_options[:insert_title_heading] = true
-        end
 
-        cli.on "--no-insert-title-heading", "Don't insert title as H1 heading" do
-          commandline_options[:insert_title_heading] = false
+        cli.on "--opt OPTION", "Set layout option: --opt key or --opt key=value (can be used multiple times). Use --opt no-key to set option to false" do |option|
+          if option.start_with?('no-') && option.include?('=')
+            raise ArgumentError, "Cannot use no- prefix with value assignment: #{option}. Use --opt no-key (without =value) to negate an option."
+          elsif option.start_with?('no-')
+            # Handle negated options: --opt no-navigation sets navigation to false
+            key = option[3..-1] # Remove 'no-' prefix
+            if key.start_with?('no-')
+              raise ArgumentError, "Double negation not allowed: #{option}. Use --opt #{key} instead of --opt no-#{key}."
+            end
+            options[key.gsub('-', '_').to_sym] = false
+          elsif option.include?('=')
+            key, value = option.split('=', 2)
+            # Try to parse the value as an integer, otherwise keep as string
+            parsed_value = value.match?(/^\d+$/) ? value.to_i : value
+            options[key.gsub('-', '_').to_sym] = parsed_value
+          else
+            options[option.gsub('-', '_').to_sym] = true
+          end
         end
       end
 
@@ -148,6 +145,8 @@ module Mint
         files = commandline_options[:files].map {|f| Pathname.new(f) }
       end
       
+      commandline_options[:options] = options
+
       commandline_config = Config.new(commandline_options)
       config = Config.defaults.merge(Mint.configuration).merge(commandline_config)
 

@@ -9,7 +9,7 @@
   <body>
     <%= render 'navigation' %>
     <main id="container">
-      <% if insert_title_heading && title %>
+      <% if options[:insert_title_heading] && title %>
         <h1><%= title %></h1>
       <% end %>
       <%= content %>

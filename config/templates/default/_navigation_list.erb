@@ -1,14 +1,20 @@
 <ul>
-  <% files.each do |item| %>
+  <% documents.each do |item| %>
+    <%
+      # Respect navigation_depth option (default to 3)
+      max_depth = options[:navigation_depth] || 3
+      item_depth = item[:depth] || 0
+      next if item_depth >= max_depth
+    %>
     <% if item[:is_directory] %>
-      <li class="depth-<%= item[:depth] || 0 %> directory">
+      <li class="depth-<%= item_depth %> directory">
         <span class="directory-name"><%= item[:title] %></span>
         <% if item[:children] && item[:children].any? %>
-          <%= render 'navigation_list', files: item[:children] %>
+          <%= render 'navigation_list', documents: item[:children] %>
         <% end %>
       </li>
     <% else %>
-      <li class="depth-<%= item[:depth] || 0 %>">
+      <li class="depth-<%= item_depth %>">
         <a href="<%= item[:html_path] %>"
            class="<%= item[:source_path] == current_path ? 'current' : '' %>">
           <%= item[:title] %>

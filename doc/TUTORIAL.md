@@ -121,7 +121,7 @@ Now when you run `mint docs/**/*.md`, it will automatically:
 - Generate navigation with your custom title
 - Insert page titles as H1 headings
 
-You can still override any config setting from the command line:
+You can still override any config setting from the commandline:
 
 ```bash
 # Use a different destination despite config file

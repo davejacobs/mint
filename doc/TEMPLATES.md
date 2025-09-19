@@ -187,19 +187,104 @@ If a JavaScript file is not found, a HTML comment is inserted instead:
 <!-- JavaScript file not found: /path/to/missing.js -->
 ```
 
+## Layout options
+
+A templates can make use of user-specified layout options which are specific to that template. 
+These options are passed in by the user and may be used to specify that a user wants to see,
+for example, a navigation bar or breadcrumbs in the template layout.
+
+Layout options are passed by the user from the commandline or configuration files, as with 
+other options. They made available to templates as a hash.
+
+### Using layout options
+
+Pass boolean layout options using the `--opt` flag:
+
+```bash
+mint document.md --opt breadcrumbs --opt sidebar --opt toc
+```
+
+Use `no-` prefix to negate boolean options:
+
+```bash
+mint document.md --opt no-navigation --opt no-insert-title-heading
+```
+
+Pass key/value layout options using the `--opt` flag and the `=` sign:
+
+```bash
+mint document.md --opt navigation-depth=3
+```
+
+Negated options cannot be combined with value assignment. Use `--opt no-key` (not `--opt no-key=value`).
+
+Layout options can also be specified by users in a config file in the \[options\] section:
+
+```toml
+# .mint/config.toml
+[options]
+breadcrumbs = true
+sidebar = true
+toc = true
+# Set options to false directly, rather than with CLI-based no-* options
+navigation = false
+insert-title-heading = false
+```
+
+Access options in templates via the `options` hash:
+
+```erb
+<% if options[:breadcrumbs] %>
+  <nav class="breadcrumbs">
+    <a href="/">Home</a> > <a href="/docs/">Docs</a> > <%= title %>
+  </nav>
+<% end %>
+
+<div class="<%= options[:sidebar] ? 'with-sidebar' : 'full-width' %>">
+  <%= content %>
+</div>
+
+<% if options[:toc] %>
+  <%= render 'table_of_contents' %>
+<% end %>
+```
+
+**Note**: Option names with hyphens are automatically converted to underscores in the options hash. For example:
+- `--opt navigation-title="Nav"` becomes `options[:navigation_title]`
+- `--opt insert-title-heading` becomes `options[:insert_title_heading]`
+- Config file `navigation-depth = 3` becomes `options[:navigation_depth]`
+
+It is the template's responsibility to decide what default values are if an option isn't specified
+by the user.
+
+### Negated option behavior
+
+- `--opt no-key` sets `options[:key] = false`
+- Negation is case-sensitive: only lowercase `no-` prefix is recognized
+- Option names starting with "no" work normally: `--opt notifications` and `--opt no-notifications` both affect the `notifications` option
+- Double negation is not allowed: `--opt no-no-key` raises an error
+- Later options override earlier ones: `--opt key --opt no-key` results in `false`
+- Hyphens are converted to underscores: `--opt no-insert-title-heading` becomes `options[:insert_title_heading] = false`
+
 ## Built-in templates
 
-Mint includes several [ready-to-use templates][built-in templates], which can be consulted as a reference.
+Mint includes [ready-to-use templates][built-in templates], which can be consulted as a reference.
 
 ## Template variables
 
-Available in layout templates:
+Mint makes these variables available in layout templates:
 
-- `content` – The converted document content
+### Core content variables
+- `content` – The converted document content (HTML)
 - `title` – Document title (from first heading or filename)
-- `stylesheet_tag` – A fully formed HTML tag representing either inline
-  styles or a link to an external stylesheet, according to the user's
-  preference (`--style-mode` option)
+- `stylesheet_tag` – HTML stylesheet tag (inline styles or external link)
+- `working_directory` – Path to the project root
+- `current_path` – Path to current source file
+- `metadata` – Frontmatter metadata from the document
+
+### Options hash
+
+- `options` – Hash of all options passed via `--opt` flags or config file (hyphens converted to underscores)
 
 ## Testing templates
 

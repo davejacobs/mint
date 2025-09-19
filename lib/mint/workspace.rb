@@ -45,23 +45,18 @@ module Mint
           style_path: style_path,
           style_destination_path: style_destination_path,
           style_mode: @config.style_mode,
-          insert_title_heading: @config.insert_title_heading,
           stdout_mode: @config.stdout_mode,
           transform_links: lambda {|link_basename| update_basename(link_basename, new_extension: "html", format_string: @config.output_file_format) },
-          render_style: index == 0
+          render_style: index == 0,
+          options: @config.options
         )
       end
     end
     
     def publish!
-      if @config.navigation
-        @documents.map do |document|
-          document.publish!(show_navigation: true, navigation: @documents, navigation_depth: @config.navigation_depth, navigation_title: @config.navigation_title)
-        end
-      else
-        @documents.map do |document|
-          document.publish!(show_navigation: false, navigation: nil, navigation_depth: 0, navigation_title: nil)
-        end
+      # Pass all documents as navigation data - individual documents will decide whether to show navigation based on options
+      @documents.map do |document|
+        document.publish!(documents: @documents)
       end
     end
     

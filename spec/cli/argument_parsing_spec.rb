@@ -46,6 +46,79 @@ RSpec.describe "CLI Argument Parsing" do
       end
     end
 
+    context "with layout options" do
+      it "parses single --opt flag" do
+        config, files, help = Mint::Commandline.parse!(["--opt", "breadcrumbs", "file.md"])
+
+        expect(config.options[:breadcrumbs]).to be(true)
+        expect(files.map(&:basename).map(&:to_s)).to include("file.md")
+      end
+
+      it "parses multiple --opt flags" do
+        config, files, help = Mint::Commandline.parse!(["--opt", "breadcrumbs", "--opt", "sidebar", "--opt", "toc", "file.md"])
+
+        expect(config.options[:breadcrumbs]).to be(true)
+        expect(config.options[:sidebar]).to be(true)
+        expect(config.options[:toc]).to be(true)
+        expect(files.map(&:basename).map(&:to_s)).to include("file.md")
+      end
+
+      it "handles empty options by default" do
+        config, files, help = Mint::Commandline.parse!(["file.md"])
+
+        expect(config.options).to eq({})
+        expect(files.map(&:basename).map(&:to_s)).to include("file.md")
+      end
+
+      it "parses --opt with values" do
+        config, files, help = Mint::Commandline.parse!(["--opt", "navigation-depth=5", "--opt", "navigation-title=My Navigation", "file.md"])
+
+        expect(config.options[:navigation_depth]).to eq(5)
+        expect(config.options[:navigation_title]).to eq("My Navigation")
+        expect(files.map(&:basename).map(&:to_s)).to include("file.md")
+      end
+
+      it "parses mixed boolean and value layout options" do
+        config, files, help = Mint::Commandline.parse!(["--opt", "navigation", "--opt", "navigation-depth=2", "--opt", "breadcrumbs", "file.md"])
+
+        expect(config.options[:navigation]).to be(true)
+        expect(config.options[:navigation_depth]).to eq(2)
+        expect(config.options[:breadcrumbs]).to be(true)
+        expect(files.map(&:basename).map(&:to_s)).to include("file.md")
+      end
+
+      it "converts navigation options to layout options" do
+        # Test that the new approach works: --opt navigation instead of --navigation
+        config, files, help = Mint::Commandline.parse!(["--opt", "navigation", "--opt", "navigation-depth=4", "--opt", "navigation-title=Test Nav", "file.md"])
+
+        expect(config.options[:navigation]).to be(true)
+        expect(config.options[:navigation_depth]).to eq(4)
+        expect(config.options[:navigation_title]).to eq("Test Nav")
+      end
+
+      it "parses negated layout options with no- prefix" do
+        config, files, help = Mint::Commandline.parse!(["--opt", "no-navigation", "--opt", "no-insert-title-heading", "file.md"])
+
+        expect(config.options[:navigation]).to be(false)
+        expect(config.options[:insert_title_heading]).to be(false)
+      end
+
+      it "handles mixed positive and negative layout options" do
+        config, files, help = Mint::Commandline.parse!(["--opt", "navigation", "--opt", "no-insert-title-heading", "--opt", "sidebar", "file.md"])
+
+        expect(config.options[:navigation]).to be(true)
+        expect(config.options[:insert_title_heading]).to be(false)
+        expect(config.options[:sidebar]).to be(true)
+      end
+
+      it "can negate and re-enable the same option" do
+        # Later options override earlier ones
+        config, files, help = Mint::Commandline.parse!(["--opt", "navigation", "--opt", "no-navigation", "--opt", "navigation", "file.md"])
+
+        expect(config.options[:navigation]).to be(true)
+      end
+    end
+
     context "with path options" do
       it "parses --working-dir option" do
         config, files, help = Mint::Commandline.parse!(["--working-dir", "/custom/path", "file.md"])
@@ -117,15 +190,7 @@ RSpec.describe "CLI Argument Parsing" do
         expect(config.preserve_structure).to be true
       end
 
-      it "parses --navigation flag" do
-        config, files, help = Mint::Commandline.parse!(["--navigation", "file.md"])
-        expect(config.navigation).to be true
-      end
 
-      it "parses --insert-title-heading flag" do
-        config, files, help = Mint::Commandline.parse!(["--insert-title-heading", "file.md"])
-        expect(config.insert_title_heading).to be true
-      end
 
       it "parses --autodrop flag" do
         config, files, help = Mint::Commandline.parse!(["--autodrop", "file.md"])
@@ -139,15 +204,7 @@ RSpec.describe "CLI Argument Parsing" do
         expect(config.preserve_structure).to be false
       end
 
-      it "parses --no-navigation flag" do
-        config, files, help = Mint::Commandline.parse!(["--no-navigation", "file.md"])
-        expect(config.navigation).to be false
-      end
 
-      it "parses --no-insert-title-heading flag" do
-        config, files, help = Mint::Commandline.parse!(["--no-insert-title-heading", "file.md"])
-        expect(config.insert_title_heading).to be false
-      end
 
       it "parses --no-autodrop flag" do
         config, files, help = Mint::Commandline.parse!(["--no-autodrop", "file.md"])

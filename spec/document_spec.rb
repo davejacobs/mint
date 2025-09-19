@@ -23,8 +23,8 @@ module Mint
           style_path: Pathname.new("style.css"),
           style_destination_path: Pathname.new("output"),
           style_mode: :inline,
-          insert_title_heading: false,
-          transform_links: proc {|basename| "#{basename}.html" }
+          transform_links: proc {|basename| "#{basename}.html" },
+          options: { insert_title_heading: false }
         )
       end
 

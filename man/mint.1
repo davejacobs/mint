@@ -38,29 +38,14 @@ Preserve source directory structure (e.g., nesting) in destination (default: tru
 .BR \-\-no\-preserve\-structure
 Flatten all files into destination directory
 .TP
-.BR \-\-navigation
-Enable navigation panel showing all files
-.TP
-.BR \-\-no\-navigation
-Disable navigation panel
-.TP
-.BR \-\-navigation\-title " " \fITITLE\fR
-Set title for navigation panel
-.TP
 .BR \-\-autodrop
 Automatically drop common directory levels from output paths and navigation (default: true)
 .TP
 .BR \-\-no\-autodrop
 Don't automatically drop common directory levels
 .TP
-.BR \-\-navigation\-depth " " \fIDEPTH\fR
-Maximum depth to show in navigation (default: 3)
-.TP
-.BR \-\-insert\-title\-heading
-Insert document title as H1 heading into content
-.TP
-.BR \-\-no\-insert\-title\-heading
-Don't insert title as H1 heading
+.BR \-\-opt " " \fIOPTION\fR
+Set layout option: \fB--opt key\fR or \fB--opt key=value\fR (can be used multiple times). Use \fB--opt no-key\fR to set option to false. Negated options cannot be combined with value assignment. Layout options are template-specific \- consult your template documentation for available options. The default template supports \fBnavigation\fR, \fBnavigation-depth=N\fR, \fBnavigation-title="Title"\fR, and \fBinsert-title-heading\fR
 .SH STYLE OPTIONS
 Mint offers flexible control over how stylesheets are incorporated into your documents:
 
@@ -102,11 +87,17 @@ User config file: ~/.config/mint/config.toml
 .IP 4. 2
 Built-in defaults (lowest priority)
 
-Boolean options set to true in configuration files can be overridden using --no- flags:
+Layout options can be set in configuration files and overridden on the commandline:
 .RS
 .nf
-# If config.toml has: navigation = true
-mint Document.md --no-navigation
+# In config.toml:
+[options]
+navigation = true
+navigation-depth = 2
+insert-title-heading = true
+
+# Override on commandline:
+mint Document.md --opt navigation-depth=4
 .fi
 .RE
 .SH EXAMPLES
@@ -123,7 +114,7 @@ mint Document1.md Document2.md Document3.md
 .TP
 Insert title as H1 heading:
 .nf
-mint Document.md --insert-title-heading
+mint Document.md --opt insert-title-heading
 .fi
 .TP
 Use a specific template:
@@ -136,9 +127,14 @@ Create external stylesheet:
 mint Document.md --style-destination css
 .fi
 .TP
-Override boolean config file settings with --no-* variants:
+Enable navigation with custom options:
 .nf
-mint Document.md --no-navigation --no-insert-title-heading
+mint Document.md --opt navigation --opt navigation-depth=2 --opt navigation-title="Contents"
+.fi
+.TP
+Disable default options:
+.nf
+mint Document.md --opt no-navigation --opt no-insert-title-heading
 .fi
 .TP
 Output to STDOUT instead of a file:

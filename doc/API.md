@@ -103,8 +103,10 @@ files = [Pathname.new("intro.md"), Pathname.new("guide.md"), Pathname.new("refer
 Mint::Commandline.publish!(files, config: {
   template_name: "professional",
   destination_directory: Pathname.new("public"),
-  navigation: true,
-  navigation_title: "Documentation"
+  options: {
+    navigation: true,
+    navigation_title: "Documentation"
+  }
 })
 ```
 
@@ -120,8 +122,10 @@ require 'mint/workspace'
 files = [Pathname.new("intro.md"), Pathname.new("guide.md")]
 config = Mint::Config.new(
   destination_directory: Pathname.new("public"),
-  navigation: true,
-  navigation_title: "Docs"
+  options: {
+    navigation: true,
+    navigation_title: "Docs"
+  }
 )
 
 workspace = Mint::Workspace.new(files, config)
@@ -135,20 +139,19 @@ destination_paths.each { |path| puts "Created: #{path}" }
 
 Templates have access to the following variables:
 
-- `content` – Rendered HTML content from the Markdown
-- `stylesheet_tag` – Generated style tag (`<style>` or `<link>`) 
-- `metadata` – YAML frontmatter from the Markdown file
-- `files` – Navigation tree data (when `navigation: true`)
-- `title` – Extracted or generated title
-- `inject_title` – Boolean indicating if title should be inserted as H1 heading
-- `show_navigation` – Boolean indicating if navigation should be shown
-- `navigation_title` – Title for the navigation panel
-- `current_path` – Path to current source file
 - `working_directory` – Current working directory
+- `current_path` – Path to current source file
+- `content` – Rendered HTML content from the Markdown
+- `stylesheet_tag` – Generated style tag (`<style>` or `<link>`)
+- `metadata` – YAML frontmatter from the Markdown file
+- `title` – Extracted or generated title
+- `documents` – Serialized version of all documents published with the command, e.g., for use
+  in building a navigation sidebar or breadcrumbs
+- `options` – Hash containing layout-specific options
 
 ### Navigation data structure
 
-When `navigation: true` is enabled, the `files` variable contains an array of navigation items:
+The `documents` variable contains an array of navigation items:
 
 ```ruby
 [
@@ -179,11 +182,13 @@ When `navigation: true` is enabled, the `files` variable contains an array of na
 Mint handles paths carefully to ensure cross-platform compatibility:
 
 ### Input files
+
 - File paths are kept as relative paths until resolution time
 - Use `Pathname` objects when working programmatically for best results
 - Absolute paths are converted to relative where possible
 
 ### Output destinations
+
 - Destination paths are resolved at publish time by combining `destination_directory` + relative output path
 - The `preserve_structure` feature (enabled by default) maintains the original directory structure
 - The `autodrop` feature (also enabled by default) removes common directory prefixes when structure is not preserved
@@ -191,12 +196,14 @@ Mint handles paths carefully to ensure cross-platform compatibility:
 ### Example path transformations
 
 With `preserve_structure: true` (default):
+
 ```
 Input files:       docs/api/intro.md, docs/api/classes.md, docs/guide.md
 Output:           docs/api/intro.html, docs/api/classes.html, docs/guide.html
 ```
 
 With `preserve_structure: false` and `autodrop: true`:
+
 ```
 Input files:       docs/api/intro.md, docs/api/classes.md, docs/guide.md
 Common prefix:     docs/ (dropped)
@@ -206,6 +213,7 @@ Output:           api/intro.html, api/classes.html, guide.html
 ## Built-in templates
 
 Available templates:
+
 - `default` – Clean, centered layout
 - `nord` – Nord color scheme
 - `nord-dark` – Dark Nord theme

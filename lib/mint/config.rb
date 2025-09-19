@@ -15,11 +15,8 @@ module Mint
     attr_accessor :destination_directory
     attr_accessor :style_destination_directory
     attr_accessor :preserve_structure
-    attr_accessor :insert_title_heading
     attr_accessor :autodrop
-    attr_accessor :navigation
-    attr_accessor :navigation_depth
-    attr_accessor :navigation_title
+    attr_accessor :options
     
     DEFAULT_STDIN_MODE                  = false
     DEFAULT_STDOUT_MODE                 = false
@@ -31,11 +28,8 @@ module Mint
     DEFAULT_WORKING_DIRECTORY           = lambda { Pathname.getwd.expand_path }
     DEFAULT_DESTINATION_DIRECTORY       = lambda { Pathname.getwd.expand_path }
     DEFAULT_PRESERVE_STRUCTURE          = true
-    DEFAULT_INSERT_TITLE_HEADING        = false
     DEFAULT_AUTODROP                    = true
-    DEFAULT_NAVIGATION                  = false
-    DEFAULT_NAVIGATION_DEPTH            = 3
-    DEFAULT_NAVIGATION_TITLE            = nil
+    DEFAULT_OPTIONS                     = {}
     
     def initialize(options = {})
       @stdin_mode = options[:stdin_mode] if options.key?(:stdin_mode)
@@ -50,11 +44,8 @@ module Mint
       @destination_directory = options[:destination_directory]
       @style_destination_directory = options[:style_destination_directory]
       @preserve_structure = options[:preserve_structure] if options.key?(:preserve_structure)
-      @insert_title_heading = options[:insert_title_heading] if options.key?(:insert_title_heading)
       @autodrop = options[:autodrop] if options.key?(:autodrop)
-      @navigation = options[:navigation] if options.key?(:navigation)
-      @navigation_depth = options[:navigation_depth] if options.key?(:navigation_depth)
-      @navigation_title = options[:navigation_title]
+      @options = options[:options] || {}
     end
     
     def to_h
@@ -71,16 +62,20 @@ module Mint
         destination_directory: @destination_directory,
         style_destination_directory: @style_destination_directory,
         preserve_structure: @preserve_structure,
-        insert_title_heading: @insert_title_heading,
         autodrop: @autodrop,
-        navigation: @navigation,
-        navigation_depth: @navigation_depth,
-        navigation_title: @navigation_title
+        options: @options
       }
     end
     
     def merge(config = Config.new)
-      Config.new(to_h.merge(config.to_h.reject {|_, v| v.nil? }))
+      merged_options = to_h.merge(config.to_h.reject {|_, v| v.nil? })
+
+      # Special handling for options - merge the hashes instead of overwriting
+      if merged_options[:options] && to_h[:options]
+        merged_options[:options] = to_h[:options].merge(merged_options[:options])
+      end
+
+      Config.new(merged_options)
     end
 
     def self.ensure_config(config)
@@ -114,11 +109,8 @@ module Mint
         destination_directory: dest_dir,
         style_destination_directory: Pathname.new('.'),
         preserve_structure: DEFAULT_PRESERVE_STRUCTURE,
-        insert_title_heading: DEFAULT_INSERT_TITLE_HEADING,
         autodrop: DEFAULT_AUTODROP,
-        navigation: DEFAULT_NAVIGATION,
-        navigation_depth: DEFAULT_NAVIGATION_DEPTH,
-        navigation_title: DEFAULT_NAVIGATION_TITLE
+        options: DEFAULT_OPTIONS
       })
     end
 
@@ -139,28 +131,34 @@ module Mint
         'style-mode' => :style_mode,
         'style-destination' => :style_destination_directory,
         'preserve-structure' => :preserve_structure,
-        'insert-title-heading' => :insert_title_heading,
-        'autodrop' => :autodrop,
-        'navigation' => :navigation,
-        'navigation-depth' => :navigation_depth,
-        'navigation-title' => :navigation_title
+        'autodrop' => :autodrop
       }
 
       mapped = {}
       toml_config.each do |key, value|
-        mapped_key = mapping[key] || key.to_sym
-        
-        # Handle special conversions
-        case mapped_key
-        when :destination_directory
-          mapped[mapped_key] = Pathname.new(value) if value
-        when :style_mode
-          mapped[mapped_key] = value.to_sym if value
+        if key == 'options' && value.is_a?(Hash)
+          # Handle nested options section
+          mapped[:options] = {}
+          value.each do |opt_key, opt_value|
+            # Convert hyphens to underscores for easier template access
+            normalized_key = opt_key.gsub('-', '_').to_sym
+            mapped[:options][normalized_key] = opt_value
+          end
         else
-          mapped[mapped_key] = value
+          mapped_key = mapping[key] || key.to_sym
+
+          # Handle special conversions
+          case mapped_key
+            when :destination_directory
+              mapped[mapped_key] = Pathname.new(value) if value
+            when :style_mode
+              mapped[mapped_key] = value.to_sym if value
+            else
+              mapped[mapped_key] = value
+            end
         end
       end
-      
+
       mapped
     end
   end

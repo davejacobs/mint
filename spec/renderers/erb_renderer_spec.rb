@@ -158,6 +158,33 @@ RSpec.describe Mint::Renderers::Erb do
       expect(result).to include('<div class="outer">')
       expect(result).to include('<span class="inner">Hello from outer</span>')
     end
+
+    it "exposes options variable in templates" do
+      template = "<% if options[:breadcrumbs] %><nav class=\"breadcrumbs\">Home > Page</nav><% end %>"
+      variables = { options: { breadcrumbs: true } }
+
+      result = described_class.render(template, variables)
+
+      expect(result).to include('<nav class="breadcrumbs">Home > Page</nav>')
+    end
+
+    it "allows access to options values" do
+      template = "<%= options[:custom_class] %>"
+      variables = { options: { custom_class: "my-special-class" } }
+
+      result = described_class.render(template, variables)
+
+      expect(result).to eq("my-special-class")
+    end
+
+    it "handles empty options gracefully" do
+      template = "<% if options[:missing_option] %>Should not appear<% end %>"
+      variables = { options: {} }
+
+      result = described_class.render(template, variables)
+
+      expect(result).to eq("")
+    end
   end
 
   describe "RenderContext" do

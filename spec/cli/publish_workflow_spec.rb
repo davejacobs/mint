@@ -341,9 +341,9 @@ RSpec.describe "CLI Publishing Workflow" do
             <html>
             <body>
               <nav>
-                <% if files && files.any? %>
-                  <% files.each do |file| %>
-                    <a href="<%= file[:html_path] %>"><%= file[:title] %></a>
+                <% if documents && documents.any? %>
+                  <% documents.each do |document| %>
+                    <a href="<%= document[:html_path] %>"><%= document[:title] %></a>
                   <% end %>
                 <% end %>
               </nav>
@@ -355,7 +355,7 @@ RSpec.describe "CLI Publishing Workflow" do
           FileUtils.mkdir_p(".mint/templates/nav")
           File.write(".mint/templates/nav/layout.erb", nav_template)
           
-          Mint::Commandline.publish!(files, config: Mint::Config.with_defaults(layout_name: "nav", navigation: true))
+          Mint::Commandline.publish!(files, config: Mint::Config.with_defaults(layout_name: "nav", options: { navigation: true }))
           
           # Check that navigation was included
           verify_file_content("page0.html") do |content|
