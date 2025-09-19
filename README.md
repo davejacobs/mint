@@ -48,30 +48,25 @@ mint Document.md
 # Publish with a non-default template
 mint Document.md --template nord
 
-# Publish to a specific directory
+# Publish to the public directory
 mint Document.md --destination public
 
-# Publish multiple files
+# Publish multiple files, specifying them using a glob pattern
 mint *.md --destination final-drafts
 
-# Read Markdown content piped from STDIN, limited to a single file; note the `-`
-# as a special filename
-echo "# Document" | mint - --output-file Document.html
-
-# Output to STDOUT instead of a file
-mint Document.md --output-file -
-
-# Pipe from STDIN to STDOUT
+# Read Markdown content piped from STDIN and print the resulting HTML and CSS
+# to STDOUT; note that this is limited to a single file
 echo "# Document" | mint - --output-file -
 
-# Publish multiple files and generate a left-hand navigation panel; use globs
-# to recursively include nested files. By default, nested directories will
-# be preserved, but any common directories for all files (in this case, `content`),
-# will be automatically removed from the output ("autodropped").
-mint content/**/*.md --destination public --navigation --navigation-title "Documentation"
+# Publish multiple files and generate a left-hand navigation panel in the default
+# template using a template-specific option. Shell globs allow you to recursively include
+# nested files. Note that by default nested directories structure be preserved in the output,
+# but any directories common to all files (in this case, `content`), will be automatically removed
+# from the output ("autodropped") for convenience.
+mint content/**/*.md --destination public --opt navigation --opt navigation-title "Documentation"
 
-# Guess document title (and h1 header) from filename
-mint Document.md --file-title
+# Publish nested files without preserving structure
+mint content/**/*.md --destination public --no-preserve-structure
 ```
 
 ### Common options
@@ -84,12 +79,9 @@ mint Document.md --file-title
 | `-m, --style-mode MODE` | How styles are included (inline, external, original) |
 | `-d, --destination DIR` | Output directory |
 | `-o, --output-file FORMAT` | Custom output filename, with substitutions available, or `-` for STDOUT |
-| `--no-autodrop` | Do not automatically drop common parent directories from published files |
+| `--opt OPT[=VAL]` | Specify template-specific options, e.g., --opt navigation for the default template |
 | `--no-preserve-structure` | Flatten all published files into one directory rather than preserving structure |
-| `--file-title` | Extract title from filename and inject into template |
-| `--navigation` | Enable navigation panel showing all files |
-| `--navigation-title TITLE` | Set title for navigation panel |
-| `--navigation-depth N` | Maximum depth to show in navigation after dropping levels (default: 3) |
+| `--no-autodrop` | Do not automatically drop common parent directories from published files |
 | `-v, --verbose` | Show where documents were published |
 
 ### Built-in templates
@@ -127,49 +119,45 @@ template = "nord"
 
 # File output handling
 destination = "public"
-preserve-structure = true
+preserve-structure = false
 output-file = "%{basename}_processed.%{new_extension}"
 style-mode = "external"
 
-# Navigation
+[options]                          # These are options for the default layout
 navigation = true
-navigation-title = "My Docs"
-navigation-autodrop = true          # Automatically drop common directory levels (default: true)
-navigation-depth = 3               # Maximum depth after dropping levels (default: 3)
-navigation-drop = 1                # Alternative to autodrop - manually specify levels to drop
-
-# Other options
-file-title = true
-working-dir = "/path/to/source"
+navigation-title = "Documents"
+navigation-depth = 3               # Maximum depth for items in navigation sidebar
+insert-title-heading = true        # Add the document title as an <h1> above document content
 ```
 
 ### Overriding configuration file settings
 
-For most flags, overriding your configuration file is simple: You can simply
+For most flags, overriding the configuration file is simple: Simply
 specify a new value via commandline flags. Boolean flags require a slightly
-different approach, the use of `--no-[option]` flags.
+different approach: use the `--no-[option]` variant of the relevant flag.
 
-If you've set `navigation = true` in `config.toml`, you can override that
-at the commandline:
+For example, if you've set the layout option `preserve-structure = true` in `config.toml`,
+you can override that at the commandline:
 
 ```bash
-mint docs.md --no-navigation
+mint docs.md --no-preserve-structure
 ```
 
-Available `--no-` flags:
-- `--no-preserve-structure` - Don't preserve directory structure 
-- `--no-navigation` - Disable navigation panel
-- `--no-file-title` - Don't extract titles from filenames
+You can do the same with layout options via `--opt no-*` variants of your template's
+specific options.
 
 ### Style modes
 
 Mint offers three ways to include styles in your HTML output:
 
 - `inline` (default) – CSS is embedded directly in the HTML document as `<style>` tags
-- `external` – CSS is compiled and saved as separate files, linked with `<link>` tags
-- `original` – Links directly to original CSS template files without processing (for live editing)
+- `external` – CSS is compiled into a single external file in your destination directory and is
+  automatically linked from your document with `<link>` tags
+- `original` – Links directly to original CSS template files without processing
 
-The `original` mode is particularly useful for template development, as it allows you to edit CSS files and see changes immediately without republishing. Only `.css` files are supported in this mode, and `@import` statements in CSS files will be included as additional `<link>` tags.
+The `original` mode is particularly useful for template development, as it allows you to edit CSS
+files and see changes immediately without republishing. In this mode, `@import` statements in CSS
+files will be included as additional `<link>` tags.
 
 ## Contributing
 
