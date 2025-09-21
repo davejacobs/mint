@@ -6,64 +6,65 @@ body {
   font-size: var(--base-font-size);
 }
 
-h1, h2, h3, h4, h5, h6 {
+#document h1, #document h2, #document h3, #document h4, #document h5, #document h6 {
   margin-top: var(--space-md);
   margin-bottom: var(--space-sm);
   line-height: var(--base-line-height);
+  font-weight: normal;
 }
 
-h1 {
+#document h1 {
   font-size: var(--font-size-2xl);
   margin-top: 0;
   margin-bottom: var(--space-base);
 }
 
-h2 {
+#document h2 {
   font-size: var(--font-size-xl);
 }
 
-h3 {
+#document h3 {
   font-size: var(--font-size-lg);
 }
 
-h4 {
+#document h4 {
   font-size: var(--font-size-base);
 }
 
-h5, h6 {
+#document h5, #document h6 {
   font-size: var(--font-size-sm);
 }
 
-ul, ol {
+#document ul, #document ol {
   margin: var(--space-base) 0;
   padding-left: var(--space-lg);
 }
 
-li {
+#document li {
   margin: var(--space-xs) 0;
 }
 
-ul ul, ol ol, ul ol, ol ul {
+#document ul ul, #document ol ol, #document ul ol, #document ol ul {
   margin: var(--space-xs) 0;
 }
 
-p {
+#document p {
   margin: var(--space-base) 0;
 }
 
-a {
+#document a {
   color: var(--color-accent);
   text-decoration: none;
   border-bottom: 1px solid transparent;
-  transition: var(--transition-fast);
+  /* transition: var(--transition-fast); */
 }
 
-a:hover {
+#document a:hover {
   color: var(--color-accent-hover);
   border-bottom-color: var(--color-accent-hover);
 }
 
-code {
+#document code {
   font-family: 'SF Mono', 'JetBrains Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
   font-size: var(--font-size-xs);
   background-color: var(--color-code-bg);
@@ -73,11 +74,11 @@ code {
   border: 1px solid var(--color-code-border);
 }
 
-pre {
+#document pre {
   font-family: 'SF Mono', 'JetBrains Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
 }
 
-pre code {
+#document pre code {
   background-color: transparent;
   border: none;
   padding: 0;
@@ -85,7 +86,7 @@ pre code {
   font-size: var(--font-size-xs);
 }
 
-pre {
+#document pre {
   margin: var(--space-base) 0;
   padding: var(--space-base);
   overflow-x: auto;
@@ -96,7 +97,7 @@ pre {
   border-radius: var(--radius-base);
 }
 
-blockquote {
+#document blockquote {
   margin: var(--space-base) 0;
   padding: var(--space-sm) var(--space-base);
   margin-left: 0;
@@ -106,12 +107,12 @@ blockquote {
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
 }
 
-img {
+#document img {
   max-width: 100%;
   height: auto;
 }
 
-table {
+#document table {
   border-collapse: collapse;
   margin: var(--space-base) 0;
   width: 100%;
@@ -121,7 +122,7 @@ table {
   overflow: hidden;
 }
 
-th, td {
+#document th, #document td {
   padding: var(--space-sm) var(--space-sm);
   text-align: left;
   border-bottom: 1px solid var(--color-table-border);
@@ -130,36 +131,36 @@ th, td {
   border-top: none;
 }
 
-th {
+#document th {
   background-color: var(--color-table-header-bg);
   color: var(--color-table-header-text);
   font-weight: 500;
 }
 
-tr:last-child td {
+#document tr:last-child td {
   border-bottom: none;
 }
 
-tr:nth-child(even) {
+#document tr:nth-child(even) {
   background-color: var(--color-table-stripe);
 }
 
-tr:hover {
+#document tr:hover {
   background-color: var(--color-table-hover);
 }
 
-hr {
+#document hr {
   margin: var(--space-xl) 0;
   border: none;
   height: 1px;
   background-color: var(--color-border);
 }
 
-strong {
+#document strong {
   font-weight: bold;
 }
 
-em {
+#document em {
   font-style: italic;
 }
 

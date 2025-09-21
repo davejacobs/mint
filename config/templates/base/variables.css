@@ -11,7 +11,7 @@
   
   /* Typographic Scale - Templates can override --scale-ratio */
   --scale-ratio: 1.25; /* Minor third by default */
-  --font-size-xxs: calc(var(--base-font-size) * 0.6);
+  --font-size-xxs: calc(var(--base-font-size) * 0.65);
   --font-size-xs: calc(var(--base-font-size) * 0.75);
   --font-size-sm: calc(var(--base-font-size) * 0.875);
   --font-size-base: var(--base-font-size);
@@ -21,6 +21,7 @@
   --font-size-3xl: calc(var(--font-size-2xl) * var(--scale-ratio));
   
   /* Spacing Scale - Based on typographic rhythm */
+  --space-xxs: calc(var(--base-unit) * 0.15);
   --space-xs: calc(var(--base-unit) * 0.25);
   --space-sm: calc(var(--base-unit) * 0.5);
   --space-base: var(--base-unit);
@@ -39,8 +40,8 @@
   --color-surface-subtle: #f8f9fa;
   --color-border: #e5e5e5;
   --color-border-subtle: #f0f0f0;
-  --color-accent: #007acc;
-  --color-accent-hover: #005fa3;
+  --color-accent: #0e5e7b;
+  --color-accent-hover: var(--color-accent);
   --color-accent-subtle: rgba(0, 122, 204, 0.1);
   
   /* Component-Specific Colors */
@@ -53,15 +54,6 @@
   --color-quote-bg: #fafafa;
   --color-quote-text: var(--color-text-subtle);
   --color-quote-border: var(--color-accent);
-  --color-nav-bg: #f8f9fa;
-  --color-nav-text: var(--color-text-subtle);
-  --color-nav-text-hover: var(--color-text);
-  --color-nav-text-active: var(--color-accent);
-  --color-nav-bg-hover: var(--color-surface-subtle);
-  --color-nav-bg-active: var(--color-accent-subtle);
-  --color-nav-border: var(--color-border);
-  --color-nav-border-active: var(--color-accent);
-  
   /* Table Colors */
   --color-table-bg: var(--color-surface);
   --color-table-header-bg: var(--color-surface-subtle);

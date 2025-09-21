@@ -7,95 +7,41 @@
 
 /* Basic template theme variables */
 :root {
-  /* Typography settings - uses golden ratio scaling */
   --base-font-size: 21px;
-
   --base-line-height: 1.4;
-  --scale-ratio: 1.23; /* Golden ratio for more dramatic scale */
-
-  /* Print settings */
+  --scale-ratio: 1.23;
   --print-font-size: 10pt;
   --print-line-height: calc(var(--print-font-size) * 1.618);
-  
-  /* Minimal color palette */
-  --color-text: #2c2c2c;
-  --color-text-subtle: #666666;
-  --color-text-muted: #8a8a8a;
-  --color-background: #fcfcfc;
-  --color-surface: #fcfcfc;
-  --color-surface-subtle: #f8f9fa;
-  --color-border: #cccccc;
-  --color-accent: #007acc;
-  --color-accent-hover: #005fa3;
-  --color-accent-subtle: rgba(0, 122, 204, 0.1);
-  
-  /* Component colors - minimal styling */
-  --color-code-bg: rgba(0, 0, 0, 0.04);
-  --color-code-text: var(--color-text);
-  --color-pre-bg: rgba(0, 0, 0, 0.02);
-  --color-pre-text: var(--color-text);
-  --color-quote-bg: transparent;
-  --color-quote-text: var(--color-text-muted);
-  --color-quote-border: var(--color-border);
-  
-  /* Navigation colors */
-  --color-nav-bg: #f8f9fa;
-  --color-nav-text: var(--color-text);
-  --color-nav-text-hover: var(--color-text);
-  --color-nav-text-active: var(--color-accent);
-  --color-nav-bg-hover: #f0f0f0;
-  --color-nav-bg-active: #f0f8ff;
-  --color-nav-border: var(--color-border);
-  --color-nav-border-active: var(--color-accent);
-  
-  /* Table colors - minimal */
-  --color-table-bg: var(--color-surface);
-  --color-table-header-bg: transparent;
-  --color-table-border: var(--color-border);
-  --color-table-stripe: transparent;
-  --color-table-hover: transparent;
-  
-  /* Layout */
-  --container-max-width: 45rem;
-  --container-padding: var(--space-lg) var(--space-2xl);
-  --navigation-gap: 4rem;
 }
 
 /* Typography */
 body {
   font-family: 'Crimson Text', serif;
-  font-optical-sizing: auto;
-  font-weight: 350;
   font-style: normal;
   background-color: var(--color-background);
   color: var(--color-text);
   text-rendering: optimizeLegibility;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-weight: 300;
-}
-
-h2 {
-  border-bottom: 1px solid var(--color-border);
-  padding-bottom: var(--space-xs);
-}
-
-/* Enhanced typography with golden ratio spacing */
-p {
-  hyphens: auto;
-}
-
 /* Container layouts */
-#container {
+#document {
   max-width: var(--container-max-width);
   margin: 0 auto;
   padding: var(--container-padding);
 }
 
+#document h2 {
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: var(--space-xs);
+}
+
+#document p {
+  hyphens: auto;
+}
+
 /* Container adjustments when navigation is present */
-body:has(#navigation) #container,
-body.has-navigation #container {
+body:has(#navigation) #document,
+body.has-navigation #document {
   max-width: var(--container-max-width);
   margin-right: auto;
   margin-top: 0;
@@ -103,37 +49,21 @@ body.has-navigation #container {
 }
 
 /* Enhanced code styling */
-code {
+#document code {
   font-family: Monaco, "Roboto Mono", "Ubuntu Mono", Consolas, "Courier New", monospace;
   font-weight: 400;
   line-height: calc(var(--base-line-height) * 1.1);
 }
 
 /* Simplified table styling */
-th {
+#document th {
   font-weight: 400;
   font-style: italic;
   border-bottom: 1px solid var(--color-border);
 }
 
-td {
+#document td {
   border: none;
-}
-
-/* Navigation font size adjustments - more compact but readable */
-#navigation h3 {
-  font-size: calc(var(--base-font-size) * 1.1);
-  margin-bottom: calc(var(--space-base) * 0.75);
-}
-
-#navigation a {
-  font-size: calc(var(--base-font-size) * 0.75);
-  padding: calc(var(--space-sm) * 0.4) var(--space-sm);
-}
-
-#navigation .directory-name {
-  font-size: calc(var(--base-font-size) * 0.8);
-  padding: calc(var(--space-sm) * 0.4) var(--space-sm);
 }
 
 /* Responsive design */
@@ -142,9 +72,9 @@ td {
     border-bottom: 1px solid var(--color-border);
   }
   
-  body:has(#navigation) #container,
-  body.has-navigation #container,
-  #container {
+  body:has(#navigation) #document,
+  body.has-navigation #document,
+  #document {
     max-width: var(--container-max-width);
     padding: var(--space-xl) var(--space-xl);
   }

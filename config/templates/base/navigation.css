@@ -1,20 +1,56 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
-
 /* Base Navigation Layout - Structural styles only */
 /* Colors, fonts, and borders should be overridden in individual templates */
+
+/* Navigation CSS Variables - Default values */
+/* Templates can override these variables to customize navigation appearance */
+:root {
+  /* Navigation colors */
+  --color-nav-bg: #f2f2f2;
+  --color-nav-text: var(--color-text);
+  --color-nav-text-hover: var(--color-accent);
+  --color-nav-text-active: var(--color-accent);
+  --color-nav-directory-text: var(--color-text-subtle);
+  --color-nav-directory-text-hover: var(--color-accent);
+  --color-nav-directory-text-active: var(--color-accent);
+  --color-nav-bg-hover: var(--color-surface-subtle);
+  --color-nav-bg-active: var(--color-accent-subtle);
+  --color-nav-border: var(--color-border);
+  --color-nav-border-active: var(--color-accent);
+
+  /* Navigation font settings */
+  --nav-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --nav-font-weight: 400;
+  --nav-header-font-size: var(--font-size-lg);
+  --nav-header-font-weight: 600;
+  --nav-link-font-size: var(--font-size-xxs);
+  --nav-link-font-weight: 400;
+  --nav-link-active-font-weight: 500;
+  --nav-directory-font-size: var(--font-size-xxs);
+  --nav-directory-font-weight: 800;
+  --nav-directory-text-transform: uppercase;
+
+  /* Navigation spacing and layout */
+  --nav-padding: var(--space-sm);
+  --nav-link-padding: var(--space-xxs);
+  --nav-border-width: 2px;
+  --nav-border-style: solid;
+}
 
 /* Navigation container positioning and dimensions */
 #navigation {
   position: fixed;
   left: 0;
   top: 0;
-  width: var(--navigation-width);
+  max-width: var(--navigation-width);
   height: 100vh;
   overflow-y: auto;
-  padding: var(--space-base) 0;
+  padding-top: calc(var(--nav-padding) * 2);
+  padding-bottom: calc(var(--nav-padding) * 2);
+  padding-left: calc(var(--nav-padding) * 0.75);
+  padding-right: calc(var(--nav-padding) * 2);
   z-index: var(--z-navigation);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  font-weight: 400;
+  font-family: var(--nav-font-family);
+  font-weight: var(--nav-font-weight);
   background-color: var(--color-nav-bg);
   border-right: 1px solid var(--color-nav-border);
 }
@@ -23,9 +59,21 @@
 #navigation h3 {
   margin: 0 0 var(--space-sm) 0;
   padding: 0 var(--space-sm);
-  font-size: var(--font-size-sm);
-  font-weight: 600;
+  font-size: var(--nav-header-font-size);
+  font-weight: var(--nav-header-font-weight);
   color: var(--color-nav-text);
+}
+
+#navigation h3 a {
+  display: block;
+  color: var(--color-nav-text);
+  text-decoration: none;
+}
+
+#navigation h3 a:hover {
+  color: var(--color-nav-text-hover);
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 /* Navigation list structure */
@@ -40,70 +88,71 @@
 }
 
 /* Navigation links layout */
-#navigation a {
+#navigation li a {
   display: block;
-  padding: var(--space-xs) var(--space-xs);
+  padding: var(--nav-link-padding) var(--nav-link-padding);
   text-decoration: none;
-  border-left: 2px solid transparent;
+  /*border-left: var(--nav-border-width) var(--nav-border-style) transparent;*/
+  border-left-color: transparent;
   border-bottom: none;
-  transition: var(--transition-fast);
-  font-weight: 400;
+  font-weight: var(--nav-link-font-weight);
   color: var(--color-nav-text);
-  font-size: var(--font-size-sm);
+  font-size: var(--nav-link-font-size);
 }
 
-#navigation a:hover {
+#navigation li a:hover {
   color: var(--color-nav-text-hover);
   background-color: var(--color-nav-bg-hover);
   border-left-color: var(--color-nav-border);
 }
 
-#navigation a.current {
+#navigation li a.current {
   color: var(--color-nav-text-active);
   background-color: var(--color-nav-bg-active);
   border-left-color: var(--color-nav-border-active);
-  font-weight: 500;
+  font-weight: var(--nav-link-active-font-weight);
 }
 
 /* Directory names (non-clickable) */
 #navigation .directory-name {
   display: block;
-  padding: var(--space-xs) var(--space-xs);
-  font-weight: 600;
-  color: var(--color-nav-text-hover);
-  font-size: var(--font-size-xxs);
+  padding: var(--nav-link-padding) var(--nav-link-padding);
+  font-weight: var(--nav-directory-font-weight);
+  color: var(--color-nav-directory-text);
+  font-size: var(--nav-directory-font-size);
+  text-transform: var(--nav-directory-text-transform);
 }
 
 /* Depth-based indentation */
-#navigation .depth-0 a,
+#navigation .depth-0 li a,
 #navigation .depth-0 .directory-name {
   padding-left: var(--space-sm);
 }
 
-#navigation .depth-1 a,
+#navigation .depth-1 li a,
 #navigation .depth-1 .directory-name {
   padding-left: calc(var(--space-sm) * 2);
 }
 
-#navigation .depth-2 a,
+#navigation .depth-2 li a,
 #navigation .depth-2 .directory-name {
   padding-left: calc(var(--space-sm) * 3);
 }
 
-#navigation .depth-3 a,
+#navigation .depth-3 li a,
 #navigation .depth-3 .directory-name {
   padding-left: calc(var(--space-sm) * 4);
 }
 
 /* Container adjustments when navigation is present */
-body:has(#navigation) #container {
+body:has(#navigation) #document {
   margin-left: var(--navigation-width);
   padding-left: var(--navigation-gap);
 }
 
 /* Fallback for browsers that don't support :has() */
 @supports not selector(:has(#navigation)) {
-  body.has-navigation #container {
+  body.has-navigation #document {
     margin-left: var(--navigation-width);
     padding-left: var(--navigation-gap);
   }
@@ -119,8 +168,8 @@ body:has(#navigation) #container {
     padding: var(--space-sm) 0;
   }
 
-  body:has(#navigation) #container,
-  body.has-navigation #container {
+  body:has(#navigation) #document,
+  body.has-navigation #document {
     margin-left: auto;
   }
 }
@@ -131,8 +180,8 @@ body:has(#navigation) #container {
     display: none !important;
   }
   
-  body:has(#navigation) #container,
-  body.has-navigation #container {
+  body:has(#navigation) #document,
+  body.has-navigation #document {
     margin-left: auto !important;
   }
 }

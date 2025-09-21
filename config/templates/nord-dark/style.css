@@ -34,6 +34,9 @@
   --color-nav-border: var(--nord3);
   --color-nav-border-active: var(--nord8);
   
+  /* Navigation typography - using parameterized system */
+  --nav-font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --nav-directory-font-weight: 600;
   /* Table dark theme colors */
   --color-table-bg: var(--nord2);      /* Dark table background */
   --color-table-header-bg: var(--nord3); /* Slightly lighter header background */
@@ -99,11 +102,6 @@ a:hover {
 /* Lists for dark theme */
 ul, ol {
   color: var(--color-text);
-}
-
-/* Navigation directory names */
-#navigation .directory-name {
-  color: var(--nord5);
 }
 
 /* Print styles - force light theme for printing */

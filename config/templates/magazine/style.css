@@ -181,7 +181,7 @@ h1 + p::first-letter {
 }
 
 /* Container layouts */
-#container {
+#document {
   max-width: var(--container-max-width);
   margin: var(--space-2xl) auto;
   padding: 0 var(--space-xl);
@@ -189,8 +189,8 @@ h1 + p::first-letter {
 }
 
 /* Container adjustments when navigation is present */
-body:has(#navigation) #container,
-body.has-navigation #container {
+body:has(#navigation) #document,
+body.has-navigation #document {
   margin-left: calc(var(--navigation-width) + var(--space-xl));
   max-width: calc(var(--container-max-width) - var(--navigation-width));
   margin-right: auto;
@@ -290,13 +290,13 @@ hr {
     width: var(--red-bar-width);
   }
   
-  #container {
+  #document {
     margin-left: var(--space-xl);
     margin-right: calc(var(--red-bar-width) + var(--space-xl));
   }
   
-  body:has(#navigation) #container,
-  body.has-navigation #container {
+  body:has(#navigation) #document,
+  body.has-navigation #document {
     margin-left: calc(var(--navigation-width) + var(--space-base));
     margin-right: var(--space-base);
   }
@@ -314,15 +314,15 @@ hr {
     left: auto;
   }
   
-  #container {
+  #document {
     margin: var(--space-base) var(--space-base);
     margin-right: calc(var(--red-bar-width) + var(--space-base));
     max-width: none;
     padding: 0;
   }
   
-  body:has(#navigation) #container,
-  body.has-navigation #container {
+  body:has(#navigation) #document,
+  body.has-navigation #document {
     margin: var(--space-base);
     margin-right: var(--space-base);
   }
@@ -353,7 +353,7 @@ hr {
     display: none !important;
   }
   
-  #container {
+  #document {
     margin: 0 !important;
     max-width: none !important;
   }

@@ -65,6 +65,11 @@
   --color-nav-border: var(--nord4);
   --color-nav-border-active: var(--nord10);
   
+  /* Navigation typography - using parameterized system */
+  --nav-font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --nav-header-font-weight: 600;
+  --nav-directory-font-weight: 600;
+  
   /* Table colors */
   --color-table-bg: #ffffff;
   --color-table-header-bg: var(--nord5);
@@ -108,15 +113,15 @@ h4, h5, h6 {
 }
 
 /* Container layouts */
-#container {
+#document {
   max-width: var(--container-max-width);
   margin: var(--space-base) auto;
   padding: var(--space-base) var(--space-2xl);
 }
 
 /* Container adjustments when navigation is present */
-body:has(#navigation) #container,
-body.has-navigation #container {
+body:has(#navigation) #document,
+body.has-navigation #document {
   max-width: calc(var(--container-max-width) - var(--navigation-width));
   margin-right: auto;
   margin-top: var(--space-base);
@@ -154,17 +159,6 @@ tr:last-child td {
   border-bottom: none;
 }
 
-/* Navigation font size adjustments */
-#navigation h3 {
-  font-weight: 600;
-  color: var(--color-text-subtle);
-}
-
-#navigation .directory-name {
-  font-weight: 600;
-  color: var(--nord1);
-}
-
 /* Responsive design */
 @media (max-width: 960px) {
   body {
@@ -176,9 +170,9 @@ tr:last-child td {
     border-bottom: 1px solid var(--color-border);
   }
   
-  body:has(#navigation) #container,
-  body.has-navigation #container,
-  #container {
+  body:has(#navigation) #document,
+  body.has-navigation #document,
+  #document {
     max-width: var(--container-max-width);
     margin: 0;
     padding: var(--space-xl) var(--space-xl);
@@ -195,7 +189,7 @@ tr:last-child td {
     color: #000 !important;
   }
   
-  #container {
+  #document {
     background-color: white !important;
   }
   
