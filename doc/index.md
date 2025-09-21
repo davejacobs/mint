@@ -1,8 +1,8 @@
-# Mint Documentation
+# Mint documentation
 
 Welcome to the Mint documentation site!
 
-## Available Documentation
+## Available documentation
 
 - [API Reference](API.md) - Complete API documentation
 - [Tutorial](TUTORIAL.md) - Getting started guide

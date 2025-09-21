@@ -132,7 +132,7 @@ workspace = Mint::Workspace.new(files, config)
 destination_paths = workspace.publish!
 
 # destination_paths contains the relative paths where files were written
-destination_paths.each { |path| puts "Created: #{path}" }
+destination_paths.each {|path| puts "Created: #{path}" }
 ```
 
 ## Template variables
