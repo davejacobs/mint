@@ -16,21 +16,21 @@ module Mint
       end
     end
     
-    def self.extract_title_from_file(file_path)
-      content = File.read(file_path.to_s)
-      
-      # Check for Title metadata in Markdown front matter
-      if content =~ /^---\n.*?^title:\s*(.+)$/m
-        return $1.strip.gsub(/^["']|["']$/, '')
-      end
-      
-      # Check for first markdown heading  
+    def self.guess_title(file_path, content, metadata = {})
+      # Start with filename as base title (lowest precedence)
+      title = file_path.basename('.*').to_s.tr('_-', ' ').upcase
+
+      # Override with first H1 from markdown if present (medium precedence)
       if content =~ /^#\s+(.+)$/
-        return $1.strip
+        title = $1.strip
       end
-      
-      # Fall back to upcased filename with underscores/hyphens converted to spaces
-      file_path.basename('.*').to_s.tr('_-', ' ').upcase
+
+      # Override with title from frontmatter metadata if present (highest precedence)
+      if metadata[:title]
+        title = metadata[:title].to_s.strip
+      end
+
+      title
     end
   end
 end

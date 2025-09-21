@@ -10,7 +10,7 @@ module Mint
     def initialize(documents)
       @nodes = []
       documents.each do |document|
-        add_document(document.destination_path, document.title)
+        add_document(document.destination_path, document.title, document.source_path)
       end
       sort_nodes!
     end
@@ -43,7 +43,7 @@ module Mint
     
     private
     
-    def add_document(path, title)
+    def add_document(path, title, source_path = nil)
       parts = path.to_s.split('/').reject(&:empty?)
       current_nodes = @nodes
       
@@ -61,7 +61,8 @@ module Mint
             pathname: path_so_far,
             title: is_file ? title : part,
             depth: idx,
-            is_file: is_file
+            is_file: is_file,
+            source_path: is_file ? source_path : nil
           )
           current_nodes << node
         end
@@ -141,14 +142,15 @@ module Mint
   end
 
   class DocumentTreeNode
-    attr_reader :name, :pathname, :title, :children, :depth
+    attr_reader :name, :pathname, :title, :children, :depth, :source_path
     
-    def initialize(name:, pathname:, title:, depth: 0, is_file: false)
+    def initialize(name:, pathname:, title:, depth: 0, is_file: false, source_path: nil)
       @name = name
       @pathname = pathname
       @title = title
       @depth = depth
       @is_file = is_file
+      @source_path = source_path
       @children = []
     end
     

@@ -12,7 +12,7 @@ module Mint
   class Document
     METADATA_DELIM = "\n\n"
     
-    attr_reader :title, :destination_path
+    attr_reader :title, :destination_path, :source_path
     
     # @param [Pathname] working_directory path by which relative links should be resolved
     # @param [Pathname] source_path path to markdown file (relative to working_directory)
@@ -49,7 +49,10 @@ module Mint
       @transform_links = transform_links
       @render_style = render_style
       @options = options
-      @title = guess_title
+
+      source_content = File.read(@source_path)
+      @metadata, @body = parse_metadata_from(source_content)
+      @title = Helpers.guess_title(@source_path, @body, @metadata)
     end
 
     # Publishes the markdown document to HTML
@@ -65,9 +68,9 @@ module Mint
         create_external_stylesheet
       end
     
-      # Read and parse Markdown into metadata + content
-      source_content = File.read(@source_path)
-      metadata, body = parse_metadata_from(source_content)
+      # Use already parsed metadata and content
+      metadata = @metadata
+      body = @body
       
       # Transform Markdown links, taking output format into account
       body_with_rewritten_links = transform_markdown_links(body, &@transform_links)
@@ -188,20 +191,30 @@ module Mint
     end
     
     def metadata_chunk(text)
-      text.split(METADATA_DELIM).first
+      match = text.match(/\A---\n(.*?)\n---\n/m)
+      match ? match[1] : ""
     end
     
     def metadata_from(text)
-      raw_metadata = YAML.load(metadata_chunk(text))
-      
+      chunk = metadata_chunk(text)
+      return {} if chunk.empty?
+
+      raw_metadata = YAML.safe_load(chunk)
+
       case raw_metadata
       when String, false, nil
         {}
+      when Hash
+        raw_metadata.transform_keys do |key|
+          key.to_s.downcase.gsub(/\s+/, '_').to_sym
+        end
       else
-        raw_metadata
+        {}
       end
-    rescue Psych::SyntaxError, Exception
-      {}
+    rescue Psych::SyntaxError => e
+      raise "Invalid YAML in front matter: #{e.message}"
+    rescue Exception => e
+      raise "Error parsing front matter: #{e.message}"
     end
 
     # Renders a stylesheet tag (either <style> or <link>) based on the style mode
@@ -255,26 +268,19 @@ module Mint
       end
     end
     
-    # Extracts title from Markdown file name
-    # 
-    # @param [Pathname] file_path path to Markdown file
-    # @return [String] extracted title
-    def guess_title
-      Helpers.extract_title_from_file(@source_path)
-    end
     
     # Parse YAML metadata from markdown content
-    # 
+    #
     # @param [String] text markdown content
     # @return [Array] array of [metadata_hash, content_without_metadata]
     def parse_metadata_from(text)
       metadata = metadata_from(text)
-      new_text = if !metadata.empty?
-        text.sub(metadata_chunk(text) + METADATA_DELIM, "")
+      new_text = if text.match(/\A---\n.*?\n---\n/m)
+        text.sub(/\A---\n.*?\n---\n/m, "")
       else
         text
       end
-      
+
       [metadata, new_text]
     end
   end
