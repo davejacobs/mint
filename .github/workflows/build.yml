@@ -46,7 +46,7 @@ jobs:
     # - name: Publish documentation with Mint
     #   if: github.ref == 'refs/heads/master' && github.event_name == 'push'
     #   run: |
-    #     bundle exec bin/mint publish doc/*.md --destination _site --template basic --navigation
+    #     bundle exec bin/mint doc/*.md --destination _site --template basic --opt navigation
     
     # - name: Setup Pages
     #   if: github.ref == 'refs/heads/master' && github.event_name == 'push'
