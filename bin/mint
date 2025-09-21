@@ -2,7 +2,5 @@
 
 # Override any local installations of Mint
 $LOAD_PATH.unshift File.expand_path('../lib', __dir__)
-
 require "mint"
-
 Mint::Commandline.run!(ARGV)
