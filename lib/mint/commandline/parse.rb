@@ -133,9 +133,10 @@ module Mint
           raise ArgumentError, "--output-file - can only be used with a single file or STDIN"
         end
 
+        # TODO: Make this duplicate defaulting unnecessary; defaults should only happen in one place (Config)
         style_mode = commandline_options[:style_mode] || Config::DEFAULT_STYLE_MODE
-        unless [:inline, :original].include?(style_mode)
-          raise ArgumentError, "--output-file - can only be used with --style-mode inline or --style-mode original"
+        unless style_mode == :inline
+          raise ArgumentError, "--output-file - can only be used with --style-mode inline"
         end
       end
       

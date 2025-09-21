@@ -239,16 +239,16 @@ RSpec.describe "CLI Argument Parsing" do
         }.not_to raise_error
       end
 
-      it "allows --output-file - with --style-mode original" do
+      it "rejects --output-file - with --style-mode original" do
         expect {
           Mint::Commandline.parse!(["--output-file", "-", "--style-mode", "original", "file.md"])
-        }.not_to raise_error
+        }.to raise_error(ArgumentError, "--output-file - can only be used with --style-mode inline")
       end
 
       it "rejects --output-file - with --style-mode external" do
         expect {
           Mint::Commandline.parse!(["--output-file", "-", "--style-mode", "external", "file.md"])
-        }.to raise_error(ArgumentError, "--output-file - can only be used with --style-mode inline or --style-mode original")
+        }.to raise_error(ArgumentError, "--output-file - can only be used with --style-mode inline")
       end
     end
 
