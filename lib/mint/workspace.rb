@@ -11,38 +11,29 @@ module Mint
       @config = config
       @documents = []
       
-      # 1. Create destination_html_paths, mapped 1:1 with markdown_paths,
-      #    and autodropping any directories that are common to all files,
-      #    if config.autodrop is on.
-      # 2. Zip markdown_paths and destination_html_paths together so they
-      #    are paired
-      # 3. For each pair, create a document with the source and destination
-      #    paths, and create navigation tree JSON that's relative to
-      #    the specific document at hand
-      #
-      # NOTE: All directories at this stage are relative so that they can be
+      # NOTE: All paths at this stage are relative so that they can be
       # concatenated and manipulated. The working directory is passed into
       # the Document, which is where it's used to calculate its actual
-      # absolute destination.
+      # absolute destination, just in time.
       
-      autodrop_levels = calculate_autodrop_levels_for(markdown_paths)
-      style_path = find_style_path(@config.style_name)
       layout_path = find_layout_path(@config.layout_name)
+      style_path = find_style_path(@config.style_name)
       style_destination_path = @config.destination_directory + @config.style_destination_directory
+      autodrop_levels = calculate_autodrop_levels_for(markdown_paths)
 
-      markdown_paths.each_with_index do |path, index|
-        destination_path = destination_path_for(path,
+      markdown_paths.each_with_index do |markdown_path, index|
+        destination_path = destination_path_for(markdown_path,
                                                 autodrop_levels: autodrop_levels,
                                                 preserve_structure: @config.preserve_structure,
                                                 output_file_format: @config.output_file_format)
 
         @documents << Document.new(
           working_directory: @config.working_directory,
-          source_path: path,
-          destination_path: destination_path,
-          destination_directory_path: @config.destination_directory,
+          source_path: markdown_path,
           layout_path: layout_path,
           style_path: style_path,
+          destination_path: destination_path,
+          destination_directory_path: @config.destination_directory,
           style_destination_path: style_destination_path,
           style_mode: @config.style_mode,
           stdout_mode: @config.stdout_mode,
@@ -54,7 +45,8 @@ module Mint
     end
     
     def publish!
-      # Pass all documents as navigation data - individual documents will decide whether to show navigation based on options
+      # Include list of all documents so that the layout can choose to display them
+      # in some form, if helpful
       @documents.map do |document|
         document.publish!(documents: @documents)
       end
@@ -145,7 +137,6 @@ module Mint
         end
       end
       
-      # Only drop if there's a meaningful common prefix and it leaves at least one level
       if common_prefix_length > 0 && path_parts.any? {|parts| parts.length > common_prefix_length }
         common_prefix_length
       else
@@ -153,14 +144,19 @@ module Mint
       end
     end
 
-    def destination_path_for(path, autodrop_levels:, preserve_structure:, output_file_format:)
+    # Generates a relative destination path based on the source path, taking into account
+    # an autodrop level (parent directories to remove), a structure preserving flag, and an output
+    # file format (which could be hardcoded or use substitutions).
+    # 
+    # This will the the final path of the generated file within the destination directory.
+    def destination_path_for(source_path, autodrop_levels:, preserve_structure:, output_file_format:)
       if preserve_structure
         # Keep directory structure, but apply autodrop if enabled and convert extension to HTML
-        dropped_path = Helpers.drop_pathname(path, autodrop_levels)
+        dropped_path = Helpers.drop_pathname(source_path, autodrop_levels)
         update_path_basename(dropped_path, new_extension: "html", format_string: output_file_format)
       else
         # Flatten all files directly into destination directory (no subdirectories)
-        Pathname.new(update_basename(path.basename, new_extension: "html", format_string: output_file_format))
+        Pathname.new(update_basename(source_path.basename, new_extension: "html", format_string: output_file_format))
       end
     end
   end

@@ -68,12 +68,8 @@ module Mint
         create_external_stylesheet
       end
     
-      # Use already parsed metadata and content
-      metadata = @metadata
-      body = @body
-      
       # Transform Markdown links, taking output format into account
-      body_with_rewritten_links = transform_markdown_links(body, &@transform_links)
+      body_with_rewritten_links = transform_markdown_links(@body, &@transform_links)
       
       # Render Markdown to HTML
       rendered_content = Renderers::Markdown.render(body_with_rewritten_links)
@@ -82,7 +78,7 @@ module Mint
       layout_variables = {
         working_directory: @working_directory,
         current_path: @source_path.to_s,
-        metadata: metadata,
+        metadata: @metadata,
         title: @title,
         content: rendered_content.html_safe,
         stylesheet_tag: render_stylesheet_tag(@style_path, @style_mode),
@@ -156,7 +152,7 @@ module Mint
     #   - :is_directory (Boolean) - true if this is a directory entry (optional key)
     def generate_document_tree(documents:)
       document_tree = DocumentTree.new(documents)
-      reoriented_tree = document_tree.reorient(@destination_path)
+      document_tree.reorient(@destination_path)
     end
 
     private
