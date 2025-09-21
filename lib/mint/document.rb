@@ -12,7 +12,7 @@ module Mint
   class Document
     METADATA_DELIM = "\n\n"
     
-    attr_reader :title, :destination_path, :source_path
+    attr_reader :title, :source_path, :destination_path
     
     # @param [Pathname] working_directory path by which relative links should be resolved
     # @param [Pathname] source_path path to markdown file (relative to working_directory)
