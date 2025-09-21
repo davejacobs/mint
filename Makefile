@@ -34,7 +34,7 @@ gallery:
 		find examples -name "*.md" -type f | while read -r md_file; do \
 			output_file=$${md_file%.md}-$$template_name.html; \
 			echo "  $$md_file -> $$output_file"; \
-			bin/mint publish "$$md_file" --template "$$template_name" --style-mode original --output-file "$$output_file"; \
+			bin/mint "$$md_file" --template "$$template_name" --style-mode original --output-file "$$output_file"; \
 		done; \
 	done
 	@echo "Gallery generation complete!"
