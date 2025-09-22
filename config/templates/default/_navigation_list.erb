@@ -2,8 +2,8 @@
   <ul>
     <% documents.each do |item| %>
       <%
-        # Respect navigation_depth option (default to 3)
-        max_depth = options[:navigation_depth] || 3
+        # Respect navigation_depth option (default to 5)
+        max_depth = options[:navigation_depth] || 5
         item_depth = item[:depth] || 0
         next if item_depth >= max_depth
       %>
@@ -39,7 +39,7 @@
       <% else %>
         <li class="depth-<%= item_depth %>">
           <a href="<%= item[:html_path] %>"
-            class="<%= item[:source_path] == current_path ? 'current' : '' %>">
+            class="file-name <%= item[:source_path] == current_path ? 'current' : '' %>">
             <%= item[:title] %>
           </a>
         </li>
