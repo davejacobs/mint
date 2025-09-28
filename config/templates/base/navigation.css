@@ -31,7 +31,7 @@
 
   /* Navigation spacing and layout */
   --nav-padding: var(--space-sm);
-  --nav-link-padding: var(--space-xxs);
+  --nav-link-padding: var(--space-xxs) var(--space-lg);
   --nav-border-width: 2px;
   --nav-border-style: solid;
 }
@@ -44,10 +44,6 @@
   max-width: var(--navigation-width);
   height: 100vh;
   overflow-y: auto;
-  padding-top: calc(var(--nav-padding) * 2);
-  padding-bottom: calc(var(--nav-padding) * 2);
-  padding-left: calc(var(--nav-padding) * 0.75);
-  padding-right: calc(var(--nav-padding) * 2);
   z-index: var(--z-navigation);
   font-family: var(--nav-font-family);
   font-weight: var(--nav-font-weight);
@@ -58,10 +54,11 @@
 /* Navigation header */
 #navigation h3 {
   margin: 0 0 var(--space-sm) 0;
-  padding: 0 var(--space-sm);
+  padding: var(--space-sm);
   font-size: var(--nav-header-font-size);
   font-weight: var(--nav-header-font-weight);
   color: var(--color-nav-text);
+  border-bottom: 1px solid var(--color-nav-border);
 }
 
 #navigation h3 a {
@@ -90,7 +87,7 @@
 /* Navigation links layout */
 #navigation li a {
   display: block;
-  padding: var(--nav-link-padding) var(--nav-link-padding);
+  padding: var(--nav-link-padding);
   text-decoration: none;
   /*border-left: var(--nav-border-width) var(--nav-border-style) transparent;*/
   border-left-color: transparent;
@@ -100,23 +97,23 @@
   font-size: var(--nav-link-font-size);
 }
 
-#navigation li a:hover {
+#navigation li a:hover, #navigation li a.current {
   color: var(--color-nav-text-hover);
   background-color: var(--color-nav-bg-hover);
   border-left-color: var(--color-nav-border);
 }
 
 #navigation li a.current {
-  color: var(--color-nav-text-active);
-  background-color: var(--color-nav-bg-active);
-  border-left-color: var(--color-nav-border-active);
+  /* color: var(--color-nav-text-active); */
+  /* background-color: var(--color-nav-bg-active); */
+  /* border-left-color: var(--color-nav-border-active); */
   font-weight: var(--nav-link-active-font-weight);
 }
 
 /* Directory names (non-clickable) */
 #navigation .directory-name {
   display: block;
-  padding: var(--nav-link-padding) var(--nav-link-padding);
+  padding: var(--nav-link-padding);
   font-weight: var(--nav-directory-font-weight);
   color: var(--color-nav-directory-text);
   font-size: var(--nav-directory-font-size);

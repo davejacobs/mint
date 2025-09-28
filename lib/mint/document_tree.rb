@@ -40,54 +40,55 @@ module Mint
       flatten_nodes(@nodes, result, max_depth: max_depth)
       result
     end
-    
+
     private
-    
+
     def add_document(path, title, source_path = nil)
       parts = path.to_s.split('/').reject(&:empty?)
       current_nodes = @nodes
-      
+
       parts.each_with_index do |part, idx|
         # Find or create node for this part
         node = current_nodes.find {|n| n.name == part }
-        
+
         if node.nil?
           # Create new node
           path_so_far = Pathname.new(parts[0..idx].join('/'))
           is_file = (idx == parts.length - 1)
-          
+
           node = DocumentTreeNode.new(
             name: part,
-            pathname: path_so_far,
+            source_path: is_file ? source_path : nil,
+            destination_path: path_so_far,
             title: is_file ? title : part,
             depth: idx,
-            is_file: is_file,
-            source_path: is_file ? source_path : nil
+            is_file: is_file
           )
           current_nodes << node
         end
-        
+
         current_nodes = node.children
       end
     end
-    
+
     def sort_nodes!
       sort_nodes_recursive(@nodes)
     end
-    
+
     def sort_nodes_recursive(nodes)
       nodes.sort_by! {|node| [node.directory? ? 0 : 1, node.name] }
       nodes.each {|node| sort_nodes_recursive(node.children) }
     end
-    
+
     def reorient_nodes(nodes, reference_pathname)
       nodes.map do |node|
-        new_pathname = calculate_relative_path(node.pathname, reference_pathname)
+        new_destination_path = calculate_relative_path(node.destination_path, reference_pathname)
         new_children = reorient_nodes(node.children, reference_pathname)
-        
+
         DocumentTreeNode.new(
           name: node.name,
-          pathname: new_pathname,
+          source_path: node.source_path,
+          destination_path: new_destination_path,
           title: node.title,
           depth: node.depth,
           is_file: node.file?
@@ -104,8 +105,8 @@ module Mint
         if node.file?
           result << {
             title: node.title,
-            html_path: node.pathname.to_s,
-            source_path: node.pathname.to_s,
+            html_path: node.destination_path.to_s,
+            source_path: node.source_path.to_s,
             depth: depth
           }
         else
@@ -142,15 +143,15 @@ module Mint
   end
 
   class DocumentTreeNode
-    attr_reader :name, :pathname, :title, :children, :depth, :source_path
-    
-    def initialize(name:, pathname:, title:, depth: 0, is_file: false, source_path: nil)
+    attr_reader :name, :title, :children, :depth, :source_path, :destination_path
+
+    def initialize(name:, source_path:, destination_path:, title:, depth: 0, is_file: false)
       @name = name
-      @pathname = pathname
+      @source_path = source_path
+      @destination_path = destination_path
       @title = title
       @depth = depth
       @is_file = is_file
-      @source_path = source_path
       @children = []
     end
     

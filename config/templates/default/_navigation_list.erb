@@ -20,9 +20,6 @@
                 <% if child[:is_directory] %>
                   <li class="depth-<%= child_depth %> directory">
                     <span class="directory-name"><%= child[:title] %></span>
-                    <% if child[:children] && child[:children].any? %>
-                      <%= render 'navigation_list', documents: child[:children] %>
-                    <% end %>
                   </li>
                 <% else %>
                   <li class="depth-<%= child_depth %>">

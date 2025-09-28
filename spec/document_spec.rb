@@ -16,6 +16,7 @@ module Mint
       let(:document) do
         Document.new(
           working_directory: Pathname.new(@test_dir),
+          autodrop_prefix_path: Pathname.new("."),
           source_path: Pathname.new("test.md"),
           destination_path: Pathname.new("test.html"),
           destination_directory_path: Pathname.new("output"),
@@ -67,6 +68,7 @@ module Mint
       let(:document) do
         Document.new(
           working_directory: Pathname.new(@test_dir),
+          autodrop_prefix_path: Pathname.new("."),
           source_path: Pathname.new("test.md"),
           destination_path: Pathname.new("test.html"),
           destination_directory_path: Pathname.new("output"),

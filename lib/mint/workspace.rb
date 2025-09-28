@@ -20,6 +20,7 @@ module Mint
       style_path = find_style_path(@config.style_name)
       style_destination_path = @config.destination_directory + @config.style_destination_directory
       autodrop_levels = calculate_autodrop_levels_for(markdown_paths)
+      autodrop_prefix_path = calculate_autodrop_prefix_for(markdown_paths)
 
       markdown_paths.each_with_index do |markdown_path, index|
         destination_path = destination_path_for(markdown_path,
@@ -29,7 +30,8 @@ module Mint
 
         @documents << Document.new(
           working_directory: @config.working_directory,
-          source_path: markdown_path,
+          autodrop_prefix_path: autodrop_prefix_path,
+          source_path: markdown_path.relative_path_from(autodrop_prefix_path),
           layout_path: layout_path,
           style_path: style_path,
           destination_path: destination_path,
@@ -43,7 +45,38 @@ module Mint
         )
       end
     end
-    
+
+    # Calculates the autodrop prefix path - the common parent directory path
+    # that should be removed from all source paths
+    def calculate_autodrop_prefix_for(markdown_paths)
+      return Pathname.new('.') unless @config.autodrop
+      return Pathname.new('.') if markdown_paths.length <= 1
+
+      # Find common parent directories by splitting paths and finding common prefix
+      path_parts = markdown_paths.map {|path| path.to_s.split('/').reject(&:empty?) }
+      return Pathname.new('.') if path_parts.empty?
+
+      # Find the minimum length to avoid index errors
+      min_length = path_parts.map(&:length).min
+      return Pathname.new('.') if min_length == 0
+
+      # Find common prefix parts
+      common_prefix_parts = []
+      (0...min_length).each do |i|
+        if path_parts.all? {|parts| parts[i] == path_parts.first[i] }
+          common_prefix_parts << path_parts.first[i]
+        else
+          break
+        end
+      end
+
+      if common_prefix_parts.any? && path_parts.any? {|parts| parts.length > common_prefix_parts.length }
+        Pathname.new(common_prefix_parts.join('/'))
+      else
+        Pathname.new('.')
+      end
+    end
+
     def publish!
       # Include list of all documents so that the layout can choose to display them
       # in some form, if helpful

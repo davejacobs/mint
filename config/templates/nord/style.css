@@ -67,6 +67,8 @@
   
   /* Navigation typography - using parameterized system */
   --nav-font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --nav-link-font-size: var(--font-size-sm);
+  --nav-directory-font-size: var(--font-size-sm);
   --nav-header-font-weight: 600;
   --nav-directory-font-weight: 600;
   

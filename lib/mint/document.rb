@@ -25,19 +25,21 @@ module Mint
     # @param [Proc] transform_links proc to transform link basenames; yields the basename of the link
     # @param [Boolean] render_style whether to render style
     # @param [Hash] options custom options to pass to layout templates
-    def initialize(working_directory:,
+    def initialize(working_directory: Pathname.new('.'),
+                   autodrop_prefix_path: Pathname.new('.'),
                    source_path:,
                    destination_path:,
-                   destination_directory_path:,
+                   destination_directory_path: Pathname.new('.'),
                    layout_path:,
                    style_path:,
-                   style_destination_path:,
+                   style_destination_path: Pathname.new('.'),
                    style_mode:,
                    stdout_mode: false,
                    transform_links: Proc.new,
                    render_style: true,
                    options: {})
       @working_directory = working_directory
+      @autodrop_prefix_path = autodrop_prefix_path
       @source_path = source_path
       @destination_path = destination_path
       @destination_directory_path = destination_directory_path
@@ -50,7 +52,9 @@ module Mint
       @render_style = render_style
       @options = options
 
-      source_content = File.read(@source_path)
+      # Use the full path for reading the file
+      full_source_path = @autodrop_prefix_path + @source_path
+      source_content = File.read(full_source_path)
       @metadata, @body = parse_metadata_from(source_content)
       @title = Helpers.guess_title(@source_path, @body, @metadata)
     end
