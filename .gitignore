@@ -8,3 +8,4 @@ examples/**/*.html
 tmp/*
 Gemfile.lock
 NOTES.md
+ROADMAP.md
