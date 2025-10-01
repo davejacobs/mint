@@ -1,0 +1,44 @@
+body {
+  margin: 0;
+  padding: 0;
+}
+
+/* This seems to be required by Kobo */
+p, div, span, blockquote, pre, code, li, dt, dd, td, th, caption, figcaption, q sub, sup {
+  font-size: 0.68em !important;
+  line-height: 1.4;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 1em 0 0.5em 0;
+  line-height: 1.45;
+}
+
+h1 {
+  font-size: 1.2em; 
+}
+
+h2 {
+  font-size: 1em; 
+}
+
+h3 {
+  font-size: 0.8em; 
+}
+
+h4 {
+  font-size: 0.75em;
+}
+
+h5, h6 {
+  font-size: 0.68em;
+}
+
+p {
+  margin: 0 0 1em 0;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
