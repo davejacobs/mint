@@ -6,6 +6,7 @@
 *.html
 examples/**/*.html
 tmp/*
+dist
 Gemfile.lock
 NOTES.md
 ROADMAP.md
