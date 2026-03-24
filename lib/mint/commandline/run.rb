@@ -1,6 +1,7 @@
 require "tempfile"
 
 require_relative "../commandline/parse"
+require_relative "../commandline/serve"
 require_relative "../config"
 require_relative "../workspace"
 
@@ -14,7 +15,11 @@ module Mint
         exit 0
       else
         begin
-          publish!(files, config: config)
+          if config.serve_mode
+            serve!(files, config: config)
+          else
+            publish!(files, config: config)
+          end
         rescue ArgumentError => e
           $stderr.puts "Error: #{e.message}"
           exit 1

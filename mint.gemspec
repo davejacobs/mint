@@ -17,6 +17,7 @@ Gem::Specification.new do |s|
   s.files = Dir["{bin,config,lib,man}/**/*"] + [ "README.md", "Gemfile", "LICENSE" ]
   s.test_files = Dir["{features,spec}/**/*"]
   
+  s.add_dependency "webrick", "~> 1.8"
   s.add_dependency "redcarpet", "~> 3.6", ">= 3.6.1"
   s.add_dependency "sass-embedded", "~> 1.89", ">= 1.89.2"
   s.add_dependency "toml", "~> 0.3"

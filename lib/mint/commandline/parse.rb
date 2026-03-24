@@ -26,6 +26,14 @@ module Mint
           commandline_options[:verbose] = true
         end
 
+        cli.on "--serve", "Publish files and serve them on a local HTTP server" do
+          commandline_options[:serve_mode] = true
+        end
+
+        cli.on "--serve-port PORT", Integer, "Port for the local server (default: 4000)" do |port|
+          commandline_options[:serve_port] = port
+        end
+
         cli.on "-t", "--template TEMPLATE", "Specify a template by name (default: default)" do |t|
           commandline_options[:layout_name] = t
           commandline_options[:style_name] = t
