@@ -11,6 +11,12 @@ Mint transforms your plain text documents into beautiful documents. It makes tha
 .BR \-h ", " \-\-help
 Show mint usage information
 .TP
+.BR \-\-serve
+Publish files to a temporary directory and serve them on a local HTTP server. The server strips \fI.html\fR extensions from URLs so that \fI/document\fR serves \fIdocument.html\fR. The temporary directory is deleted when the server is stopped. This option forces inline style mode so that CSS is always self-contained.
+.TP
+.BR \-\-serve\-port " " \fIPORT\fR
+Port for the local server started by \fB--serve\fR. Default is 4000.
+.TP
 .BR \-d ", " \-\-destination " " \fIDIRECTORY\fR
 Specify a destination directory
 .TP
@@ -101,6 +107,16 @@ mint Document.md --opt navigation-depth=4
 .fi
 .RE
 .SH EXAMPLES
+.TP
+Preview a document in the browser:
+.nf
+mint Document.md --serve
+.fi
+.TP
+Preview on a specific port:
+.nf
+mint Document.md --serve --serve-port 8080
+.fi
 .TP
 Transform a single Markdown file:
 .nf

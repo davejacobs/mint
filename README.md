@@ -7,11 +7,11 @@ Transform your plain text documents into beautiful HTML documents with customiza
 ## Why Mint?
 
 - **Focus on writing** – Keep documents as plain text
-- **Beautiful output** – Professional-looking HTML ready for print or web
-- **Digital gardens** – Easily publish linked sets of HTML documents from tools like Obsidian
+- **Beautiful output by default** – Professional-looking HTML ready for print or web
+- **Customizable** – Create your own templates and styles
 - **Version control-friendly** – Text documents work great with Git
 - **Scriptable** – Automate document processing and analysis
-- **Highly customizable** – Create your own templates and styles
+- **Native support for digital gardens** – Easily publish linked sets of HTML documents from tools like Obsidian
 
 ## Installation
 
@@ -42,6 +42,12 @@ same thing.
 ### Basic commands
 
 ```bash
+# Preview a document in the browser on a local server
+mint Document.md --serve
+
+# Preview on a specific port
+mint Document.md --serve --serve-port 8080
+
 # Publish a single document with a default template
 mint Document.md
 
@@ -73,6 +79,8 @@ mint content/**/*.md --destination public --no-preserve-structure
 
 | Flag | Description |
 |------|-------------|
+| `--serve` | Publish files and preview them on a local HTTP server |
+| `--serve-port PORT` | Port for the local server (default: 4000) |
 | `-t, --template TEMPLATE` | Use a built-in template (combines layout + style) |
 | `-l, --layout LAYOUT` | Specify only the template layout, by name |
 | `-s, --style STYLE` | Specify only the template style, by name |
@@ -158,14 +166,6 @@ Mint offers three ways to include styles in your HTML output:
 The `original` mode is particularly useful for template development, as it allows you to edit CSS
 files and see changes immediately without republishing. In this mode, `@import` statements in CSS
 files will be included as additional `<link>` tags.
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Run the tests: `rspec`
-5. Submit a pull request
 
 ## License
 
