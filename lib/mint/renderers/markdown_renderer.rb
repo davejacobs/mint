@@ -32,6 +32,7 @@ module Mint
           space_after_headers: true,
           underline: true,
           # Additional options
+          lax_spacing: true,
           # lax_html_blocks: false,
           # disable_indented_code_blocks: false
           }.merge(markdown_options)
