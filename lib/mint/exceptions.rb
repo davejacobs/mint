@@ -1,4 +1,4 @@
 module Mint
-  class LayoutNotFoundException < Exception; end
-  class StyleNotFoundException < Exception; end
+  class LayoutNotFoundException < StandardError; end
+  class StyleNotFoundException < StandardError; end
 end

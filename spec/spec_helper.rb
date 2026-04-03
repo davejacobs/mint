@@ -32,6 +32,17 @@ RSpec.configure do |config|
     FileUtils.rm_r @tmp_dir
   end
 
+  config.before(:each) do
+    allow(Mint).to receive(:configuration) do
+      [Mint::LOCAL_SCOPE, Mint::GLOBAL_SCOPE].
+        reverse.
+        map {|p| p + Mint::CONFIG_FILE }.
+        select(&:exist?).
+        map {|p| Mint::Config.load_file(p) }.
+        reduce(Mint::Config.defaults) {|agg, cfg| agg.merge(cfg) }
+    end
+  end
+
   config.after(:each) do
     ["content.html", ".mint/config.toml"].map {|file| Pathname.new file }.
       select(&:exist?).

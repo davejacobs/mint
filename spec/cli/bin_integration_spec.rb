@@ -12,10 +12,18 @@ RSpec.describe "Bin Script Integration" do
           # Copy bin scripts to test directory for isolation
           FileUtils.cp_r("#{project_root}/bin", ".")
           FileUtils.cp_r("#{project_root}/lib", ".")
-          
+
           # Make sure bin script is executable
           FileUtils.chmod(0755, "bin/mint")
-          example.run
+
+          # Override HOME so the subprocess doesn't pick up user-scope config
+          old_home = ENV['HOME']
+          ENV['HOME'] = dir
+          begin
+            example.run
+          ensure
+            ENV['HOME'] = old_home
+          end
         end
       end
 

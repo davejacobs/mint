@@ -404,17 +404,19 @@ RSpec.describe "Config File Integration" do
       end
 
       it "local config overrides user config" do
+        allow(Mint).to receive(:configuration).and_call_original
+
         File.write(File.expand_path("~/.config/mint/config.toml"), <<~TOML)
           template = "user"
           destination = "user-dest"
         TOML
-        
+
         File.write(".mint/config.toml", <<~TOML)
           template = "local"
         TOML
 
         config, files, help = Mint::Commandline.parse!(["test.md"])
-        
+
         expect(config.layout_name).to eq("local") # local overrides user
         expect(config.destination_directory).to eq(Pathname.new("user-dest")) # user config still applies for non-overridden values
       end
