@@ -6,12 +6,14 @@ Transform your plain text documents into beautiful HTML documents with customiza
 
 ## Why Mint?
 
-- **Focus on writing** – Keep documents as plain text
-- **Beautiful output by default** – Professional-looking HTML ready for print or web
-- **Customizable** – Create your own templates and styles
-- **Version control-friendly** – Text documents work great with Git
-- **Scriptable** – Automate document processing and analysis
-- **Native support for digital gardens** – Easily publish linked sets of HTML documents from tools like Obsidian
+Mint lets you create and edit your documents in plain text, which has tons of benefits. A few of my favorites:
+
+- Focus on the text, not the style, until you're ready to preview or publish
+- Tailor your final design to your heart's content with custom templates
+- Store your document history in Git
+- Automate document processing and analysis through scripts
+
+Mint also makes it easy to publish cross-linked collections of documents as a single page without a full-blown static site generator.
 
 ## Installation
 
