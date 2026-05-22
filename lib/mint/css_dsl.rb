@@ -63,15 +63,9 @@ module Mint
     def self.parse(style)
       css = style.map {|k,v| stylify(k, v) }.join("\n  ")
       container_scope = "##{CONTAINER}\n  #{css.strip}\n"
-      
-      # Suppress warnings by capturing $stderr
-      original_stderr = $stderr
-      $stderr = StringIO.new
-      
-      result = Sass.compile_string(container_scope, syntax: :indented)
+
+      result = Sass.compile_string(container_scope, syntax: :indented, logger: Sass::Logger.silent)
       result.css
-    ensure
-      $stderr = original_stderr
     end
   end
 end
